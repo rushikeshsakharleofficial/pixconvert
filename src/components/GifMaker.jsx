@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import GIF from 'gif.js';
 import DropZone from './DropZone';
+import FolderUpload from './FolderUpload';
 
 const GIF_WORKER_URL = new URL('gif.js/dist/gif.worker.js', import.meta.url).href;
 
@@ -116,7 +117,13 @@ const GifMaker = () => {
 
   return (
     <div>
-      <DropZone onFiles={handleFiles} maxFiles={99999} label="Drop images to use as GIF frames" />
+      <div style={{ marginBottom: '1.5rem' }}>
+        <DropZone onFiles={handleFiles} maxFiles={99999} label="Drop images to use as GIF frames" />
+        <div style={{ textAlign: 'center', marginTop: '1rem' }}>
+          <p style={{ marginBottom: '0.5rem', color: 'var(--text2)', fontSize: '0.85rem' }}>— OR —</p>
+          <FolderUpload onFiles={handleFiles} />
+        </div>
+      </div>
       {frames.length > 0 && (
         <>
           <div className="frame-list">
