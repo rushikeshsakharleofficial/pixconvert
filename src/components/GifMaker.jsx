@@ -25,7 +25,7 @@ const GifMaker = () => {
 
   const handleFiles = async (files) => {
     const loaded = [];
-    for (const file of files.slice(0, 10)) {
+    for (const file of files) {
       const url = await new Promise((res, rej) => {
         const r = new FileReader();
         r.onload = () => res(r.result);
@@ -43,6 +43,27 @@ const GifMaker = () => {
     setFrames(f => f.filter((_, i) => i !== idx));
     setGifUrl(null);
   };
+
+  const handleDragStart = (e, idx) => {
+    e.dataTransfer.setData('text/plain', idx);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDrop = (e, dropIdx) => {
+    e.preventDefault();
+    const dragIdx = parseInt(e.dataTransfer.getData('text/plain'), 10);
+    if (dragIdx === dropIdx || isNaN(dragIdx)) return;
+    
+    setFrames(prev => {
+      const newFrames = [...prev];
+      const [dragged] = newFrames.splice(dragIdx, 1);
+      newFrames.splice(dropIdx, 0, dragged);
+      return newFrames;
+    });
+    setGifUrl(null);
+  };
+
+  const handleDragOver = (e) => e.preventDefault();
 
   const generateGif = async () => {
     if (frames.length < 2) return;
@@ -95,13 +116,21 @@ const GifMaker = () => {
 
   return (
     <div>
-      <DropZone onFiles={handleFiles} maxFiles={10} label="Drop 2–10 images as GIF frames" />
+      <DropZone onFiles={handleFiles} maxFiles={99999} label="Drop images to use as GIF frames" />
       {frames.length > 0 && (
         <>
           <div className="frame-list">
             {frames.map((f, i) => (
-              <div key={i} style={{ position: 'relative', display: 'inline-block' }}>
-                <img className="frame-thumb" src={f.url} alt={`Frame ${i + 1}`} />
+              <div 
+                key={i} 
+                draggable
+                onDragStart={(e) => handleDragStart(e, i)}
+                onDragOver={handleDragOver}
+                onDrop={(e) => handleDrop(e, i)}
+                style={{ position: 'relative', display: 'inline-block', cursor: 'grab' }}
+                title="Drag to reorder"
+              >
+                <img className="frame-thumb" src={f.url} alt={`Frame ${i + 1}`} style={{ pointerEvents: 'none' }} />
                 <button onClick={() => removeFrame(i)} style={{
                   position: 'absolute', top: -6, right: -6, width: 20, height: 20,
                   borderRadius: '50%', background: '#ef4444', color: '#fff',

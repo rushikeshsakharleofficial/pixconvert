@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 
-const DropZone = ({ onFiles, multiple = true, accept = 'image/*', maxFiles = 10, label }) => {
+const DropZone = ({ onFiles, multiple = true, accept = 'image/*', maxFiles = 99999, label }) => {
   const [dragOver, setDragOver] = useState(false);
   const inputRef = useRef();
 
@@ -23,7 +23,7 @@ const DropZone = ({ onFiles, multiple = true, accept = 'image/*', maxFiles = 10,
       <span className="icon-upload">📁</span>
       <p>{label || 'Drag & drop images here or click to browse'}</p>
       <p style={{ fontSize: '.8rem', marginTop: '.25rem', color: 'var(--text2)' }}>
-        {multiple ? `Up to ${maxFiles} files` : 'Single file'}
+        {multiple ? (maxFiles === 99999 ? 'Multiple files allowed' : `Up to ${maxFiles} files`) : 'Single file'}
       </p>
       <input ref={inputRef} type="file" accept={accept} multiple={multiple}
         onChange={e => { handleFiles(e.target.files); e.target.value = ''; }} />

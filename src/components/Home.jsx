@@ -23,7 +23,7 @@ const Home = () => (
             <div className="icon">{f.icon}</div>
             <h3>{f.title}</h3>
             <p>{f.desc}</p>
-            <Link to="/tools" state={{ tab: f.link }} className="btn btn-outline btn-sm" style={{ marginTop: '1rem' }}>
+            <Link to={`/tools/${f.link}`} className="btn btn-outline btn-sm" style={{ marginTop: '1rem' }}>
               Try It →
             </Link>
           </div>

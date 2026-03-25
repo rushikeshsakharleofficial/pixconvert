@@ -53,24 +53,139 @@ const drawToCanvas = (img, fmt, resizeW, resizeH) => {
   return canvas;
 };
 
+const FilePreviewRow = ({ file, config, onChangeConfig }) => {
+  const [preview, setPreview] = useState(null);
+  const [isRendering, setIsRendering] = useState(false);
+  const imgCache = useRef(null);
+  const debounceRef = useRef(null);
+
+  const { outputFormat, quality, resizeEnabled, resizeW, resizeH } = config;
+  const showsQuality = !noQualityFormats.includes(outputFormat);
+
+  const renderPreview = useCallback(async () => {
+    setIsRendering(true);
+    try {
+      if (!imgCache.current) {
+        let src;
+        if (isHeic(file)) {
+          const pngBlob = await heic2any({ blob: file, toType: 'image/png', quality: 1 });
+          src = URL.createObjectURL(Array.isArray(pngBlob) ? pngBlob[0] : pngBlob);
+        } else {
+          src = await readFile(file);
+        }
+        imgCache.current = await loadImg(src);
+      }
+      const rw = resizeEnabled ? resizeW : null;
+      const rh = resizeEnabled ? resizeH : null;
+      const canvas = drawToCanvas(imgCache.current, outputFormat, rw, rh);
+      const q = noQualityFormats.includes(outputFormat) ? undefined : quality / 100;
+      let blob = await new Promise(res => canvas.toBlob(res, outputFormat, q));
+      if (!blob) blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
+      
+      setPreview(prev => {
+        if (prev?.src?.startsWith('blob:')) URL.revokeObjectURL(prev.src);
+        return { src: URL.createObjectURL(blob), size: blob.size, origSize: file.size };
+      });
+    } catch { 
+       // silently skip err
+    } finally {
+      setIsRendering(false);
+    }
+  }, [file, outputFormat, quality, resizeEnabled, resizeW, resizeH]);
+
+  useEffect(() => {
+    clearTimeout(debounceRef.current);
+    // stagger the preview rendering for performance using slight random jitter
+    debounceRef.current = setTimeout(() => {
+      renderPreview();
+    }, 300 + Math.random() * 300);
+    return () => clearTimeout(debounceRef.current);
+  }, [renderPreview]);
+
+  useEffect(() => {
+    return () => { if (preview?.src?.startsWith('blob:')) URL.revokeObjectURL(preview.src); };
+  }, [preview]);
+
+  return (
+    <div className="preview-card" style={{ display: 'flex', flexDirection: 'column', padding: '1.25rem', marginBottom: '1rem', background: 'var(--glass)', borderRadius: '12px', border: '1px solid var(--border)' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '1rem' }}>
+        <h4 style={{ margin: 0, textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', maxWidth: '30%', minWidth: '150px' }} title={file.name}>{file.name}</h4>
+        
+        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center', fontSize: '0.85rem' }}>
+          <select value={outputFormat} onChange={e => onChangeConfig({ outputFormat: e.target.value })} style={{ padding: '0.25rem 0.5rem', borderRadius: '4px', border: '1px solid var(--border)', background: 'var(--bg)', color: 'var(--text)' }}>
+            {formats.map(f => <option key={f.value} value={f.value}>{f.label}</option>)}
+          </select>
+          {showsQuality && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <input type="range" min="1" max="100" value={quality}
+                onChange={e => onChangeConfig({ quality: +e.target.value })}
+                style={{ width: '80px', accentColor: 'var(--teal)' }} title="Quality" />
+              <span style={{ minWidth: '32px' }}>{quality}%</span>
+            </div>
+          )}
+          <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+            <input type="checkbox" checked={resizeEnabled} onChange={e => onChangeConfig({ resizeEnabled: e.target.checked })} style={{ accentColor: 'var(--teal)' }} />
+            Resize
+          </label>
+          {resizeEnabled && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+              <input type="number" min="1" max="8000" value={resizeW} onChange={e => onChangeConfig({ resizeW: +e.target.value })} style={{ width: '60px', padding: '0.25rem', borderRadius: '4px', border: '1px solid var(--border)', background: 'var(--bg)', color: 'var(--text)' }} title="Width" />
+              <span>×</span>
+              <input type="number" min="1" max="8000" value={resizeH} onChange={e => onChangeConfig({ resizeH: +e.target.value })} style={{ width: '60px', padding: '0.25rem', borderRadius: '4px', border: '1px solid var(--border)', background: 'var(--bg)', color: 'var(--text)' }} title="Height" />
+            </div>
+          )}
+        </div>
+      </div>
+      
+      <div className="live-preview-images" style={{ marginTop: '0', background: 'transparent', padding: '0', border: 'none' }}>
+        <div className="live-preview-img-wrap">
+          <span className="live-preview-tag">Original</span>
+          {imgCache.current && <img src={imgCache.current.src} alt="Original" style={{ maxHeight: '120px', borderRadius: '8px' }} />}
+          <span className="live-preview-size">{formatSize(file.size)}</span>
+        </div>
+        <div className="live-preview-arrow">→</div>
+        <div className="live-preview-img-wrap">
+          <span className="live-preview-tag output">
+            {formats.find(f => f.value === outputFormat)?.label}
+          </span>
+          {preview ? (
+            <>
+              <img src={preview.src} alt="Preview" style={{ maxHeight: '120px', borderRadius: '8px' }} />
+              <span className="live-preview-size" style={{ color: preview.size < preview.origSize ? 'var(--teal)' : '#f87171' }}>
+                {formatSize(preview.size)} ({preview.size < preview.origSize
+                  ? `-${Math.round((1 - preview.size / preview.origSize) * 100)}%`
+                  : `+${Math.round((preview.size / preview.origSize - 1) * 100)}%`})
+              </span>
+            </>
+          ) : (
+            <div style={{ height: '120px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text2)', borderRadius: '8px', border: '1px dashed var(--border)', padding: '1rem' }}>
+              {isRendering ? 'Rendering…' : 'Waiting…'}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const UniversalConverter = () => {
   const [files, setFiles] = useState([]);
+  
+  // Global baseline controls
   const [outputFormat, setOutputFormat] = useState('image/jpeg');
   const [quality, setQuality] = useState(92);
   const [resizeEnabled, setResizeEnabled] = useState(false);
   const [resizeW, setResizeW] = useState(512);
   const [resizeH, setResizeH] = useState(512);
+
+  // Per-file configurations
+  const [fileConfigs, setFileConfigs] = useState([]);
+
   const [results, setResults] = useState([]);
   const [processing, setProcessing] = useState(false);
   const [zipping, setZipping] = useState(false);
   const [progressStage, setProgressStage] = useState('');
   const [progressValue, setProgressValue] = useState(0);
-
-  // Live preview state (first file only)
-  const [livePreview, setLivePreview] = useState(null);
-  const liveDebounce = useRef(null);
-  const cachedImg = useRef(null);
-  const cachedFile = useRef(null);
 
   useEffect(() => {
     return () => {
@@ -81,58 +196,34 @@ const UniversalConverter = () => {
     };
   }, [results]);
 
-  useEffect(() => {
-    return () => { if (livePreview?.src?.startsWith('blob:')) URL.revokeObjectURL(livePreview.src); };
-  }, [livePreview]);
+  const handleFiles = (newFiles) => {
+    setFiles(newFiles);
+    setResults([]);
+    // Setup initial per-file configs using global settings
+    setFileConfigs(newFiles.map(() => ({
+      outputFormat, quality, resizeEnabled, resizeW, resizeH
+    })));
+  };
 
-  const renderLivePreview = useCallback(async (file, fmt, q, w, h) => {
-    try {
-      if (cachedFile.current !== file) {
-        let src;
-        if (isHeic(file)) {
-          const pngBlob = await heic2any({ blob: file, toType: 'image/png', quality: 1 });
-          src = URL.createObjectURL(Array.isArray(pngBlob) ? pngBlob[0] : pngBlob);
-        } else {
-          src = await readFile(file);
-        }
-        cachedImg.current = await loadImg(src);
-        cachedFile.current = file;
-      }
-      const canvas = drawToCanvas(cachedImg.current, fmt, w, h);
-      const qualityArg = noQualityFormats.includes(fmt) ? undefined : q / 100;
-      let blob = await new Promise(res => canvas.toBlob(res, fmt, qualityArg));
-      if (!blob) blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
-      setLivePreview(prev => {
-        if (prev?.src?.startsWith('blob:')) URL.revokeObjectURL(prev.src);
-        return { src: URL.createObjectURL(blob), size: blob.size, origSize: file.size };
-      });
-    } catch { /* skip */ }
-  }, []);
-
-  useEffect(() => {
-    if (!files.length) { setLivePreview(null); return; }
-    clearTimeout(liveDebounce.current);
-    liveDebounce.current = setTimeout(
-      () => renderLivePreview(files[0], outputFormat, quality, resizeEnabled ? resizeW : null, resizeEnabled ? resizeH : null),
-      300
-    );
-    return () => clearTimeout(liveDebounce.current);
-  }, [files, outputFormat, quality, resizeW, resizeH, resizeEnabled, renderLivePreview]);
-
-  const getExt = () => (formats.find(f => f.value === outputFormat) || { ext: 'png' }).ext;
-  const handleFiles = (newFiles) => { setFiles(newFiles); setResults([]); cachedFile.current = null; };
+  const applyToAll = () => {
+    setFileConfigs(files.map(() => ({
+      outputFormat, quality, resizeEnabled, resizeW, resizeH
+    })));
+  };
 
   const convertAll = async () => {
     setProcessing(true);
     setProgressStage('Converting…');
     setProgressValue(0);
-    const rw = resizeEnabled ? resizeW : null;
-    const rh = resizeEnabled ? resizeH : null;
     const out = [];
     const fd = new FormData();
 
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
+      const cfg = fileConfigs[i] || { outputFormat, quality, resizeEnabled, resizeW, resizeH };
+      const rw = cfg.resizeEnabled ? cfg.resizeW : null;
+      const rh = cfg.resizeEnabled ? cfg.resizeH : null;
+
       try {
         let url;
         if (isHeic(file)) {
@@ -142,35 +233,54 @@ const UniversalConverter = () => {
           url = await readFile(file);
         }
         const img = await loadImg(url);
-        const canvas = drawToCanvas(img, outputFormat, rw, rh);
-        const q = noQualityFormats.includes(outputFormat) ? undefined : quality / 100;
-        let blob = await new Promise(res => canvas.toBlob(res, outputFormat, q));
+        const canvas = drawToCanvas(img, cfg.outputFormat, rw, rh);
+        const q = noQualityFormats.includes(cfg.outputFormat) ? undefined : cfg.quality / 100;
+        let blob = await new Promise(res => canvas.toBlob(res, cfg.outputFormat, q));
         if (!blob) blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
-        const name = file.name.replace(/\.[^.]+$/, '') + '.' + getExt();
+        
+        const ext = (formats.find(f => f.value === cfg.outputFormat) || { ext: 'png' }).ext;
+        const name = file.name.replace(/\.[^.]+$/, '') + '.' + ext;
         fd.append('files', blob, name);
-        out.push({ name, originalSize: file.size, newSize: blob.size, url: URL.createObjectURL(blob), previewUrl: url });
+        out.push({ blob, name, originalSize: file.size, newSize: blob.size, url: URL.createObjectURL(blob), previewUrl: url });
       } catch (err) {
         out.push({ name: file.name, error: err.message });
       }
       setProgressValue(Math.round(((i + 1) / files.length) * 100));
     }
 
-    // Auto-save all converted files to server via tracking XHR
+    // Auto-save all converted files to server via tracking XHR in batches of 10
     if (out.length > 0) {
       setProgressStage('Uploading…');
       setProgressValue(0);
-      try {
-        await new Promise((resolve, reject) => {
-          const xhr = new XMLHttpRequest();
-          xhr.open('POST', '/api/upload');
-          xhr.upload.onprogress = (e) => {
-            if (e.lengthComputable) setProgressValue(Math.round((e.loaded / e.total) * 100));
-          };
-          xhr.onload = () => resolve();
-          xhr.onerror = () => reject();
-          xhr.send(fd);
-        });
-      } catch { /* server unavailable — silently skip */ }
+      const BATCH_SIZE = 10;
+      let totalLoadedGlobal = 0;
+      const totalSizeGlobal = out.reduce((acc, current) => acc + current.blob.size, 0);
+
+      for (let i = 0; i < out.length; i += BATCH_SIZE) {
+        const batch = out.slice(i, i + BATCH_SIZE);
+        const batchSize = batch.reduce((acc, curr) => acc + curr.blob.size, 0);
+        const fdBatch = new FormData();
+        batch.forEach(f => fdBatch.append('files', f.blob, f.name));
+
+        try {
+          await new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '/api/upload');
+            xhr.upload.onprogress = (e) => {
+              if (e.lengthComputable && totalSizeGlobal > 0) {
+                const currentLoaded = totalLoadedGlobal + e.loaded;
+                setProgressValue(Math.round((currentLoaded / totalSizeGlobal) * 100));
+              }
+            };
+            xhr.onload = () => {
+              totalLoadedGlobal += batchSize;
+              resolve();
+            };
+            xhr.onerror = () => reject();
+            xhr.send(fdBatch);
+          });
+        } catch { /* silently skip server availability issues */ }
+      }
     }
 
     setResults(out);
@@ -223,73 +333,64 @@ const UniversalConverter = () => {
 
   return (
     <div>
-      <DropZone onFiles={handleFiles} maxFiles={100} accept="image/*,.heic,.heif"
+      <DropZone onFiles={handleFiles} maxFiles={99999} accept="image/*,.heic,.heif"
         label="Drop images to convert — supports PNG, JPG, WebP, HEIC, HEIF & more" />
       <FolderUpload onFiles={handleFiles} />
 
       {files.length > 0 && (
         <>
-          <div className="controls-row">
-            <label>Convert to:</label>
-            <select value={outputFormat} onChange={e => { setOutputFormat(e.target.value); setResults([]); }}>
-              {formats.map(f => <option key={f.value} value={f.value}>{f.label}</option>)}
-            </select>
+          <div className="controls-row" style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'center', background: 'var(--glass)', padding: '1rem', borderRadius: '8px', border: '1px solid var(--border)', marginBottom: '1.5rem' }}>
+            <div style={{ fontWeight: 600, color: 'var(--text)' }}>Global Settings:</div>
+            
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+              Format:
+              <select value={outputFormat} onChange={e => { setOutputFormat(e.target.value); setResults([]); }} style={{ padding: '0.25rem' }}>
+                {formats.map(f => <option key={f.value} value={f.value}>{f.label}</option>)}
+              </select>
+            </label>
+            
             {showsQuality && (
-              <>
-                <label>Quality:</label>
-                <div className="quality-control">
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                Quality:
+                <div className="quality-control" style={{ margin: 0 }}>
                   <input
                     type="range" min="1" max="100" value={quality}
                     onChange={e => setQuality(+e.target.value)}
-                    className="quality-slider"
-                    style={{ background: `linear-gradient(to right, var(--teal) 0%, var(--teal) ${quality}%, var(--border) ${quality}%, var(--border) 100%)` }}
+                    style={{ background: `linear-gradient(to right, var(--teal) 0%, var(--teal) ${quality}%, var(--border) ${quality}%, var(--border) 100%)`, width: '100px', accentColor: 'var(--teal)' }}
                   />
                   <input
                     type="number" min="1" max="100" value={quality}
                     onChange={e => setQuality(Math.max(1, Math.min(100, +e.target.value)))}
-                    className="quality-number"
+                    style={{ width: '50px', marginLeft: '0.5rem', padding: '0.25rem' }}
                   />
                   <span style={{ fontSize: '.85rem', color: 'var(--text2)' }}>%</span>
                 </div>
-              </>
+              </label>
             )}
-            <label className="resize-toggle-label">
-              <input
-                type="checkbox"
-                checked={resizeEnabled}
-                onChange={e => setResizeEnabled(e.target.checked)}
-                style={{ accentColor: 'var(--teal)', marginRight: '.35rem' }}
-              />
+            
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+              <input type="checkbox" checked={resizeEnabled} onChange={e => setResizeEnabled(e.target.checked)} style={{ accentColor: 'var(--teal)' }} />
               Resize
             </label>
+            
             {resizeEnabled && (
-              <>
-                <input
-                  type="number" min="1" max="8000" placeholder="W"
-                  value={resizeW}
-                  onChange={e => setResizeW(Math.max(1, Math.min(8000, +e.target.value)))}
-                  className="px-input" title="Width (px)"
-                />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                <input type="number" min="1" max="8000" placeholder="W" value={resizeW} onChange={e => setResizeW(Math.max(1, Math.min(8000, +e.target.value)))} style={{ width: '60px', padding: '0.25rem' }} title="Width (px)" />
                 <span style={{ fontSize: '.9rem', color: 'var(--text2)', fontWeight: 600 }}>×</span>
-                <input
-                  type="number" min="1" max="8000" placeholder="H"
-                  value={resizeH}
-                  onChange={e => setResizeH(Math.max(1, Math.min(8000, +e.target.value)))}
-                  className="px-input" title="Height (px)"
-                />
+                <input type="number" min="1" max="8000" placeholder="H" value={resizeH} onChange={e => setResizeH(Math.max(1, Math.min(8000, +e.target.value)))} style={{ width: '60px', padding: '0.25rem' }} title="Height (px)" />
                 <span style={{ fontSize: '.8rem', color: 'var(--text2)' }}>px</span>
-              </>
+              </div>
             )}
-            <button className="btn btn-primary btn-sm" onClick={convertAll} disabled={processing}>
+            
+            <div style={{ borderLeft: '1px solid var(--border)', height: '24px', margin: '0 0.5rem' }}></div>
+            
+            <button className="btn btn-outline btn-sm" onClick={applyToAll} style={{ padding: '0.5rem 1rem' }} title="Apply these settings to all listed images">
+              🔄 Apply to All
+            </button>
+            <button className="btn btn-primary btn-sm" onClick={convertAll} disabled={processing} style={{ marginLeft: 'auto', padding: '0.5rem 1rem' }}>
               {processing ? 'Converting…' : `Convert ${files.length} file${files.length > 1 ? 's' : ''}`}
             </button>
           </div>
-          {resizeEnabled && <p style={{ fontSize: '.8rem', color: 'var(--teal)', marginBottom: '.5rem' }}>
-            ↔ Output will be resized to {resizeW}×{resizeH}px
-          </p>}
-          <p style={{ color: 'var(--text2)', fontSize: '.85rem' }}>
-            {files.length} file{files.length > 1 ? 's' : ''} selected: {files.map(f => f.name).join(', ')}
-          </p>
 
           {progressStage && (
             <div className="progress-container fade-in visible" style={{ margin: '1rem 0', padding: '1rem', background: 'var(--glass)', borderRadius: '8px', border: '1px solid var(--border)' }}>
@@ -303,31 +404,21 @@ const UniversalConverter = () => {
             </div>
           )}
 
-          {livePreview && (
-            <div className="live-preview-panel">
-              <div className="live-preview-label">Live Preview{files.length > 1 ? ' (first image)' : ''}</div>
-              <div className="live-preview-images">
-                <div className="live-preview-img-wrap">
-                  <span className="live-preview-tag">Original</span>
-                  {cachedImg.current && <img src={cachedImg.current.src} alt="Original" />}
-                  <span className="live-preview-size">{formatSize(livePreview.origSize)}</span>
-                </div>
-                <div className="live-preview-arrow">→</div>
-                <div className="live-preview-img-wrap">
-                  <span className="live-preview-tag output">
-                    {formats.find(f => f.value === outputFormat)?.label}
-                    {showsQuality ? ` @ ${quality}%` : ''}
-                    {resizeEnabled ? ` · ${resizeW}×${resizeH}` : ''}
-                  </span>
-                  <img src={livePreview.src} alt="Preview" />
-                  <span className="live-preview-size" style={{ color: livePreview.size < livePreview.origSize ? 'var(--teal)' : '#f87171' }}>
-                    {formatSize(livePreview.size)}
-                    {' '}({livePreview.size < livePreview.origSize
-                      ? `-${Math.round((1 - livePreview.size / livePreview.origSize) * 100)}%`
-                      : `+${Math.round((livePreview.size / livePreview.origSize - 1) * 100)}%`})
-                  </span>
-                </div>
-              </div>
+          {/* Individual Image Previews */}
+          {results.length === 0 && (
+            <div style={{ marginTop: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0' }}>
+              {files.map((file, i) => (
+                <FilePreviewRow 
+                  key={`${file.name}-${i}`}
+                  file={file}
+                  config={fileConfigs[i] || { outputFormat, quality, resizeEnabled, resizeW, resizeH }}
+                  onChangeConfig={(newCfg) => {
+                    const next = [...fileConfigs];
+                    next[i] = { ...next[i], ...newCfg };
+                    setFileConfigs(next);
+                  }}
+                />
+              ))}
             </div>
           )}
         </>

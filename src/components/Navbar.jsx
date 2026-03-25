@@ -12,13 +12,26 @@ const Navbar = () => {
         PixConvert
       </Link>
       <ul className={`nav-links${menuOpen ? ' open' : ''}`}>
-        {[['/','Home'],['/tools','Tools'],['/about','About'],['/privacy','Privacy'],['/contact','Contact']].map(([path,label]) => (
-          <li key={path}>
-            <NavLink to={path} className={({ isActive }) => isActive ? 'active' : ''} onClick={closeMenu} end={path === '/'}>
-              {label}
-            </NavLink>
-          </li>
-        ))}
+        {[['/','Home'],['/tools','Tools'],['/about','About'],['/privacy','Privacy'],['/contact','Contact']].map(([path,label]) => {
+          if (label === 'Tools') {
+            return (
+              <li key={path} className="nav-dropdown">
+                <span className="nav-dropdown-trigger">Tools ▾</span>
+                <div className="nav-dropdown-menu">
+                  <NavLink to="/tools/converter" className={({ isActive }) => isActive ? 'active' : ''} onClick={closeMenu}>🔄 Universal Converter</NavLink>
+                  <NavLink to="/tools/gif" className={({ isActive }) => isActive ? 'active' : ''} onClick={closeMenu}>🎞️ GIF Maker</NavLink>
+                </div>
+              </li>
+            );
+          }
+          return (
+            <li key={path}>
+              <NavLink to={path} className={({ isActive }) => isActive ? 'active' : ''} onClick={closeMenu} end={path === '/'}>
+                {label}
+              </NavLink>
+            </li>
+          );
+        })}
       </ul>
       <button className={`hamburger${menuOpen ? ' open' : ''}`} onClick={() => setMenuOpen(!menuOpen)} aria-label="Menu">
         <span/><span/><span/>
