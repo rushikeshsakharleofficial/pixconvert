@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { PDFDocument } from 'pdf-lib';
+import { decryptPDF } from '@pdfsmaller/pdf-decrypt';
 import DropZone from './DropZone';
 
 const formatSize = (bytes) => {
@@ -37,13 +38,17 @@ const PdfUnlocker = () => {
 
     try {
       const arrayBuffer = await file.arrayBuffer();
-      const pdfDoc = await PDFDocument.load(arrayBuffer, { password, ignoreEncryption: false });
-      const pdfBytes = await pdfDoc.save();
-      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+      const pdfBytes = new Uint8Array(arrayBuffer);
+      
+      // Use the decryptPDF function from @pdfsmaller/pdf-decrypt
+      const decryptedBytes = await decryptPDF(pdfBytes, password);
+      
+      const blob = new Blob([decryptedBytes], { type: 'application/pdf' });
       
       setUnlockedUrl(URL.createObjectURL(blob));
       setUnlockedSize(blob.size);
     } catch (err) {
+      console.error(err);
       setError("Failed to unlock: " + (err.message || 'Incorrect password or invalid PDF.'));
     } finally {
       setIsProcessing(false);
@@ -63,7 +68,7 @@ const PdfUnlocker = () => {
       <DropZone onFiles={handleFiles} multiple={false} maxFiles={1} accept="application/pdf" label="Drop an encrypted PDF file here" />
       
       {file && !unlockedUrl && (
-        <div className="glass fade-in visible" style={{ marginTop: '1.5rem', padding: '1.5rem' }}>
+        <div className="glass fade-in visible" style={{ marginTop: '1rem', padding: '1.5rem' }}>
           <h3 style={{ fontFamily: 'var(--heading)', fontSize: '1.2rem', color: 'var(--text)', marginBottom: '1rem' }}>
             🔒 Unlock {file.name} ({formatSize(file.size)})
           </h3>
@@ -88,7 +93,7 @@ const PdfUnlocker = () => {
       )}
 
       {unlockedUrl && (
-        <div className="glass fade-in visible" style={{ marginTop: '1.5rem', textAlign: 'center' }}>
+        <div className="glass fade-in visible" style={{ marginTop: '1rem', textAlign: 'center' }}>
           <div className="icon" style={{ fontSize: '3rem', marginBottom: '1rem' }}>✅</div>
           <h3 style={{ fontFamily: 'var(--heading)', fontSize: '1.3rem', color: 'var(--text)', marginBottom: '0.5rem' }}>
             Successfully Unlocked!
