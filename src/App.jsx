@@ -42,6 +42,42 @@ const App = () => (
         <Route path="pdf-to-excel" element={<PdfToExcel />} />
         <Route path="pdf-to-pdf-a" element={<PdfToPdfA />} />
         
+        {/* Organize PDF */}
+        <Route path="merge-pdf" element={<ComingSoon />} />
+        <Route path="split-pdf" element={<ComingSoon />} />
+        <Route path="remove-pages" element={<ComingSoon />} />
+        <Route path="extract-pages" element={<ComingSoon />} />
+        <Route path="organize-pdf" element={<ComingSoon />} />
+        <Route path="scan-to-pdf" element={<ComingSoon />} />
+
+        {/* Optimize PDF */}
+        <Route path="compress-pdf" element={<ComingSoon />} />
+        <Route path="repair-pdf" element={<ComingSoon />} />
+        <Route path="ocr-pdf" element={<ComingSoon />} />
+
+        {/* Convert to PDF */}
+        <Route path="jpg-to-pdf" element={<ComingSoon />} />
+        <Route path="word-to-pdf" element={<ComingSoon />} />
+        <Route path="powerpoint-to-pdf" element={<ComingSoon />} />
+        <Route path="excel-to-pdf" element={<ComingSoon />} />
+        <Route path="html-to-pdf" element={<ComingSoon />} />
+
+        {/* Edit PDF */}
+        <Route path="rotate-pdf" element={<ComingSoon />} />
+        <Route path="add-page-numbers" element={<ComingSoon />} />
+        <Route path="add-watermark" element={<ComingSoon />} />
+        <Route path="crop-pdf" element={<ComingSoon />} />
+        <Route path="edit-pdf" element={<ComingSoon />} />
+
+        {/* PDF Security */}
+        <Route path="sign-pdf" element={<ComingSoon />} />
+        <Route path="redact-pdf" element={<ComingSoon />} />
+        <Route path="compare-pdf" element={<ComingSoon />} />
+
+        {/* PDF Intelligence */}
+        <Route path="ai-summarizer" element={<ComingSoon />} />
+        <Route path="translate-pdf" element={<ComingSoon />} />
+
         <Route path="*" element={<ComingSoon />} />
       </Route>
       <Route path="/about"   element={<About />} />
