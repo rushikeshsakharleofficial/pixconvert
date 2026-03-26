@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import DropZone from './DropZone';
 import { PDFDocument } from 'pdf-lib';
+import { isEncryptedError } from '../utils/pdfPasswordCheck';
 
 const PdfToPdfA = () => {
   const [file, setFile] = useState(null);
@@ -48,10 +49,7 @@ const PdfToPdfA = () => {
 
     } catch (err) {
       console.error(err);
-      const isEncrypted = err.name === 'PasswordException' || err.name === 'EncryptedPDFError' || 
-                          (err.message && (err.message.toLowerCase().includes('password') || err.message.toLowerCase().includes('encrypt')));
-      
-      if (isEncrypted) {
+      if (isEncryptedError(err)) {
         setNeedsPassword(true);
       } else {
         setError('An error occurred: ' + (err.message || 'The PDF might be corrupted or restricted.'));
@@ -105,8 +103,8 @@ const PdfToPdfA = () => {
             </div>
           ) : !downloadUrl ? (
             <div className="mt-3">
-              <p className="text-muted text-sm mb-3">Note: We flatten forms and optimize metadata for long-term preservation.</p>
-              <button className="btn btn-primary" onClick={() => processPdf()}>Convert to PDF/A</button>
+              <p className="text-muted text-sm mb-3">Note: This tool flattens forms and optimizes metadata for long-term preservation. It does not produce a fully ISO 19005-compliant PDF/A — for strict compliance, use a dedicated PDF/A validator.</p>
+              <button className="btn btn-primary" onClick={() => processPdf()}>Flatten &amp; Archive PDF</button>
             </div>
           ) : (
             <div className="mt-4">

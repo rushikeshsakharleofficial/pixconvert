@@ -3,6 +3,7 @@ import DropZone from './DropZone';
 import * as pdfjsLib from 'pdfjs-dist';
 import pdfWorker from 'pdfjs-dist/build/pdf.worker.mjs?url';
 import JSZip from 'jszip';
+import { isEncryptedError } from '../utils/pdfPasswordCheck';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
 
@@ -67,10 +68,7 @@ const PdfToJpg = () => {
 
     } catch (err) {
       console.error(err);
-      const isEncrypted = err.name === 'PasswordException' || err.name === 'EncryptedPDFError' || 
-                          (err.message && (err.message.toLowerCase().includes('password') || err.message.toLowerCase().includes('encrypt')));
-      
-      if (isEncrypted) {
+      if (isEncryptedError(err)) {
         setNeedsPassword(true);
       } else {
         setError('An error occurred: ' + (err.message || 'Unknown error.'));

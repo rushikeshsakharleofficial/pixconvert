@@ -3,6 +3,7 @@ import DropZone from './DropZone';
 import * as pdfjsLib from 'pdfjs-dist';
 import pdfWorker from 'pdfjs-dist/build/pdf.worker.mjs?url';
 import * as XLSX from 'xlsx';
+import { isEncryptedError } from '../utils/pdfPasswordCheck';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
 
@@ -115,10 +116,7 @@ const PdfToExcel = () => {
 
     } catch (err) {
       console.error(err);
-      const isEncrypted = err.name === 'PasswordException' || err.name === 'EncryptedPDFError' || 
-                          (err.message && (err.message.toLowerCase().includes('password') || err.message.toLowerCase().includes('encrypt')));
-      
-      if (isEncrypted) {
+      if (isEncryptedError(err)) {
         setNeedsPassword(true);
       } else {
         setError('An error occurred: ' + (err.message || 'PDF may not contain recognizable text tables.'));

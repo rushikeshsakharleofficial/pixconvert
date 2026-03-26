@@ -37,7 +37,7 @@ const Home = () => (
       </div>
 
       <div className="trust-strip fade-in delay-4">
-        {['No Sign-up Required', 'No File Size Limit', 'Works Offline', 'Open Source Friendly', 'Zero Data Collection'].map((t, i) => (
+        {['No Sign-up Required', 'No File Size Limit', 'Browser-Based', 'Open Source Friendly', 'Zero Data Collection'].map((t, i) => (
           <div className="trust-item" key={i}><span className="dot"/> {t}</div>
         ))}
       </div>

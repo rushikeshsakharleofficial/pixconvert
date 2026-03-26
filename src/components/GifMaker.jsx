@@ -3,20 +3,10 @@ import GIF from 'gif.js';
 import heic2any from 'heic2any';
 import DropZone from './DropZone';
 import FolderUpload from './FolderUpload';
+import formatSize from '../utils/formatSize';
+import isHeic from '../utils/isHeic';
 
 const GIF_WORKER_URL = new URL('gif.js/dist/gif.worker.js', import.meta.url).href;
-
-const formatSize = (bytes) => {
-  if (bytes < 1024) return bytes + ' B';
-  if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
-  return (bytes / 1048576).toFixed(2) + ' MB';
-};
-
-const isHeic = (file) => {
-  const name = file.name.toLowerCase();
-  return name.endsWith('.heic') || name.endsWith('.heif') ||
-         file.type === 'image/heic' || file.type === 'image/heif';
-};
 
 const GifMaker = () => {
   const [frames, setFrames] = useState([]);
@@ -103,7 +93,8 @@ const GifMaker = () => {
       const width = Math.max(...images.map(i => i.naturalWidth));
       const height = Math.max(...images.map(i => i.naturalHeight));
 
-      const gif = new GIF({ workers: 2, quality: 10, width, height, workerScript: GIF_WORKER_URL });
+      const workerCount = Math.min(navigator.hardwareConcurrency || 2, 4);
+      const gif = new GIF({ workers: workerCount, quality: 10, width, height, workerScript: GIF_WORKER_URL });
 
       images.forEach(img => {
         const canvas = document.createElement('canvas');

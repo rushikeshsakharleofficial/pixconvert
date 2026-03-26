@@ -4,7 +4,7 @@ const faqs = [
   { q: 'Is PixConvert really free?', a: 'Yes, 100% free. There are no premium tiers, no hidden fees, no watermarks. Every feature is available to everyone.' },
   { q: 'Are my images uploaded to any server?', a: 'No. All processing happens entirely in your browser using the Canvas API and JavaScript. Your files never leave your device.' },
   { q: 'What image formats are supported?', a: 'Our universal converter supports PNG, JPEG, WebP, BMP, AVIF, ICO, TIFF, HEIC (iPhone), and HEIF (Samsung). You can convert between any of these formats.' },
-  { q: 'Is there a file size limit?', a: "There's no server-side limit since nothing is uploaded. The only limitation is your browser's available memory. Most images up to 50MB work fine." },
+  { q: 'Is there a file size limit?', a: "All processing happens in your browser, so the main limitation is your device's available memory. Most files up to 50MB work fine." },
   { q: 'Can I use PixConvert on my phone?', a: "Absolutely! PixConvert is fully responsive and works on mobile browsers. The WhatsApp Sticker tool even includes a 'Share to WhatsApp' button on mobile devices." }
 ];
 
@@ -22,11 +22,12 @@ const Contact = () => {
         body: JSON.stringify(formData)
       });
       if (!res.ok) throw new Error('Failed to send message over SMTP');
-      setToast(true);
+      setToast('success');
       setFormData({ name: '', email: '', subject: '', message: '' });
       setTimeout(() => setToast(false), 3500);
     } catch (err) {
-      alert('Error: ' + err.message);
+      setToast('error');
+      setTimeout(() => setToast(false), 3500);
     }
   };
 
@@ -85,7 +86,8 @@ const Contact = () => {
           </div>
         </div>
       </div>
-      {toast && <div className="toast">✅ Message sent successfully!</div>}
+      {toast === 'success' && <div className="toast">✅ Message sent successfully!</div>}
+      {toast === 'error' && <div className="toast" style={{ background: '#dc2626' }}>❌ Failed to send message. Please try again later.</div>}
     </section>
   );
 };

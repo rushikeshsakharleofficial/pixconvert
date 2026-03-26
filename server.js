@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import express from 'express';
 import multer from 'multer';
 import cors from 'cors';
@@ -5,11 +6,17 @@ import fs from 'fs';
 import nodemailer from 'nodemailer';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import rateLimit from 'express-rate-limit';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const UPLOADS_DIR = path.join(__dirname, 'uploads');
+const UPLOADS_DIR = path.resolve(__dirname, 'uploads');
 const MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
-const PORT = 4000;
+const PORT = process.env.PORT || 4000;
+
+// Allowed origins for CORS (comma-separated in env, fallback to localhost for dev)
+const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim())
+  : ['http://localhost:5173', 'http://localhost:4000'];
 
 // Ensure uploads dir exists
 fs.mkdirSync(UPLOADS_DIR, { recursive: true });
@@ -20,10 +27,14 @@ const cleanupOldFiles = () => {
   fs.readdirSync(UPLOADS_DIR).forEach(file => {
     if (file === '.gitkeep') return;
     const filePath = path.join(UPLOADS_DIR, file);
-    const { mtimeMs } = fs.statSync(filePath);
-    if (now - mtimeMs > MAX_AGE_MS) {
-      fs.unlinkSync(filePath);
-      console.log(`[cleanup] Deleted expired file: ${file}`);
+    try {
+      const { mtimeMs } = fs.statSync(filePath);
+      if (now - mtimeMs > MAX_AGE_MS) {
+        fs.unlinkSync(filePath);
+        console.log(`[cleanup] Deleted expired file: ${file}`);
+      }
+    } catch (err) {
+      console.error(`[cleanup] Failed to process ${file}:`, err.message);
     }
   });
 };
@@ -41,9 +52,13 @@ const storage = multer.diskStorage({
     cb(null, `${ts}_${safe}`);
   },
 });
+
+const MAX_FILE_SIZE = parseInt(process.env.MAX_FILE_SIZE_MB || '50', 10) * 1024 * 1024;
+const MAX_FILES_PER_UPLOAD = parseInt(process.env.MAX_FILES_PER_UPLOAD || '50', 10);
+
 const upload = multer({
   storage,
-  limits: { fileSize: 50 * 1024 * 1024 }, // 50 MB per file
+  limits: { fileSize: MAX_FILE_SIZE },
   fileFilter: (req, file, cb) => {
     if (file.mimetype.startsWith('image/')) cb(null, true);
     else cb(new Error('Only image files are allowed'));
@@ -51,14 +66,54 @@ const upload = multer({
 });
 
 const app = express();
-app.use(cors());
-app.use(express.json());
+
+// CORS — restrict to allowed origins
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no origin (server-to-server, curl, etc.)
+    if (!origin || ALLOWED_ORIGINS.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+}));
+
+app.use(express.json({ limit: '10kb' }));
+
+// Rate limiting
+const uploadLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 10,
+  message: { error: 'Too many uploads. Please try again later.' },
+});
+
+const contactLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 5,
+  message: { error: 'Too many contact submissions. Please try again later.' },
+});
+
+const generalLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 60,
+  message: { error: 'Too many requests. Please slow down.' },
+});
+
+app.use('/api/', generalLimiter);
 
 // Serve uploads folder statically
 app.use('/uploads', express.static(UPLOADS_DIR));
 
+// --- Path traversal protection helper ---
+const safePath = (filename) => {
+  const filePath = path.join(UPLOADS_DIR, path.basename(filename));
+  if (!filePath.startsWith(UPLOADS_DIR)) return null;
+  return filePath;
+};
+
 // POST /api/upload — accept one or more images
-app.post('/api/upload', upload.array('files', 100), (req, res) => {
+app.post('/api/upload', uploadLimiter, upload.array('files', MAX_FILES_PER_UPLOAD), (req, res) => {
   if (!req.files?.length) return res.status(400).json({ error: 'No files uploaded' });
   const saved = req.files.map(f => ({
     id: f.filename,
@@ -80,47 +135,71 @@ app.get('/api/files', (req, res) => {
       const expiresAt = new Date(mtimeMs + MAX_AGE_MS);
       const msLeft = expiresAt - now;
       const daysLeft = Math.ceil(msLeft / (24 * 60 * 60 * 1000));
-      // Original name is everything after the first underscore
       const name = f.replace(/^\d+_/, '');
       return { id: f, name, size, url: `/uploads/${f}`, expiresAt: expiresAt.toISOString(), daysLeft };
     })
-    .sort((a, b) => b.id.localeCompare(a.id)); // newest first
+    .sort((a, b) => b.id.localeCompare(a.id));
   res.json({ files });
 });
 
-// DELETE /api/files/:id — delete a specific file
+// DELETE /api/files/:id — delete a specific file (with path traversal protection)
 app.delete('/api/files/:id', (req, res) => {
-  const filePath = path.join(UPLOADS_DIR, req.params.id);
+  const filePath = safePath(req.params.id);
+  if (!filePath) return res.status(403).json({ error: 'Forbidden' });
   if (!fs.existsSync(filePath)) return res.status(404).json({ error: 'File not found' });
   fs.unlinkSync(filePath);
   res.json({ ok: true });
 });
 
 // POST /api/contact — Handle Contact Us form
-app.post('/api/contact', async (req, res) => {
+app.post('/api/contact', contactLimiter, async (req, res) => {
   const { name, email, subject, message } = req.body;
   if (!name || !email || !message) return res.status(400).json({ error: 'Missing required fields' });
 
+  // Basic email format validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) return res.status(400).json({ error: 'Invalid email format' });
+
+  const SMTP_HOST = process.env.SMTP_HOST;
+  const SMTP_PORT = parseInt(process.env.SMTP_PORT || '587', 10);
+  const SMTP_SECURE = process.env.SMTP_SECURE === 'true';
+  const SMTP_USER = process.env.SMTP_USER || '';
+  const SMTP_PASS = process.env.SMTP_PASS || '';
+  const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
+  const FROM_EMAIL = process.env.FROM_EMAIL || 'noreply@pixconvert.com';
+
+  if (!SMTP_HOST || !ADMIN_EMAIL) {
+    console.error('SMTP_HOST or ADMIN_EMAIL not configured in environment variables');
+    return res.status(500).json({ error: 'Email service not configured' });
+  }
+
   try {
-    const transporter = nodemailer.createTransport({
-      host: 'smtp.linuxhardened.com',
-      port: 25,
-      secure: false,
-      tls: {
-        rejectUnauthorized: false
-      }
-    });
+    const transportConfig = {
+      host: SMTP_HOST,
+      port: SMTP_PORT,
+      secure: SMTP_SECURE,
+    };
+
+    if (SMTP_USER) {
+      transportConfig.auth = {
+        user: SMTP_USER,
+        pass: SMTP_PASS,
+      };
+    }
+
+    const transporter = nodemailer.createTransport(transportConfig);
 
     await transporter.sendMail({
-      from: `"${name}" <${email}>`,
-      to: 'admin@localhost', // Assuming a default admin since none was given
-      subject: `Contact Form: ${subject || 'Feedback'}`,
+      from: `"PixConvert Contact" <${FROM_EMAIL}>`,
+      replyTo: `"${name.replace(/[<>"]/g, '')}" <${email}>`,
+      to: ADMIN_EMAIL,
+      subject: `Contact Form: ${(subject || 'Feedback').replace(/[<>]/g, '')}`,
       text: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
     });
 
     res.json({ ok: true });
   } catch (error) {
-    console.error('SMTP Error:', error);
+    console.error('SMTP Error:', error.message);
     res.status(500).json({ error: 'Failed to send email' });
   }
 });

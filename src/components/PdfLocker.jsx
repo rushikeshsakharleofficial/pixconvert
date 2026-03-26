@@ -2,12 +2,7 @@ import { useState, useEffect } from 'react';
 import { PDFDocument } from 'pdf-lib';
 import { encryptPDF } from '@pdfsmaller/pdf-encrypt-lite';
 import DropZone from './DropZone';
-
-const formatSize = (bytes) => {
-  if (bytes < 1024) return bytes + ' B';
-  if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
-  return (bytes / 1048576).toFixed(2) + ' MB';
-};
+import formatSize from '../utils/formatSize';
 
 const PdfLocker = () => {
   const [file, setFile] = useState(null);

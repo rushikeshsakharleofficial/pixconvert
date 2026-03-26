@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import DropZone from './DropZone';
 import * as pdfjsLib from 'pdfjs-dist';
-// Explicitly require the worker for pdfjs
 import pdfWorker from 'pdfjs-dist/build/pdf.worker.mjs?url';
 import pptxgen from 'pptxgenjs';
+import { isEncryptedError } from '../utils/pdfPasswordCheck';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
 
@@ -78,10 +78,7 @@ const PdfToPowerpoint = () => {
 
     } catch (err) {
       console.error(err);
-      const isEncrypted = err.name === 'PasswordException' || err.name === 'EncryptedPDFError' || 
-                          (err.message && (err.message.toLowerCase().includes('password') || err.message.toLowerCase().includes('encrypt')));
-      
-      if (isEncrypted) {
+      if (isEncryptedError(err)) {
         setNeedsPassword(true);
       } else {
         setError('An error occurred: ' + (err.message || 'Unknown error.'));
