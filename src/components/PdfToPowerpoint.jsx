@@ -135,7 +135,7 @@ const PdfToPowerpoint = () => {
               </div>
             </div>
           ) : !downloadUrl ? (
-            <button className="btn btn-primary mt-3" onClick={processPdf}>Convert to POWERPOINT</button>
+            <button className="btn btn-primary mt-3" onClick={() => processPdf()}>Convert to POWERPOINT</button>
           ) : (
             <div className="mt-4">
               <p className="text-success mb-3">✅ Conversion complete!</p>
