@@ -4,7 +4,6 @@ uploads/*
 !uploads/.gitkeep
 .env
 .env.local
-
 node_modules
 dist
 .env
