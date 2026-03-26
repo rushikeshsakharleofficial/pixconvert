@@ -7,25 +7,30 @@ const PdfToPdfA = () => {
   const [processing, setProcessing] = useState(false);
   const [downloadUrl, setDownloadUrl] = useState(null);
   const [error, setError] = useState(null);
+  const [needsPassword, setNeedsPassword] = useState(false);
+  const [password, setPassword] = useState('');
 
   const handleFiles = (files) => {
     if (files[0] && files[0].type === 'application/pdf') {
       setFile(files[0]);
       setDownloadUrl(null);
       setError(null);
+      setNeedsPassword(false);
+      setPassword('');
     } else {
       setError('Please upload a valid PDF file.');
     }
   };
 
-  const processPdf = async () => {
+  const processPdf = async (pwd = '') => {
     if (!file) return;
     setProcessing(true);
     setError(null);
+    setNeedsPassword(false);
 
     try {
       const arrayBuffer = await file.arrayBuffer();
-      const pdfDoc = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
+      const pdfDoc = await PDFDocument.load(arrayBuffer, { password: pwd || undefined });
       
       // Basic PDF/A simulation: flatten forms to make it uneditable (archived)
       const form = pdfDoc.getForm();
@@ -44,7 +49,7 @@ const PdfToPdfA = () => {
     } catch (err) {
       console.error(err);
       if (err.name === 'EncryptedPDFError' || (err.message && err.message.toLowerCase().includes('encrypt'))) {
-        setError('This PDF is password protected. Please unlock it first using our Unlock PDF tool.');
+        setNeedsPassword(true);
       } else {
         setError('An error occurred. The PDF might be corrupted or severely restricted.');
       }
@@ -72,9 +77,23 @@ const PdfToPdfA = () => {
           )}
           <h4 className="mb-3">{file.name}</h4>
           
-          {error && <p className="text-danger">{error}</p>}
-          
-          {processing ? (
+          {needsPassword ? (
+            <div className="mt-4">
+              <p className="text-danger mb-3">🔒 This PDF is password protected.</p>
+              <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
+                <input 
+                  type="password" 
+                  placeholder="Enter password" 
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  style={{ padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--border)', outline: 'none' }}
+                />
+                <button className="btn btn-primary" onClick={() => processPdf(password)}>
+                  Unlock & Archive
+                </button>
+              </div>
+            </div>
+          ) : processing ? (
             <div className="mt-4">
               <p>Optimizing and flattening for archive...</p>
               <div className="progress-bar">

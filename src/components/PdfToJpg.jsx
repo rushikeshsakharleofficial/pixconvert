@@ -12,26 +12,34 @@ const PdfToJpg = () => {
   const [progress, setProgress] = useState(0);
   const [downloadUrl, setDownloadUrl] = useState(null);
   const [error, setError] = useState(null);
+  const [needsPassword, setNeedsPassword] = useState(false);
+  const [password, setPassword] = useState('');
 
   const handleFiles = (files) => {
     if (files[0] && files[0].type === 'application/pdf') {
       setFile(files[0]);
       setDownloadUrl(null);
       setError(null);
+      setNeedsPassword(false);
+      setPassword('');
     } else {
       setError('Please upload a valid PDF file.');
     }
   };
 
-  const processPdf = async () => {
+  const processPdf = async (pwd = '') => {
     if (!file) return;
     setProcessing(true);
     setProgress(0);
     setError(null);
+    setNeedsPassword(false);
 
     try {
       const arrayBuffer = await file.arrayBuffer();
-      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      const options = { data: arrayBuffer };
+      if (pwd) options.password = pwd;
+      
+      const pdf = await pdfjsLib.getDocument(options).promise;
       const numPages = pdf.numPages;
       const zip = new JSZip();
 
@@ -60,7 +68,7 @@ const PdfToJpg = () => {
     } catch (err) {
       console.error(err);
       if (err.name === 'PasswordException') {
-        setError('This PDF is password protected. Please unlock it first using our Unlock PDF tool.');
+        setNeedsPassword(true);
       } else {
         setError('An error occurred while processing the PDF.');
       }
@@ -89,9 +97,23 @@ const PdfToJpg = () => {
           )}
           <h4 className="mb-3">{file.name}</h4>
           
-          {error && <p className="text-danger">{error}</p>}
-          
-          {processing ? (
+          {needsPassword ? (
+            <div className="mt-4">
+              <p className="text-danger mb-3">🔒 This PDF is password protected.</p>
+              <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
+                <input 
+                  type="password" 
+                  placeholder="Enter password" 
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  style={{ padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--border)', outline: 'none' }}
+                />
+                <button className="btn btn-primary" onClick={() => processPdf(password)}>
+                  Unlock & Convert
+                </button>
+              </div>
+            </div>
+          ) : processing ? (
             <div className="mt-4">
               <p>Converting to JPG... {progress}%</p>
               <div className="progress-bar">
