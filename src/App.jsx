@@ -17,6 +17,8 @@ import ComingSoon from './components/ComingSoon';
 import About from './components/About';
 import Privacy from './components/Privacy';
 import Contact from './components/Contact';
+import Blog from './components/Blog';
+import BlogPost from './components/BlogPost';
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -91,6 +93,8 @@ const App = () => (
       <Route path="/about"   element={<About />} />
       <Route path="/privacy" element={<Privacy />} />
       <Route path="/contact" element={<Contact />} />
+      <Route path="/blog"    element={<Blog />} />
+      <Route path="/blog/:id" element={<BlogPost />} />
     </Routes>
     <Footer />
   </BrowserRouter>

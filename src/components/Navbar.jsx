@@ -76,6 +76,7 @@ const Navbar = () => {
         <li><NavLink to="/about" className={({ isActive }) => isActive ? 'active' : ''} onClick={closeMenu}>About</NavLink></li>
         <li><NavLink to="/privacy" className={({ isActive }) => isActive ? 'active' : ''} onClick={closeMenu}>Privacy</NavLink></li>
         <li><NavLink to="/contact" className={({ isActive }) => isActive ? 'active' : ''} onClick={closeMenu}>Contact</NavLink></li>
+        <li><NavLink to="/blog" className={({ isActive }) => isActive ? 'active' : ''} onClick={closeMenu}>Blog</NavLink></li>
       </ul>
       <button className={`hamburger${menuOpen ? ' open' : ''}`} onClick={() => setMenuOpen(!menuOpen)} aria-label="Menu">
         <span/><span/><span/>
