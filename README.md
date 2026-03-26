@@ -73,7 +73,6 @@ Privacy isn't a feature; it's our foundation. By utilizing **Client-Side Process
 
 ## 🤝 Contributing
 We're always looking for fellow developers to help expand PixConvert's capabilities. Whether it's adding a new conversion format or optimizing our processing engines, your input is welcome!
-
 1. Fork the Project
 2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
 3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
