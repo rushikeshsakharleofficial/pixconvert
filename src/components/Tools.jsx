@@ -19,7 +19,7 @@ const Tools = () => {
                 {cat.items.map((item, i) => (
                   <Link key={i} to={item.path} className="tool-card" style={{ '--card-color': item.color }}>
                     <div className="tool-card-icon">{item.icon}</div>
-                    <h3>{item.name}</h3>
+                    <h3>{item.name} {item.isNew && <span className="badge badge-new">New</span>}</h3>
                     <p>{item.desc}</p>
                   </Link>
                 ))}

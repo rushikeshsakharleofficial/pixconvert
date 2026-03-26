@@ -38,11 +38,11 @@ export const toolsData = [
   {
     category: "Convert from PDF",
     items: [
-      { name: "PDF to JPG", path: "/tools/pdf-to-jpg", icon: "🖼️", color: "#f39c12", desc: "Convert each PDF page into a JPG or extract all images contained in a PDF." },
-      { name: "PDF to WORD", path: "/tools/pdf-to-word", icon: "📝", color: "#2b579a", desc: "Easily convert your PDF files into easy to edit DOC and DOCX documents." },
-      { name: "PDF to POWERPOINT", path: "/tools/pdf-to-powerpoint", icon: "📊", color: "#d24726", desc: "Turn your PDF files into easy to edit PPT and PPTX slideshows." },
-      { name: "PDF to EXCEL", path: "/tools/pdf-to-excel", icon: "📈", color: "#217346", desc: "Pull data straight from PDFs into Excel spreadsheets in a few short seconds." },
-      { name: "PDF to PDF/A", path: "/tools/pdf-to-pdf-a", icon: "🔒", color: "#8e44ad", desc: "Transform your PDF to PDF/A for long-term archiving and compliance." }
+      { name: "PDF to JPG", path: "/tools/pdf-to-jpg", icon: "🖼️", color: "#f39c12", isNew: true, desc: "Convert each PDF page into a JPG or extract all images contained in a PDF." },
+      { name: "PDF to WORD", path: "/tools/pdf-to-word", icon: "📝", color: "#2b579a", isNew: true, desc: "Easily convert your PDF files into easy to edit DOC and DOCX documents." },
+      { name: "PDF to POWERPOINT", path: "/tools/pdf-to-powerpoint", icon: "📊", color: "#d24726", isNew: true, desc: "Turn your PDF files into easy to edit PPT and PPTX slideshows." },
+      { name: "PDF to EXCEL", path: "/tools/pdf-to-excel", icon: "📈", color: "#217346", isNew: true, desc: "Pull data straight from PDFs into Excel spreadsheets in a few short seconds." },
+      { name: "PDF to PDF/A", path: "/tools/pdf-to-pdf-a", icon: "🔒", color: "#8e44ad", isNew: true, desc: "Transform your PDF to PDF/A for long-term archiving and compliance." }
     ]
   },
   {

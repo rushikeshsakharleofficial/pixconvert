@@ -8,6 +8,11 @@ import UniversalConverter from './components/UniversalConverter';
 import GifMaker from './components/GifMaker';
 import PdfUnlocker from './components/PdfUnlocker';
 import PdfLocker from './components/PdfLocker';
+import PdfToJpg from './components/PdfToJpg';
+import PdfToWord from './components/PdfToWord';
+import PdfToPowerpoint from './components/PdfToPowerpoint';
+import PdfToExcel from './components/PdfToExcel';
+import PdfToPdfA from './components/PdfToPdfA';
 import ComingSoon from './components/ComingSoon';
 import About from './components/About';
 import Privacy from './components/Privacy';
@@ -30,6 +35,13 @@ const App = () => (
         <Route path="gif" element={<GifMaker />} />
         <Route path="pdf" element={<PdfUnlocker />} />
         <Route path="pdf-lock" element={<PdfLocker />} />
+        {/* Convert from PDF tools */}
+        <Route path="pdf-to-jpg" element={<PdfToJpg />} />
+        <Route path="pdf-to-word" element={<PdfToWord />} />
+        <Route path="pdf-to-powerpoint" element={<PdfToPowerpoint />} />
+        <Route path="pdf-to-excel" element={<PdfToExcel />} />
+        <Route path="pdf-to-pdf-a" element={<PdfToPdfA />} />
+        
         <Route path="*" element={<ComingSoon />} />
       </Route>
       <Route path="/about"   element={<About />} />

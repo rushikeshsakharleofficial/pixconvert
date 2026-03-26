@@ -43,6 +43,7 @@ const Navbar = () => {
                 {cat.items.map((item, i) => (
                   <NavLink key={i} to={item.path} className={({ isActive }) => isActive ? 'active' : ''} onClick={closeMenu}>
                     <span className="mega-icon">{item.icon}</span> {item.name}
+                    {item.isNew && <span className="badge badge-new">New</span>}
                   </NavLink>
                 ))}
               </div>
@@ -63,6 +64,7 @@ const Navbar = () => {
                   {cat.items.map((item, i) => (
                     <NavLink key={i} to={item.path} onClick={closeMenu}>
                       {item.icon} {item.name}
+                      {item.isNew && <span className="badge badge-new" style={{marginLeft: 'auto'}}>New</span>}
                     </NavLink>
                   ))}
                 </div>

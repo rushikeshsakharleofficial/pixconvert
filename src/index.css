@@ -1,4 +1,5 @@
 /* ===== Reset & Base ===== */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg:#f9f9f9;--bg2:#f0f0f0;--card:#ffffff;--border:#e8e8e8;
@@ -8,7 +9,6 @@
   --radius:12px;--pill:999px;
   --shadow:0 2px 8px rgba(0,0,0,.06);--shadow-lg:0 8px 30px rgba(0,0,0,.1);
 }
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 html{scroll-behavior:smooth;font-size:16px}
 body{font-family:var(--body);background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden}
 ::selection{background:var(--primary);color:#fff}
@@ -256,6 +256,18 @@ section{min-height:100vh;padding:6rem 2rem 4rem}
 .footer-links a:hover{color:var(--primary)}
 .footer p{color:var(--text3);font-size:.85rem}
 
+/* ===== Badges ===== */
+.badge{display:inline-block;padding:.2rem .5rem;border-radius:4px;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.badge-new{
+  background:linear-gradient(135deg,#ff3b30,#ff9500);color:#fff;
+  box-shadow:0 0 10px rgba(255,59,48,.5);
+  animation:badgeGlow 2s infinite alternate;
+  margin-left:.5rem;
+  vertical-align:middle;
+}
+@keyframes badgeGlow{from{box-shadow:0 0 5px rgba(255,59,48,.4)}to{box-shadow:0 0 15px rgba(255,149,0,.7)}}
+
+/* ===== Typography ===== */
 /* ===== Toast ===== */
 .toast{position:fixed;bottom:2rem;right:2rem;background:var(--primary);color:#fff;padding:1rem 1.5rem;border-radius:12px;font-weight:600;font-size:.95rem;z-index:9999;animation:slideIn .4s ease;box-shadow:0 8px 25px var(--primary-glow)}
 @keyframes slideIn{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}

@@ -1,0 +1,126 @@
+import { useState } from 'react';
+import DropZone from './DropZone';
+import * as pdfjsLib from 'pdfjs-dist';
+// Explicitly require the worker for pdfjs
+import pdfWorker from 'pdfjs-dist/build/pdf.worker.mjs?url';
+import pptxgen from 'pptxgenjs';
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
+
+const PdfToPowerpoint = () => {
+  const [file, setFile] = useState(null);
+  const [processing, setProcessing] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [downloadUrl, setDownloadUrl] = useState(null);
+  const [error, setError] = useState(null);
+
+  const handleFiles = (files) => {
+    if (files[0] && files[0].type === 'application/pdf') {
+      setFile(files[0]);
+      setDownloadUrl(null);
+      setError(null);
+    } else {
+      setError('Please upload a valid PDF file.');
+    }
+  };
+
+  const processPdf = async () => {
+    if (!file) return;
+    setProcessing(true);
+    setProgress(0);
+    setError(null);
+
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      const numPages = pdf.numPages;
+      const pptx = new pptxgen();
+
+      for (let i = 1; i <= numPages; i++) {
+        const page = await pdf.getPage(i);
+        const viewport = page.getViewport({ scale: 2.0 }); // High res for PPT
+
+        const canvas = document.createElement('canvas');
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = "white"; // ensure white background instead of transparent
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        await page.render({ canvasContext: ctx, viewport }).promise;
+
+        // Convert canvas to base64
+        const base64 = canvas.toDataURL('image/jpeg', 0.9);
+        
+        // Add slide to PPTX
+        const slide = pptx.addSlide();
+        
+        // Convert viewport size (px at 72dpi scale 2.0) to inches for PPTX layout
+        // Let PPTX auto-stretch, or we can force standard 16:9 / 4:3
+        // For best results, we'll just cover the whole slide
+        slide.addImage({ data: base64, x: 0, y: 0, w: '100%', h: '100%' });
+
+        setProgress(Math.round((i / numPages) * 100));
+      }
+
+      // Generate the PPTX as a blob
+      const blob = await pptx.write({ outputType: 'blob' });
+      const url = URL.createObjectURL(blob);
+      setDownloadUrl(url);
+
+    } catch (err) {
+      console.error(err);
+      if (err.name === 'PasswordException') {
+        setError('This PDF is password protected. Please unlock it first using our Unlock PDF tool.');
+      } else {
+        setError('An error occurred while generating the PowerPoint.');
+      }
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const reset = () => {
+    setFile(null);
+    setDownloadUrl(null);
+    setProgress(0);
+    setError(null);
+  };
+
+  return (
+    <div className="tool-container">
+      {!file ? (
+        <DropZone onFiles={handleFiles} multiple={false} accept=".pdf" label="Drop PDF here to convert to PPTX" />
+      ) : (
+        <div className="processing-box text-center">
+          <h3 className="mb-3">📄 {file.name}</h3>
+          
+          {error && <p className="text-danger">{error}</p>}
+          
+          {processing ? (
+            <div className="mt-4">
+              <p>Converting to PowerPoint... {progress}%</p>
+              <div className="progress-bar">
+                <div className="progress-fill" style={{ width: `${progress}%` }}></div>
+              </div>
+            </div>
+          ) : !downloadUrl ? (
+            <button className="btn btn-primary mt-3" onClick={processPdf}>Convert to POWERPOINT</button>
+          ) : (
+            <div className="mt-4">
+              <p className="text-success mb-3">✅ Conversion complete!</p>
+              <div className="cs-actions">
+                <a href={downloadUrl} download={`${file.name.replace('.pdf', '')}.pptx`} className="btn btn-primary">
+                  ⬇ Download PowerPoint
+                </a>
+                <button className="btn btn-outline" onClick={reset}>Convert Another</button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default PdfToPowerpoint;
