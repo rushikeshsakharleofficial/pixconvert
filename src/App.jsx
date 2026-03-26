@@ -67,6 +67,7 @@ const LoadingFallback = () => (
   </div>
 );
 
+// Vercel trigger: 2026-03-26
 const App = () => (
   <BrowserRouter>
     <ScrollToTop />
