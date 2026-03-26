@@ -14,7 +14,7 @@ export const toolsData = [
       { name: "WebP to JPG", path: "/tools/webp-to-jpg", icon: "🖼️", color: "#4a90d9", desc: "Convert WebP images to JPG format for better compatibility." },
       { name: "HEIC to JPG", path: "/tools/heic-to-jpg", icon: "🖼️", color: "#4a90d9", desc: "Convert Apple's HEIC images to standard JPG format." },
       { name: "BMP to PNG", path: "/tools/bmp-to-png", icon: "🖼️", color: "#4a90d9", desc: "Convert BMP images to PNG format for web use." },
-      { name: "Photo to Markdown", path: "/tools/photo-to-markdown", icon: "📝", color: "#4a90d9", desc: "Extract text from photos and save as Markdown using OCR." }
+      { name: "Photo to Markdown", path: "/tools/photo-to-markdown", icon: "📝", color: "#4a90d9", isNew: true, desc: "Extract text from photos and save as Markdown using OCR." }
     ]
   },
   {
@@ -33,7 +33,7 @@ export const toolsData = [
     items: [
       { name: "Compress PDF", path: "/tools/compress-pdf", icon: "🗜️", color: "#27ae60", desc: "Reduce file size while optimizing for maximal PDF quality." },
       { name: "Repair PDF", path: "/tools/repair-pdf", icon: "🔧", color: "#27ae60", desc: "Repair a damaged PDF and recover data from corrupt PDF files." },
-      { name: "OCR PDF", path: "/tools/ocr-pdf", icon: "👁️", color: "#27ae60", desc: "Recognize and extract text from scanned PDFs into Markdown." }
+      { name: "OCR PDF", path: "/tools/ocr-pdf", icon: "👁️", color: "#27ae60", isNew: true, desc: "Recognize and extract text from scanned PDFs into Markdown." }
     ]
   },
   {

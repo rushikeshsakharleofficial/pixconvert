@@ -16,6 +16,8 @@ const OcrTool = ({ type = 'image' }) => {
   const [needsPassword, setNeedsPassword] = useState(false);
   const [password, setPassword] = useState('');
 
+  const [copying, setCopying] = useState(false);
+
   const handleFiles = (files) => {
     if (files[0]) {
       setFile(files[0]);
@@ -27,6 +29,13 @@ const OcrTool = ({ type = 'image' }) => {
     }
   };
 
+  const copyToClipboard = () => {
+    if (!result) return;
+    navigator.clipboard.writeText(result);
+    setCopying(true);
+    setTimeout(() => setCopying(false), 2000);
+  };
+
   const processFile = async (pwd = '') => {
     if (!file) return;
     setProcessing(true);
@@ -35,17 +44,18 @@ const OcrTool = ({ type = 'image' }) => {
     setNeedsPassword(false);
 
     try {
+      let fullText = '';
+      const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+
       const worker = await createWorker('eng', 1, {
         logger: m => {
-          if (m.status === 'recognizing text') {
+          if (m.status === 'recognizing text' && !isPdf) {
             setProgress(Math.round(m.progress * 100));
           }
         }
       });
 
-      let fullText = '';
-
-      if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
+      if (isPdf) {
         const arrayBuffer = await file.arrayBuffer();
         const options = { data: arrayBuffer };
         if (pwd) options.password = pwd;
@@ -150,8 +160,14 @@ const OcrTool = ({ type = 'image' }) => {
           ) : (
             <div className="mt-4">
               <p className="text-success mb-3">✅ Text extracted successfully!</p>
-              <div className="result-preview glass p-3 mb-3 text-left" style={{ maxHeight: '200px', overflowY: 'auto', textAlign: 'left', fontSize: '0.9rem', whiteSpace: 'pre-wrap' }}>
+              <div className="result-preview glass p-3 mb-3 text-left" style={{ maxHeight: '250px', overflowY: 'auto', textAlign: 'left', fontSize: '0.9rem', whiteSpace: 'pre-wrap', position: 'relative' }}>
                 {result}
+                <button 
+                  onClick={copyToClipboard}
+                  style={{ position: 'absolute', top: '10px', right: '10px', padding: '4px 8px', fontSize: '0.75rem', borderRadius: '4px', background: 'var(--primary)', color: 'white', border: 'none', cursor: 'pointer' }}
+                >
+                  {copying ? 'Copied!' : 'Copy'}
+                </button>
               </div>
               <div className="cs-actions">
                 <a href={downloadUrl} download={`${file.name.replace(/\.[^.]+$/, '')}.md`} className="btn btn-primary">

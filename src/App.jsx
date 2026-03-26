@@ -45,6 +45,7 @@ const App = () => (
         <Route path="webp-to-jpg" element={<UniversalConverter defaultOutputFormat="image/jpeg" />} />
         <Route path="heic-to-jpg" element={<UniversalConverter defaultOutputFormat="image/jpeg" />} />
         <Route path="bmp-to-png" element={<UniversalConverter defaultOutputFormat="image/png" />} />
+        <Route path="photo-to-markdown" element={<OcrTool type="image" />} />
 
         {/* Convert from PDF tools */}
         <Route path="pdf-to-jpg" element={<PdfToJpg />} />
@@ -64,7 +65,7 @@ const App = () => (
         {/* Optimize PDF */}
         <Route path="compress-pdf" element={<ComingSoon />} />
         <Route path="repair-pdf" element={<ComingSoon />} />
-        <Route path="ocr-pdf" element={<ComingSoon />} />
+        <Route path="ocr-pdf" element={<OcrTool type="pdf" />} />
 
         {/* Convert to PDF */}
         <Route path="jpg-to-pdf" element={<ComingSoon />} />
