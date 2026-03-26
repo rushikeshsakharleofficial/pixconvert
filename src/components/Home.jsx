@@ -1,11 +1,13 @@
 import { Link } from 'react-router-dom';
-import { toolsData } from '../data/toolsData';
 
 const Home = () => (
   <section className="hero">
     <div className="container fade-in visible">
-      <h1>Convert Images & Edit PDFs Instantly.<br/><span className="accent">Free. Private.</span></h1>
-      <p>All processing happens in your browser. No uploads, no servers, no tracking. Your files never leave your device.</p>
+      <h1>Every tool you need to work with <span className="accent">PDFs & Images</span></h1>
+      <p className="hero-desc">
+        Merge, split, compress, convert, rotate, unlock and watermark PDFs with just a few clicks.
+        <br/>All <strong>100% FREE</strong>, private, and processed right in your browser.
+      </p>
       <div className="hero-cta">
         <Link to="/tools" className="btn btn-primary">🚀 Explore All Tools</Link>
         <Link to="/about" className="btn btn-outline">Learn More</Link>
@@ -13,20 +15,25 @@ const Home = () => (
     </div>
 
     <div className="container">
-      <div className="tools-directory" style={{ marginTop: '3rem' }}>
-        {toolsData.map((cat, idx) => (
-          <div className="glass feature-card fade-in visible" key={idx} style={{ textAlign: 'left' }}>
-            <h3 style={{ fontFamily: 'var(--heading)', marginBottom: '.75rem', borderBottom: '2px solid rgba(252,94,2,.15)', paddingBottom: '.5rem' }}>{cat.category}</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '.25rem' }}>
-              {cat.items.map((item, i) => (
-                <Link key={i} to={item.path} className="tool-link-item">
-                  <span className="tool-icon">{item.icon}</span>
-                  <span className="tool-name">{item.name}</span>
-                </Link>
-              ))}
-            </div>
-          </div>
+      <div className="features-grid fade-in visible">
+        {[
+          { icon: '📁', title: 'Merge PDF', desc: 'Combine multiple PDFs into one single document.', link: '/tools/merge-pdf' },
+          { icon: '✂️', title: 'Split PDF', desc: 'Separate pages into independent PDF files.', link: '/tools/split-pdf' },
+          { icon: '🗜️', title: 'Compress PDF', desc: 'Reduce file size while keeping quality.', link: '/tools/compress-pdf' },
+          { icon: '🔄', title: 'Convert Files', desc: 'Convert images between PNG, JPG, WebP and more.', link: '/tools/converter' },
+          { icon: '🔓', title: 'Unlock PDF', desc: 'Remove passwords from protected PDFs.', link: '/tools/pdf' },
+          { icon: '🔐', title: 'Protect PDF', desc: 'Add password encryption to your PDFs.', link: '/tools/pdf-lock' },
+        ].map((f, i) => (
+          <Link to={f.link} className="glass feature-card fade-in visible" key={i} style={{ textDecoration: 'none' }}>
+            <div className="icon">{f.icon}</div>
+            <h3>{f.title}</h3>
+            <p>{f.desc}</p>
+          </Link>
         ))}
+      </div>
+
+      <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+        <Link to="/tools" className="btn btn-outline">View All Tools →</Link>
       </div>
 
       <div className="trust-strip fade-in visible">
@@ -39,8 +46,8 @@ const Home = () => (
         <h2>How It Works</h2>
         <div className="steps">
           {[
-            { n: '1', title: 'Upload', desc: 'Drag & drop or click to select your files' },
-            { n: '2', title: 'Choose Tool', desc: 'Pick your desired tool and settings' },
+            { n: '1', title: 'Select Tool', desc: 'Choose from our collection of PDF & image tools' },
+            { n: '2', title: 'Upload Files', desc: 'Drag & drop or click to select your files' },
             { n: '3', title: 'Download', desc: 'Get your processed files instantly — no waiting' }
           ].map((s, i) => (
             <div className="step" key={i}>

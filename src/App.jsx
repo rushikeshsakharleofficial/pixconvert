@@ -8,6 +8,7 @@ import UniversalConverter from './components/UniversalConverter';
 import GifMaker from './components/GifMaker';
 import PdfUnlocker from './components/PdfUnlocker';
 import PdfLocker from './components/PdfLocker';
+import ComingSoon from './components/ComingSoon';
 import About from './components/About';
 import Privacy from './components/Privacy';
 import Contact from './components/Contact';
@@ -29,6 +30,7 @@ const App = () => (
         <Route path="gif" element={<GifMaker />} />
         <Route path="pdf" element={<PdfUnlocker />} />
         <Route path="pdf-lock" element={<PdfLocker />} />
+        <Route path="*" element={<ComingSoon />} />
       </Route>
       <Route path="/about"   element={<About />} />
       <Route path="/privacy" element={<Privacy />} />
