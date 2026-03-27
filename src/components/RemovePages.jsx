@@ -29,7 +29,7 @@ const RemovePages = () => {
     if (!files.length) return;
     try {
       const selected = files[0];
-      const bytes = await selected.arrayBuffer();
+      const bytes = new Uint8Array(await selected.arrayBuffer());
       const pdf = await PDFDocument.load(bytes, { ignoreEncryption: true });
       const count = pdf.getPageCount();
       setFile(selected);
@@ -44,7 +44,9 @@ const RemovePages = () => {
       }
 
       setPreviewLoading(true);
-      const previewPdf = await pdfjsLib.getDocument({ data: bytes }).promise;
+      // Use a cloned byte array so preview rendering cannot mutate/detach
+      // the source bytes needed later for final PDF processing.
+      const previewPdf = await pdfjsLib.getDocument({ data: bytes.slice() }).promise;
       const previews = [];
       for (let i = 1; i <= previewPdf.numPages; i += 1) {
         const page = await previewPdf.getPage(i);
