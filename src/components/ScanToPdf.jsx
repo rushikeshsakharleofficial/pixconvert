@@ -1,31 +1,82 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { PDFDocument } from 'pdf-lib';
 import DropZone from './DropZone';
 
+const reorder = (items, from, to) => {
+  if (from === to || from < 0 || to < 0 || from >= items.length || to >= items.length) return items;
+  const copy = [...items];
+  const [moved] = copy.splice(from, 1);
+  copy.splice(to, 0, moved);
+  return copy;
+};
+
 const ScanToPdf = () => {
   const [files, setFiles] = useState([]);
+  const filesRef = useRef([]);
+  const [dragIndex, setDragIndex] = useState(null);
+  const [dragOverIndex, setDragOverIndex] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState(null);
   const [isReady, setIsReady] = useState(false);
 
+  useEffect(() => {
+    filesRef.current = files;
+  }, [files]);
+
+  useEffect(() => {
+    return () => {
+      filesRef.current.forEach((item) => URL.revokeObjectURL(item.previewUrl));
+    };
+  }, []);
+
   const handleFiles = (nextFiles) => {
-    setFiles((prev) => [...prev, ...nextFiles].slice(0, 60));
+    setFiles((prev) => {
+      const incoming = nextFiles.map((file) => ({
+        id: `${file.name}-${file.size}-${file.lastModified}-${Math.random().toString(36).slice(2, 8)}`,
+        file,
+        previewUrl: URL.createObjectURL(file),
+      }));
+      const combined = [...prev, ...incoming];
+      const kept = combined.slice(0, 60);
+      const dropped = combined.slice(60);
+      dropped.forEach((item) => URL.revokeObjectURL(item.previewUrl));
+      return kept;
+    });
     setError(null);
     setIsReady(false);
   };
 
   const removeFile = (index) => {
-    setFiles((prev) => prev.filter((_, i) => i !== index));
+    setFiles((prev) => {
+      const target = prev[index];
+      if (target) URL.revokeObjectURL(target.previewUrl);
+      return prev.filter((_, i) => i !== index);
+    });
   };
 
   const move = (index, direction) => {
     const next = index + direction;
-    if (next < 0 || next >= files.length) return;
-    setFiles((prev) => {
-      const copy = [...prev];
-      [copy[index], copy[next]] = [copy[next], copy[index]];
-      return copy;
-    });
+    setFiles((prev) => reorder(prev, index, next));
+  };
+
+  const onDragStart = (index) => {
+    setDragIndex(index);
+  };
+
+  const onDragEnter = (index) => {
+    setDragOverIndex(index);
+  };
+
+  const onDrop = (index) => {
+    if (dragIndex === null) return;
+    setFiles((prev) => reorder(prev, dragIndex, index));
+    setDragIndex(null);
+    setDragOverIndex(null);
+  };
+
+  const onDragEnd = () => {
+    setDragIndex(null);
+    setDragOverIndex(null);
   };
 
   const convert = async () => {
@@ -34,7 +85,8 @@ const ScanToPdf = () => {
     setError(null);
     try {
       const pdf = await PDFDocument.create();
-      for (const file of files) {
+      for (const item of files) {
+        const file = item.file;
         const name = file.name.toLowerCase();
         const bytes = await file.arrayBuffer();
         let embedded;
@@ -82,11 +134,33 @@ const ScanToPdf = () => {
 
       {files.length > 0 && (
         <div className="tool-info-bar fade-in" style={{ marginTop: '1rem' }}>
-          <p className="tool-info-desc" style={{ marginBottom: '0.7rem' }}>{files.length} page image(s) selected</p>
-          <div style={{ display: 'grid', gap: '0.5rem', marginBottom: '0.9rem' }}>
-            {files.map((file, i) => (
-              <div key={`${file.name}-${i}`} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.5rem', border: '1px solid var(--border)', borderRadius: '10px', padding: '0.5rem 0.7rem', background: 'var(--bg2)' }}>
-                <span style={{ fontSize: '0.92rem' }}>{i + 1}. {file.name}</span>
+          <p className="tool-info-desc" style={{ marginBottom: '0.35rem' }}>{files.length} page image(s) selected</p>
+          <p className="tool-info-desc" style={{ marginBottom: '0.8rem', color: 'var(--text3)' }}>
+            Drag and drop cards with mouse to reorder pages.
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: '0.75rem', marginBottom: '0.9rem' }}>
+            {files.map((item, i) => (
+              <div
+                key={item.id}
+                draggable
+                onDragStart={() => onDragStart(i)}
+                onDragEnter={() => onDragEnter(i)}
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={() => onDrop(i)}
+                onDragEnd={onDragEnd}
+                style={{
+                  border: `1px solid ${dragOverIndex === i ? 'var(--primary)' : 'var(--border)'}`,
+                  borderRadius: '10px',
+                  padding: '0.5rem',
+                  background: 'var(--bg2)',
+                  opacity: dragIndex === i ? 0.6 : 1,
+                  cursor: 'grab',
+                }}
+              >
+                <div style={{ width: '100%', aspectRatio: '1 / 1.3', overflow: 'hidden', borderRadius: '8px', background: 'var(--bg3)', marginBottom: '0.45rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <img src={item.previewUrl} alt={`Page preview ${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                </div>
+                <span style={{ fontSize: '0.86rem', display: 'block', marginBottom: '0.45rem' }}>{i + 1}. {item.file.name}</span>
                 <div style={{ display: 'flex', gap: '0.35rem' }}>
                   <button className="btn btn-outline btn-sm" onClick={() => move(i, -1)} disabled={i === 0}>↑</button>
                   <button className="btn btn-outline btn-sm" onClick={() => move(i, 1)} disabled={i === files.length - 1}>↓</button>
