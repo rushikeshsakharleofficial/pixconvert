@@ -29,8 +29,6 @@ const ExtractPages = lazy(() => import('./components/ExtractPages'));
 const OrganizePdf = lazy(() => import('./components/OrganizePdf'));
 const ScanToPdf = lazy(() => import('./components/ScanToPdf'));
 const Contact = lazy(() => import('./components/Contact'));
-const Blog = lazy(() => import('./components/Blog'));
-const BlogPost = lazy(() => import('./components/BlogPost'));
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -143,8 +141,6 @@ const App = () => (
         <Route path="/about"   element={<About />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/contact" element={<Contact />} />
-        <Route path="/blog"    element={<Blog />} />
-        <Route path="/blog/:id" element={<BlogPost />} />
       </Routes>
     </Suspense>
     <Footer />

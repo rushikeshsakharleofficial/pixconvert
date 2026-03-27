@@ -168,7 +168,6 @@ const Navbar = () => {
           <li><NavLink to="/about"   onClick={closeMenu} className={({ isActive }) => isActive ? 'active' : ''}>About</NavLink></li>
           <li><NavLink to="/privacy" onClick={closeMenu} className={({ isActive }) => isActive ? 'active' : ''}>Privacy</NavLink></li>
           <li><NavLink to="/contact" onClick={closeMenu} className={({ isActive }) => isActive ? 'active' : ''}>Contact</NavLink></li>
-          {/* <li><NavLink to="/blog"    onClick={closeMenu} className={({ isActive }) => isActive ? 'active' : ''}>Blog</NavLink></li> */}
         </ul>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
