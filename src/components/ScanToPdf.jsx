@@ -182,10 +182,30 @@ const ScanToPdf = () => {
                   <span style={{ color: 'var(--text3)', marginRight: '0.35rem' }}>{i + 1}.</span>
                   <span style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>{item.file.name}</span>
                 </div>
-                <div style={{ display: 'flex', gap: '0.35rem' }}>
-                  <button className="btn btn-outline btn-sm" onClick={() => move(i, -1)} disabled={i === 0}>↑</button>
-                  <button className="btn btn-outline btn-sm" onClick={() => move(i, 1)} disabled={i === files.length - 1}>↓</button>
-                  <button className="btn btn-outline btn-sm" onClick={() => removeFile(i)}>Remove</button>
+                <div style={{ display: 'flex', gap: '0.35rem', alignItems: 'center' }}>
+                  <button
+                    className="btn btn-outline btn-sm"
+                    style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1, minWidth: '2.2rem' }}
+                    onClick={() => move(i, -1)}
+                    disabled={i === 0}
+                  >
+                    ↑
+                  </button>
+                  <button
+                    className="btn btn-outline btn-sm"
+                    style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1, minWidth: '2.2rem' }}
+                    onClick={() => move(i, 1)}
+                    disabled={i === files.length - 1}
+                  >
+                    ↓
+                  </button>
+                  <button
+                    className="btn btn-outline btn-sm"
+                    style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1.1, minWidth: '5.2rem' }}
+                    onClick={() => removeFile(i)}
+                  >
+                    Remove
+                  </button>
                 </div>
               </div>
             ))}
