@@ -10,6 +10,7 @@ import OcrTool from './components/OcrTool';
 import ComingSoon from './components/ComingSoon';
 import About from './components/About';
 import Privacy from './components/Privacy';
+import NotFound from './components/NotFound';
 
 // Lazy loaded (heavy tools — only loaded when navigated to)
 const Tools = lazy(() => import('./components/Tools'));
@@ -136,11 +137,12 @@ const App = () => (
           <Route path="ai-summarizer" element={<ComingSoon />} />
           <Route path="translate-pdf" element={<ComingSoon />} />
 
-          <Route path="*" element={<ComingSoon />} />
+          <Route path="*" element={<NotFound />} />
         </Route>
         <Route path="/about"   element={<About />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Suspense>
     <Footer />
