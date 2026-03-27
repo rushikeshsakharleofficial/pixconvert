@@ -22,6 +22,7 @@ const PdfToWord = lazy(() => import('./components/PdfToWord'));
 const PdfToPowerpoint = lazy(() => import('./components/PdfToPowerpoint'));
 const PdfToExcel = lazy(() => import('./components/PdfToExcel'));
 const PdfToPdfA = lazy(() => import('./components/PdfToPdfA'));
+const OrganizePdf = lazy(() => import('./components/OrganizePdf'));
 const Contact = lazy(() => import('./components/Contact'));
 const Blog = lazy(() => import('./components/Blog'));
 const BlogPost = lazy(() => import('./components/BlogPost'));
@@ -101,7 +102,7 @@ const App = () => (
           <Route path="split-pdf" element={<ComingSoon />} />
           <Route path="remove-pages" element={<ComingSoon />} />
           <Route path="extract-pages" element={<ComingSoon />} />
-          <Route path="organize-pdf" element={<ComingSoon />} />
+          <Route path="organize-pdf" element={<OrganizePdf />} />
           <Route path="scan-to-pdf" element={<ComingSoon />} />
 
           {/* Optimize PDF */}

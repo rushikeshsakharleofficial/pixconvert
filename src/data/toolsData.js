@@ -24,7 +24,7 @@ export const toolsData = [
       { name: "Split PDF",    path: "/tools/split-pdf",     icon: "✂️", color: "#e5322d", comingSoon: true, desc: "Separate one page or a whole set for easy conversion into independent PDF files." },
       { name: "Remove Pages", path: "/tools/remove-pages",  icon: "🗑️", color: "#e5322d", comingSoon: true, desc: "Remove unwanted pages from your PDF documents easily." },
       { name: "Extract Pages",path: "/tools/extract-pages", icon: "📄", color: "#e5322d", comingSoon: true, desc: "Extract specific pages from your PDF documents." },
-      { name: "Organize PDF", path: "/tools/organize-pdf",  icon: "📑", color: "#e5322d", comingSoon: true, desc: "Sort, reorder, and organize PDF pages with drag & drop." },
+      { name: "Organize PDF", path: "/tools/organize-pdf",  icon: "📑", color: "#e5322d", isNew: true, desc: "Sort, reorder, and organize PDF pages with drag & drop." },
       { name: "Scan to PDF",  path: "/tools/scan-to-pdf",   icon: "🖨️", color: "#e5322d", comingSoon: true, desc: "Scan documents and save them directly as PDF files." }
     ]
   },
