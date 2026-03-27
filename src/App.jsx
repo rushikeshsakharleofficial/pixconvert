@@ -22,7 +22,12 @@ const PdfToWord = lazy(() => import('./components/PdfToWord'));
 const PdfToPowerpoint = lazy(() => import('./components/PdfToPowerpoint'));
 const PdfToExcel = lazy(() => import('./components/PdfToExcel'));
 const PdfToPdfA = lazy(() => import('./components/PdfToPdfA'));
+const MergePdf = lazy(() => import('./components/MergePdf'));
+const SplitPdf = lazy(() => import('./components/SplitPdf'));
+const RemovePages = lazy(() => import('./components/RemovePages'));
+const ExtractPages = lazy(() => import('./components/ExtractPages'));
 const OrganizePdf = lazy(() => import('./components/OrganizePdf'));
+const ScanToPdf = lazy(() => import('./components/ScanToPdf'));
 const Contact = lazy(() => import('./components/Contact'));
 const Blog = lazy(() => import('./components/Blog'));
 const BlogPost = lazy(() => import('./components/BlogPost'));
@@ -98,12 +103,12 @@ const App = () => (
           <Route path="pdf-to-pdf-a" element={<PdfToPdfA />} />
 
           {/* Organize PDF */}
-          <Route path="merge-pdf" element={<ComingSoon />} />
-          <Route path="split-pdf" element={<ComingSoon />} />
-          <Route path="remove-pages" element={<ComingSoon />} />
-          <Route path="extract-pages" element={<ComingSoon />} />
+          <Route path="merge-pdf" element={<MergePdf />} />
+          <Route path="split-pdf" element={<SplitPdf />} />
+          <Route path="remove-pages" element={<RemovePages />} />
+          <Route path="extract-pages" element={<ExtractPages />} />
           <Route path="organize-pdf" element={<OrganizePdf />} />
-          <Route path="scan-to-pdf" element={<ComingSoon />} />
+          <Route path="scan-to-pdf" element={<ScanToPdf />} />
 
           {/* Optimize PDF */}
           <Route path="compress-pdf" element={<ComingSoon />} />
