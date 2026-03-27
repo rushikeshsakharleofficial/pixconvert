@@ -59,16 +59,32 @@ const ScanToPdf = () => {
     setFiles((prev) => reorder(prev, index, next));
   };
 
-  const onDragStart = (index) => {
+  const onDragStart = (event, index) => {
+    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData('text/plain', String(index));
     setDragIndex(index);
   };
 
-  const onDragEnter = (index) => {
-    setDragOverIndex(index);
+  const getDropIndexFromTarget = (target) => {
+    const card = target.closest('[data-scan-card-index]');
+    if (!card) return null;
+    const raw = card.getAttribute('data-scan-card-index');
+    const parsed = Number(raw);
+    return Number.isInteger(parsed) ? parsed : null;
   };
 
-  const onDrop = (index) => {
+  const onGridDragOver = (event) => {
+    event.preventDefault();
     if (dragIndex === null) return;
+    const index = getDropIndexFromTarget(event.target);
+    if (index !== null) setDragOverIndex(index);
+  };
+
+  const onGridDrop = (event) => {
+    event.preventDefault();
+    if (dragIndex === null) return;
+    const index = getDropIndexFromTarget(event.target);
+    if (index === null) return;
     setFiles((prev) => reorder(prev, dragIndex, index));
     setDragIndex(null);
     setDragOverIndex(null);
@@ -138,15 +154,17 @@ const ScanToPdf = () => {
           <p className="tool-info-desc" style={{ marginBottom: '0.8rem', color: 'var(--text3)' }}>
             Drag and drop cards with mouse to reorder pages.
           </p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: '0.75rem', marginBottom: '0.9rem' }}>
+          <div
+            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: '0.75rem', marginBottom: '0.9rem' }}
+            onDragOver={onGridDragOver}
+            onDrop={onGridDrop}
+          >
             {files.map((item, i) => (
               <div
                 key={item.id}
+                data-scan-card-index={i}
                 draggable
-                onDragStart={() => onDragStart(i)}
-                onDragEnter={() => onDragEnter(i)}
-                onDragOver={(e) => e.preventDefault()}
-                onDrop={() => onDrop(i)}
+                onDragStart={(e) => onDragStart(e, i)}
                 onDragEnd={onDragEnd}
                 style={{
                   border: `1px solid ${dragOverIndex === i ? 'var(--primary)' : 'var(--border)'}`,
@@ -160,7 +178,10 @@ const ScanToPdf = () => {
                 <div style={{ width: '100%', aspectRatio: '1 / 1.3', overflow: 'hidden', borderRadius: '8px', background: 'var(--bg3)', marginBottom: '0.45rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <img src={item.previewUrl} alt={`Page preview ${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
-                <span style={{ fontSize: '0.86rem', display: 'block', marginBottom: '0.45rem' }}>{i + 1}. {item.file.name}</span>
+                <div style={{ fontSize: '0.86rem', marginBottom: '0.45rem', minHeight: '2.4rem', lineHeight: 1.35 }}>
+                  <span style={{ color: 'var(--text3)', marginRight: '0.35rem' }}>{i + 1}.</span>
+                  <span style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>{item.file.name}</span>
+                </div>
                 <div style={{ display: 'flex', gap: '0.35rem' }}>
                   <button className="btn btn-outline btn-sm" onClick={() => move(i, -1)} disabled={i === 0}>↑</button>
                   <button className="btn btn-outline btn-sm" onClick={() => move(i, 1)} disabled={i === files.length - 1}>↓</button>
