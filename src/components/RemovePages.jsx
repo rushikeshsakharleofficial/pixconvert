@@ -1,13 +1,19 @@
 import { useEffect, useState } from 'react';
 import { PDFDocument } from 'pdf-lib';
+import * as pdfjsLib from 'pdfjs-dist';
+import pdfWorker from 'pdfjs-dist/build/pdf.worker.mjs?url';
 import DropZone from './DropZone';
 import formatSize from '../utils/formatSize';
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
 
 const RemovePages = () => {
   const [file, setFile] = useState(null);
   const [sourceBytes, setSourceBytes] = useState(null);
   const [pageCount, setPageCount] = useState(0);
   const [removeFlags, setRemoveFlags] = useState([]);
+  const [pagePreviews, setPagePreviews] = useState([]);
+  const [previewLoading, setPreviewLoading] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState(null);
   const [resultUrl, setResultUrl] = useState(null);
@@ -30,14 +36,32 @@ const RemovePages = () => {
       setSourceBytes(bytes);
       setPageCount(count);
       setRemoveFlags(Array.from({ length: count }, () => false));
+      setPagePreviews(Array.from({ length: count }, () => null));
       setError(null);
       if (resultUrl) {
         URL.revokeObjectURL(resultUrl);
         setResultUrl(null);
       }
+
+      setPreviewLoading(true);
+      const previewPdf = await pdfjsLib.getDocument({ data: bytes }).promise;
+      const previews = [];
+      for (let i = 1; i <= previewPdf.numPages; i += 1) {
+        const page = await previewPdf.getPage(i);
+        const viewport = page.getViewport({ scale: 0.4 });
+        const canvas = document.createElement('canvas');
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        const ctx = canvas.getContext('2d');
+        await page.render({ canvasContext: ctx, viewport }).promise;
+        previews.push(canvas.toDataURL('image/jpeg', 0.72));
+      }
+      setPagePreviews(previews);
     } catch (err) {
       console.error(err);
       setError('Could not read this PDF. Try another file.');
+    } finally {
+      setPreviewLoading(false);
     }
   };
 
@@ -97,11 +121,25 @@ const RemovePages = () => {
       {file && (
         <div className="tool-info-bar fade-in" style={{ marginTop: '1rem' }}>
           <p className="tool-info-desc">{file.name} ({formatSize(file.size)}) - {pageCount} pages</p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '0.5rem', margin: '0.75rem 0' }}>
+          {previewLoading && (
+            <p className="tool-info-desc" style={{ marginBottom: '0.6rem' }}>
+              Rendering page previews...
+            </p>
+          )}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '0.75rem', margin: '0.75rem 0' }}>
             {removeFlags.map((remove, i) => (
-              <label key={i} style={{ border: '1px solid var(--border)', borderRadius: '8px', padding: '0.45rem 0.55rem', display: 'flex', alignItems: 'center', gap: '0.45rem', background: 'var(--bg2)' }}>
-                <input type="checkbox" checked={remove} onChange={() => toggleRemove(i)} />
-                <span>Page {i + 1}</span>
+              <label key={i} style={{ border: `1px solid ${remove ? 'var(--danger)' : 'var(--border)'}`, borderRadius: '10px', padding: '0.55rem', display: 'grid', gap: '0.45rem', background: 'var(--bg2)', cursor: 'pointer', opacity: remove ? 0.72 : 1 }}>
+                <div style={{ width: '100%', aspectRatio: '1 / 1.42', overflow: 'hidden', borderRadius: '8px', background: 'var(--bg3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {pagePreviews[i] ? (
+                    <img src={pagePreviews[i]} alt={`Page ${i + 1} preview`} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                  ) : (
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text3)' }}>Loading preview...</span>
+                  )}
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                  <input type="checkbox" checked={remove} onChange={() => toggleRemove(i)} />
+                  <span>Page {i + 1}</span>
+                </div>
               </label>
             ))}
           </div>
