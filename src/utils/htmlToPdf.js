@@ -1,5 +1,6 @@
 import html2canvas from 'html2canvas';
 import { PDFDocument } from 'pdf-lib';
+import DOMPurify from 'dompurify';
 
 const A4_W = 595.28;
 const A4_H = 841.89;
@@ -25,7 +26,7 @@ export async function htmlToPdfBytes(html, options = {}) {
     `font:14px/1.6 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif`,
     `word-break:break-word`,
   ].join(';');
-  wrap.innerHTML = html;
+  wrap.innerHTML = DOMPurify.sanitize(html, { FORCE_BODY: true });
   document.body.appendChild(wrap);
 
   try {

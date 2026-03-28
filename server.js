@@ -156,8 +156,12 @@ app.get('/api/files', (req, res) => {
   res.json({ files });
 });
 
-// DELETE /api/files/:id — delete a specific file (with path traversal protection)
+// DELETE /api/files/:id — delete a specific file (admin only)
 app.delete('/api/files/:id', (req, res) => {
+  const apiKey = req.headers['x-admin-key'];
+  if (!process.env.ADMIN_API_KEY || apiKey !== process.env.ADMIN_API_KEY) {
+    return res.status(403).json({ error: 'Forbidden — admin key required' });
+  }
   const filePath = safePath(req.params.id);
   if (!filePath) return res.status(403).json({ error: 'Forbidden' });
   if (!fs.existsSync(filePath)) return res.status(404).json({ error: 'File not found' });
