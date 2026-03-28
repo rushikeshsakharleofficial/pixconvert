@@ -11,10 +11,13 @@ const faqs = [
 const Contact = () => {
   const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
   const [toast, setToast] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [openFaq, setOpenFaq] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (submitting) return;
+    setSubmitting(true);
     try {
       const res = await fetch('/api/contact', {
         method: 'POST',
@@ -28,6 +31,8 @@ const Contact = () => {
     } catch (err) {
       setToast('error');
       setTimeout(() => setToast(false), 3500);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -61,8 +66,8 @@ const Contact = () => {
                 <textarea id="contact-message" required value={formData.message}
                   onChange={e => update('message', e.target.value)} placeholder="Tell us more…" />
               </div>
-              <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
-                ✉️ Send Message
+              <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={submitting}>
+                {submitting ? 'Sending…' : '✉️ Send Message'}
               </button>
             </form>
           </div>

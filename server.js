@@ -81,6 +81,14 @@ app.use(cors({
 
 app.use(express.json({ limit: '10kb' }));
 
+// Security headers
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  next();
+});
+
 // Rate limiting
 const uploadLimiter = rateLimit({
   windowMs: 60 * 1000, // 1 minute
@@ -125,8 +133,14 @@ app.post('/api/upload', uploadLimiter, upload.array('files', MAX_FILES_PER_UPLOA
   res.json({ files: saved });
 });
 
-// GET /api/files — list all uploaded files with expiry info
+// GET /api/files — list uploaded files (restricted to admin use only)
+// WARNING: This endpoint lists ALL uploads. In production, add authentication
+// middleware or remove this endpoint entirely if not needed.
 app.get('/api/files', (req, res) => {
+  const apiKey = req.headers['x-admin-key'];
+  if (!process.env.ADMIN_API_KEY || apiKey !== process.env.ADMIN_API_KEY) {
+    return res.status(403).json({ error: 'Forbidden — admin key required' });
+  }
   const now = Date.now();
   const files = fs.readdirSync(UPLOADS_DIR)
     .filter(f => f !== '.gitkeep')
@@ -155,6 +169,12 @@ app.delete('/api/files/:id', (req, res) => {
 app.post('/api/contact', contactLimiter, async (req, res) => {
   const { name, email, subject, message } = req.body;
   if (!name || !email || !message) return res.status(400).json({ error: 'Missing required fields' });
+
+  // Input length limits to prevent abuse
+  if (typeof name !== 'string' || name.length > 100) return res.status(400).json({ error: 'Name too long (max 100 chars)' });
+  if (typeof email !== 'string' || email.length > 254) return res.status(400).json({ error: 'Email too long' });
+  if (subject && (typeof subject !== 'string' || subject.length > 200)) return res.status(400).json({ error: 'Subject too long (max 200 chars)' });
+  if (typeof message !== 'string' || message.length > 5000) return res.status(400).json({ error: 'Message too long (max 5000 chars)' });
 
   // Basic email format validation
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

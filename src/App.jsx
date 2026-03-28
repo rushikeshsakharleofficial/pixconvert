@@ -36,10 +36,48 @@ const ExcelToPdf = lazy(() => import('./components/ExcelToPdf'));
 const HtmlToPdf = lazy(() => import('./components/HtmlToPdf'));
 const Contact = lazy(() => import('./components/Contact'));
 
+const PAGE_TITLES = {
+  '/': 'PixConvert — Free Online PDF & Image Converter',
+  '/tools': 'All Tools — PixConvert',
+  '/about': 'About — PixConvert',
+  '/privacy': 'Privacy Policy — PixConvert',
+  '/contact': 'Contact Us — PixConvert',
+  '/tools/converter': 'Universal Image Converter — PixConvert',
+  '/tools/gif': 'GIF Maker — PixConvert',
+  '/tools/pdf': 'Unlock PDF — PixConvert',
+  '/tools/pdf-lock': 'Protect PDF — PixConvert',
+  '/tools/pdf-to-jpg': 'PDF to JPG — PixConvert',
+  '/tools/pdf-to-word': 'PDF to Word — PixConvert',
+  '/tools/pdf-to-powerpoint': 'PDF to PowerPoint — PixConvert',
+  '/tools/pdf-to-excel': 'PDF to Excel — PixConvert',
+  '/tools/pdf-to-pdf-a': 'PDF to PDF/A — PixConvert',
+  '/tools/merge-pdf': 'Merge PDF — PixConvert',
+  '/tools/split-pdf': 'Split PDF — PixConvert',
+  '/tools/remove-pages': 'Remove PDF Pages — PixConvert',
+  '/tools/extract-pages': 'Extract PDF Pages — PixConvert',
+  '/tools/organize-pdf': 'Organize PDF — PixConvert',
+  '/tools/scan-to-pdf': 'Scan to PDF — PixConvert',
+  '/tools/jpg-to-pdf': 'JPG to PDF — PixConvert',
+  '/tools/word-to-pdf': 'Word to PDF — PixConvert',
+  '/tools/powerpoint-to-pdf': 'PowerPoint to PDF — PixConvert',
+  '/tools/excel-to-pdf': 'Excel to PDF — PixConvert',
+  '/tools/html-to-pdf': 'HTML to PDF — PixConvert',
+  '/tools/jpg-to-png': 'JPG to PNG — PixConvert',
+  '/tools/png-to-jpg': 'PNG to JPG — PixConvert',
+  '/tools/webp-to-jpg': 'WebP to JPG — PixConvert',
+  '/tools/heic-to-jpg': 'HEIC to JPG — PixConvert',
+  '/tools/bmp-to-png': 'BMP to PNG — PixConvert',
+  '/tools/photo-to-markdown': 'Photo to Markdown (OCR) — PixConvert',
+  '/tools/ocr-pdf': 'OCR PDF — PixConvert',
+};
+
 const ScrollToTop = () => {
   const { pathname } = useLocation();
 
-  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    document.title = PAGE_TITLES[pathname] || 'PixConvert — Free Online PDF & Image Converter';
+  }, [pathname]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -77,11 +115,11 @@ const LoadingFallback = () => (
   </div>
 );
 
-// Vercel trigger: 2026-03-26
 const App = () => (
   <BrowserRouter>
     <ScrollToTop />
     <Navbar />
+    <ErrorBoundary>
     <Suspense fallback={<LoadingFallback />}>
       <Routes>
         <Route path="/"        element={<Home />} />
@@ -150,6 +188,7 @@ const App = () => (
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Suspense>
+    </ErrorBoundary>
     <Footer />
   </BrowserRouter>
 );
