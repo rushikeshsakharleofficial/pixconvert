@@ -8,7 +8,8 @@
     "server": "node server.js",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "autoscale:docker": "node scripts/docker-autoscale.mjs"
   },
   "dependencies": {
     "@pdfsmaller/pdf-decrypt": "^1.0.1",

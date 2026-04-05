@@ -10,6 +10,8 @@ services:
       NODE_ENV: production
       PORT: 4000
       TRUST_PROXY: 1
+      APP_MIN_REPLICAS: ${APP_MIN_REPLICAS:-1}
+      APP_MAX_REPLICAS: ${APP_MAX_REPLICAS:-10}
     expose:
       - "4000"
     volumes:
