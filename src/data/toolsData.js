@@ -71,9 +71,9 @@ export const toolsData = [
     items: [
       { name: "Unlock PDF",  path: "/tools/pdf",          icon: "🔓", color: "#e74c3c", desc: "Remove PDF password security, giving you the freedom to use your PDFs as you want." },
       { name: "Protect PDF", path: "/tools/pdf-lock",     icon: "🔐", color: "#e74c3c", desc: "Protect PDF files with a password. Encrypt documents to prevent unauthorized access." },
-      { name: "Sign PDF",    path: "/tools/sign-pdf",     icon: "✍️", color: "#e74c3c", comingSoon: true, desc: "Sign yourself or request electronic signatures from others." },
-      { name: "Redact PDF",  path: "/tools/redact-pdf",   icon: "⬛", color: "#e74c3c", comingSoon: true, desc: "Permanently remove sensitive content from your PDF documents." },
-      { name: "Compare PDF", path: "/tools/compare-pdf",  icon: "⚖️", color: "#e74c3c", comingSoon: true, desc: "Compare two PDF documents side by side and find the differences." }
+      { name: "Sign PDF",    path: "/tools/sign-pdf",     icon: "✍️", color: "#e74c3c", desc: "Sign yourself or request electronic signatures from others." },
+      { name: "Redact PDF",  path: "/tools/redact-pdf",   icon: "⬛", color: "#e74c3c", desc: "Permanently remove sensitive content from your PDF documents." },
+      { name: "Compare PDF", path: "/tools/compare-pdf",  icon: "⚖️", color: "#e74c3c", desc: "Compare two PDF documents side by side and find the differences." }
     ]
   },
   {

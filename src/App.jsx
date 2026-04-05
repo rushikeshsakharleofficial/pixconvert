@@ -40,6 +40,9 @@ const PowerpointToPdf = lazy(() => import('./components/PowerpointToPdf'));
 const ExcelToPdf = lazy(() => import('./components/ExcelToPdf'));
 const HtmlToPdf = lazy(() => import('./components/HtmlToPdf'));
 const Contact = lazy(() => import('./components/Contact'));
+const SignPdf = lazy(() => import('./components/SignPdf'));
+const RedactPdf = lazy(() => import('./components/RedactPdf'));
+const ComparePdf = lazy(() => import('./components/ComparePdf'));
 
 const PAGE_TITLES = {
   '/': 'PixConvert — Free Online PDF & Image Converter',
@@ -80,6 +83,9 @@ const PAGE_TITLES = {
   '/tools/photo-to-markdown': 'Photo to Markdown (OCR) — PixConvert',
   '/tools/ocr-pdf': 'OCR PDF — PixConvert',
   '/tools/demo': 'Demo — PixConvert',
+  '/tools/sign-pdf': 'Sign PDF — PixConvert',
+  '/tools/redact-pdf': 'Redact PDF — PixConvert',
+  '/tools/compare-pdf': 'Compare PDF — PixConvert',
 };
 
 const ScrollToTop = () => {
@@ -183,9 +189,9 @@ const App = () => (
           <Route path="edit-pdf" element={<EditPdf />} />
 
           {/* PDF Security */}
-          <Route path="sign-pdf" element={<ComingSoon />} />
-          <Route path="redact-pdf" element={<ComingSoon />} />
-          <Route path="compare-pdf" element={<ComingSoon />} />
+          <Route path="sign-pdf" element={<SignPdf />} />
+          <Route path="redact-pdf" element={<RedactPdf />} />
+          <Route path="compare-pdf" element={<ComparePdf />} />
 
           {/* PDF Intelligence */}
           <Route path="ai-summarizer" element={<ComingSoon />} />
