@@ -5,25 +5,22 @@ import * as React from 'react';
 import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-medium transition-colors outline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring/70 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0',
+  'relative inline-flex items-center justify-center whitespace-nowrap overflow-hidden rounded-full border-2 border-[var(--cartoon-btn-border)] text-sm font-bold text-[var(--cartoon-btn-text)] transition-all duration-150 outline-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 before:absolute before:top-1/2 before:left-[-100%] before:h-20 before:w-12 before:-translate-y-1/2 before:rotate-12 before:bg-white/50 before:transition-all before:duration-500 before:content-[""] hover:-translate-y-1 hover:before:left-[200%] active:translate-y-0',
   {
     variants: {
       variant: {
-        default: 'bg-primary text-primary-foreground shadow-sm shadow-black/5 hover:bg-primary/90',
-        destructive:
-          'bg-destructive text-destructive-foreground shadow-sm shadow-black/5 hover:bg-destructive/90',
-        outline:
-          'border border-input bg-background shadow-sm shadow-black/5 hover:bg-accent hover:text-accent-foreground',
-        secondary:
-          'bg-secondary text-secondary-foreground shadow-sm shadow-black/5 hover:bg-secondary/80',
-        ghost: 'hover:bg-accent hover:text-accent-foreground',
-        link: 'text-primary underline-offset-4 hover:underline',
+        default: 'bg-[var(--cartoon-btn-primary)] shadow-[0_4px_0_0_var(--cartoon-btn-shadow)]',
+        destructive: 'bg-[var(--cartoon-btn-danger)] shadow-[0_4px_0_0_var(--cartoon-btn-shadow)]',
+        outline: 'bg-[var(--cartoon-btn-outline)] shadow-[0_4px_0_0_var(--cartoon-btn-shadow)]',
+        secondary: 'bg-[var(--cartoon-btn-secondary)] shadow-[0_4px_0_0_var(--cartoon-btn-shadow)]',
+        ghost: 'border-transparent bg-transparent text-foreground before:hidden shadow-none hover:bg-accent hover:shadow-none',
+        link: 'border-transparent bg-transparent text-primary underline-offset-4 before:hidden shadow-none hover:underline hover:shadow-none',
       },
       size: {
-        default: 'h-9 px-4 py-2',
-        sm: 'h-8 rounded-lg px-3 text-xs',
-        lg: 'h-10 rounded-lg px-8',
-        icon: 'h-9 w-9',
+        default: 'h-12 px-6 text-base',
+        sm: 'h-10 px-4 text-sm',
+        lg: 'h-14 px-8 text-lg',
+        icon: 'h-11 w-11 rounded-full px-0',
       },
     },
     defaultVariants: {
