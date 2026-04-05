@@ -1,6 +1,29 @@
 import { Link, NavLink } from 'react-router-dom';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { toolsData } from '../data/toolsData';
+import { DropdownNavigation } from './ui/dropdown-navigation';
+import { 
+  Wrench, 
+  FileText, 
+  RefreshCw, 
+  ShieldCheck, 
+  Layers, 
+  Scissors, 
+  Trash2, 
+  FilePlus, 
+  Layout, 
+  Maximize, 
+  FileSearch,
+  Image as ImageIcon,
+  FileDigit,
+  Globe,
+  Lock,
+  RotateCcw,
+  Hash,
+  Stamp,
+  Crop,
+  Edit3
+} from 'lucide-react';
 
 const SunIcon = () => (
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -20,20 +43,56 @@ const MoonIcon = () => (
 
 const THEME_KEY = 'pixconvert-theme';
 
+// Map toolsData categories to logical groups for the mega menu
+const CATEGORY_MAP = {
+  "Organize PDF": "Management",
+  "Optimize PDF": "Management",
+  "PDF Security": "Management",
+  "Convert to PDF": "Conversion",
+  "Convert from PDF": "Conversion",
+  "Image Conversion": "Media & Edit",
+  "Edit PDF": "Media & Edit",
+  "Media Tools": "Media & Edit",
+  "PDF Intelligence": "Media & Edit"
+};
+
+const ICON_MAP = {
+  "Merge PDF": Layers,
+  "Split PDF": Scissors,
+  "Remove Pages": Trash2,
+  "Extract Pages": FilePlus,
+  "Organize PDF": Layout,
+  "Scan to PDF": Maximize,
+  "Compress PDF": Maximize,
+  "Repair PDF": Wrench,
+  "OCR PDF": FileSearch,
+  "Universal Converter": RefreshCw,
+  "GIF Maker": ImageIcon,
+  "JPG to PDF": ImageIcon,
+  "WORD to PDF": FileText,
+  "POWERPOINT to PDF": Layout,
+  "EXCEL to PDF": FileDigit,
+  "HTML to PDF": Globe,
+  "Unlock PDF": Lock,
+  "Protect PDF": ShieldCheck,
+  "Rotate PDF": RotateCcw,
+  "Add Page Numbers": Hash,
+  "Add Watermark": Stamp,
+  "Crop PDF": Crop,
+  "Edit PDF": Edit3
+};
+
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [megaOpen, setMegaOpen] = useState(false);
   const [mobileToolsOpen, setMobileToolsOpen] = useState(false);
   const [isDark, setIsDark] = useState(() => {
     try {
       return (localStorage.getItem(THEME_KEY) ?? 'dark') !== 'light';
     } catch { return true; }
   });
-  const dropdownRef = useRef(null);
 
   const closeMenu = () => {
     setMenuOpen(false);
-    setMegaOpen(false);
     setMobileToolsOpen(false);
   };
 
@@ -52,21 +111,51 @@ const Navbar = () => {
     setIsDark(theme !== 'light');
   }, []);
 
-  useEffect(() => {
-    const handler = (e) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-        setMegaOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, []);
-
   // Lock body scroll when mobile menu is open
   useEffect(() => {
     document.body.style.overflow = menuOpen ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
   }, [menuOpen]);
+
+  const navItems = useMemo(() => {
+    const toolsNavItem = {
+      id: 2,
+      label: "Tools",
+      subMenus: [
+        { title: "Management", items: [] },
+        { title: "Conversion", items: [] },
+        { title: "Media & Edit", items: [] }
+      ]
+    };
+
+    toolsData.forEach(cat => {
+      const groupName = CATEGORY_MAP[cat.category] || "Media & Edit";
+      const targetSubMenu = toolsNavItem.subMenus.find(s => s.title === groupName);
+      
+      cat.items.filter(i => !i.comingSoon).forEach(item => {
+        targetSubMenu.items.push({
+          label: item.name,
+          description: item.desc,
+          path: item.path,
+          icon: ICON_MAP[item.name] || item.icon,
+          isNew: item.isNew
+        });
+      });
+    });
+
+    // Limit items per submenu to prevent too much height
+    toolsNavItem.subMenus.forEach(subMenu => {
+      subMenu.items = subMenu.items.slice(0, 8);
+    });
+
+    return [
+      { id: 1, label: "Home", link: "/" },
+      toolsNavItem,
+      { id: 3, label: "About", link: "/about" },
+      { id: 4, label: "Privacy", link: "/privacy" },
+      { id: 5, label: "Contact", link: "/contact" }
+    ];
+  }, []);
 
   return (
     <>
@@ -87,74 +176,18 @@ const Navbar = () => {
           Pix<span className="logo-mark">Convert</span>
         </Link>
 
+        {/* Desktop Navigation */}
+        <div className="desktop-only">
+          <DropdownNavigation navItems={navItems} />
+        </div>
+
         <ul className={`nav-links${menuOpen ? ' open' : ''}`}>
-          <li>
+          {/* Mobile links only since desktop is handled by DropdownNavigation */}
+          <li className="mobile-only">
             <NavLink to="/" end onClick={closeMenu}
               className={({ isActive }) => isActive ? 'active' : ''}>
               Home
             </NavLink>
-          </li>
-
-          {/* Desktop compact dropdown */}
-          <li className="nav-dropdown desktop-only" ref={dropdownRef}
-            onMouseEnter={() => setMegaOpen(true)}
-            onMouseLeave={() => setMegaOpen(false)}>
-            <span className="nav-dropdown-trigger"
-              onClick={() => setMegaOpen(o => !o)}
-              aria-expanded={megaOpen}>
-              Tools ▾
-            </span>
-            <div className={`tools-dropdown${megaOpen ? ' open' : ''}`}>
-              {/* Popular / Quick Access */}
-              <div className="tools-dd-popular">
-                <span className="tools-dd-popular-label">Popular</span>
-                <div className="tools-dd-popular-grid">
-                  {[
-                    { icon: '🔄', name: 'Converter', path: '/tools/converter' },
-                    { icon: '📁', name: 'Merge PDF', path: '/tools/merge-pdf' },
-                    { icon: '✂️', name: 'Split PDF', path: '/tools/split-pdf' },
-                    { icon: '🔓', name: 'Unlock PDF', path: '/tools/pdf' },
-                    { icon: '🖼️', name: 'PDF → JPG', path: '/tools/pdf-to-jpg' },
-                    { icon: '📝', name: 'PDF → Word', path: '/tools/pdf-to-word' },
-                    { icon: '🎞️', name: 'GIF Maker', path: '/tools/gif' },
-                    { icon: '🖼️', name: 'JPG → PDF', path: '/tools/jpg-to-pdf' },
-                  ].map(t => (
-                    <NavLink key={t.path} to={t.path} onClick={closeMenu}
-                      className={({ isActive }) => `tools-dd-pill${isActive ? ' active' : ''}`}>
-                      <span className="tdi-icon">{t.icon}</span>{t.name}
-                    </NavLink>
-                  ))}
-                </div>
-              </div>
-
-              {/* All categories — compact */}
-              <div className="tools-dropdown-grid">
-                {toolsData.map(cat => {
-                  const active = cat.items.filter(i => !i.comingSoon);
-                  if (!active.length) return null;
-                  return (
-                    <div key={cat.category} className="tools-dropdown-group">
-                      <span className="tools-dropdown-label">{cat.category}</span>
-                      {active.map(item => (
-                        <NavLink key={item.path} to={item.path} onClick={closeMenu}
-                          className={({ isActive }) => `tools-dropdown-item${isActive ? ' active' : ''}`}>
-                          <span className="tdi-icon">{item.icon}</span>
-                          <span className="tdi-name">
-                            {item.name}
-                            {item.isNew && <span className="badge badge-new">New</span>}
-                          </span>
-                        </NavLink>
-                      ))}
-                    </div>
-                  );
-                })}
-              </div>
-              <div className="tools-dropdown-footer">
-                <Link to="/tools" onClick={closeMenu} className="tools-dropdown-browse">
-                  Browse all tools →
-                </Link>
-              </div>
-            </div>
           </li>
 
           {/* Mobile tools accordion */}
@@ -203,9 +236,24 @@ const Navbar = () => {
             )}
           </li>
 
-          <li><NavLink to="/about"   onClick={closeMenu} className={({ isActive }) => isActive ? 'active' : ''}>About</NavLink></li>
-          <li><NavLink to="/privacy" onClick={closeMenu} className={({ isActive }) => isActive ? 'active' : ''}>Privacy</NavLink></li>
-          <li><NavLink to="/contact" onClick={closeMenu} className={({ isActive }) => isActive ? 'active' : ''}>Contact</NavLink></li>
+          <li className="mobile-only">
+            <NavLink to="/about" onClick={closeMenu}
+              className={({ isActive }) => isActive ? 'active' : ''}>
+              About
+            </NavLink>
+          </li>
+          <li className="mobile-only">
+            <NavLink to="/privacy" onClick={closeMenu}
+              className={({ isActive }) => isActive ? 'active' : ''}>
+              Privacy
+            </NavLink>
+          </li>
+          <li className="mobile-only">
+            <NavLink to="/contact" onClick={closeMenu}
+              className={({ isActive }) => isActive ? 'active' : ''}>
+              Contact
+            </NavLink>
+          </li>
         </ul>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>

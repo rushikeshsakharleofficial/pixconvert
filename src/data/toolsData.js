@@ -59,11 +59,11 @@ export const toolsData = [
   {
     category: "Edit PDF",
     items: [
-      { name: "Rotate PDF",       path: "/tools/rotate-pdf",       icon: "🔄", color: "#16a085", comingSoon: true, desc: "Rotate your PDFs the way you need them. Rotate multiple PDFs at once!" },
-      { name: "Add Page Numbers", path: "/tools/add-page-numbers", icon: "🔢", color: "#16a085", comingSoon: true, desc: "Add page numbers to your PDF documents with full customization." },
-      { name: "Add Watermark",    path: "/tools/add-watermark",    icon: "©️", color: "#16a085", comingSoon: true, desc: "Stamp an image or text over your PDF. Choose typography, transparency and position." },
-      { name: "Crop PDF",         path: "/tools/crop-pdf",         icon: "📐", color: "#16a085", comingSoon: true, desc: "Crop PDF pages to adjust margins and remove unwanted whitespace." },
-      { name: "Edit PDF",         path: "/tools/edit-pdf",         icon: "✏️", color: "#16a085", comingSoon: true, desc: "Add text, images, shapes or freehand annotations to a PDF document." }
+      { name: "Rotate PDF",       path: "/tools/rotate-pdf",       icon: "🔄", color: "#16a085", isNew: true, desc: "Rotate your PDFs the way you need them. Rotate multiple PDFs at once!" },
+      { name: "Add Page Numbers", path: "/tools/add-page-numbers", icon: "🔢", color: "#16a085", isNew: true, desc: "Add page numbers to your PDF documents with full customization." },
+      { name: "Add Watermark",    path: "/tools/add-watermark",    icon: "©️", color: "#16a085", isNew: true, desc: "Stamp an image or text over your PDF. Choose typography, transparency and position." },
+      { name: "Crop PDF",         path: "/tools/crop-pdf",         icon: "📐", color: "#16a085", isNew: true, desc: "Crop PDF pages to adjust margins and remove unwanted whitespace." },
+      { name: "Edit PDF",         path: "/tools/edit-pdf",         icon: "✏️", color: "#16a085", isNew: true, desc: "Add text, images, shapes or freehand annotations to a PDF document." }
     ]
   },
   {

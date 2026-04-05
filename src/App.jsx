@@ -15,6 +15,11 @@ import NotFound from './components/NotFound';
 // Lazy loaded (heavy tools — only loaded when navigated to)
 const Tools = lazy(() => import('./components/Tools'));
 const UniversalConverter = lazy(() => import('./components/UniversalConverter'));
+const RotatePdf = lazy(() => import('./components/RotatePdf'));
+const AddPageNumbers = lazy(() => import('./components/AddPageNumbers'));
+const AddWatermark = lazy(() => import('./components/AddWatermark'));
+const CropPdf = lazy(() => import('./components/CropPdf'));
+const EditPdf = lazy(() => import('./components/EditPdf'));
 const GifMaker = lazy(() => import('./components/GifMaker'));
 const PdfUnlocker = lazy(() => import('./components/PdfUnlocker'));
 const PdfLocker = lazy(() => import('./components/PdfLocker'));
@@ -62,6 +67,11 @@ const PAGE_TITLES = {
   '/tools/powerpoint-to-pdf': 'PowerPoint to PDF — PixConvert',
   '/tools/excel-to-pdf': 'Excel to PDF — PixConvert',
   '/tools/html-to-pdf': 'HTML to PDF — PixConvert',
+  '/tools/rotate-pdf': 'Rotate PDF — PixConvert',
+  '/tools/add-page-numbers': 'Add Page Numbers to PDF — PixConvert',
+  '/tools/add-watermark': 'Add Watermark to PDF — PixConvert',
+  '/tools/crop-pdf': 'Crop PDF — PixConvert',
+  '/tools/edit-pdf': 'Edit PDF — PixConvert',
   '/tools/jpg-to-png': 'JPG to PNG — PixConvert',
   '/tools/png-to-jpg': 'PNG to JPG — PixConvert',
   '/tools/webp-to-jpg': 'WebP to JPG — PixConvert',
@@ -165,11 +175,11 @@ const App = () => (
           <Route path="html-to-pdf" element={<HtmlToPdf />} />
 
           {/* Edit PDF */}
-          <Route path="rotate-pdf" element={<ComingSoon />} />
-          <Route path="add-page-numbers" element={<ComingSoon />} />
-          <Route path="add-watermark" element={<ComingSoon />} />
-          <Route path="crop-pdf" element={<ComingSoon />} />
-          <Route path="edit-pdf" element={<ComingSoon />} />
+          <Route path="rotate-pdf" element={<RotatePdf />} />
+          <Route path="add-page-numbers" element={<AddPageNumbers />} />
+          <Route path="add-watermark" element={<AddWatermark />} />
+          <Route path="crop-pdf" element={<CropPdf />} />
+          <Route path="edit-pdf" element={<EditPdf />} />
 
           {/* PDF Security */}
           <Route path="sign-pdf" element={<ComingSoon />} />

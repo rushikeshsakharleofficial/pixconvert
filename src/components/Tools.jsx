@@ -1,37 +1,17 @@
-import { Outlet, useLocation, Link } from 'react-router-dom';
-import { useRef, useCallback } from 'react';
+import { Outlet, useLocation } from 'react-router-dom';
 import { toolsData } from '../data/toolsData';
+import { ServiceCard } from './ui/service-card';
 
-const Tilt3DCard = ({ children, to, className, style, disabled }) => {
-  const ref = useRef(null);
-  const rafRef = useRef(null);
-
-  const handleMove = useCallback((e) => {
-    if (disabled || rafRef.current) return;
-    rafRef.current = requestAnimationFrame(() => {
-      const el = ref.current;
-      if (!el) { rafRef.current = null; return; }
-      const rect = el.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / rect.width - 0.5;
-      const y = (e.clientY - rect.top) / rect.height - 0.5;
-      el.style.transform = `perspective(500px) rotateY(${x * 10}deg) rotateX(${-y * 10}deg) translateY(-4px) scale3d(1.02,1.02,1.02)`;
-      rafRef.current = null;
-    });
-  }, [disabled]);
-
-  const handleLeave = useCallback(() => {
-    const el = ref.current;
-    if (el) el.style.transform = '';
-    if (rafRef.current) { cancelAnimationFrame(rafRef.current); rafRef.current = null; }
-  }, []);
-
-  return (
-    <Link to={to} ref={ref} className={className}
-      style={{ ...style, transformStyle: 'preserve-3d', transition: 'transform 0.25s ease-out' }}
-      onMouseMove={handleMove} onMouseLeave={handleLeave}>
-      {children}
-    </Link>
-  );
+const CATEGORY_STYLE_MAP = {
+  "Media Tools": { variant: "default", img: "https://images.unsplash.com/photo-1542038783-0ad457d2242e?q=80&w=320&auto=format&fit=crop" },
+  "Image Conversion": { variant: "blue", img: "https://images.unsplash.com/photo-1452780212940-6f5c0c14d848?q=80&w=320&auto=format&fit=crop" },
+  "Organize PDF": { variant: "red", img: "https://images.unsplash.com/photo-1544391496-0d77af2dd8ae?q=80&w=320&auto=format&fit=crop" },
+  "Optimize PDF": { variant: "gray", img: "https://images.unsplash.com/photo-1504328156602-383033180681?q=80&w=320&auto=format&fit=crop" },
+  "Convert to PDF": { variant: "primary", img: "https://images.unsplash.com/photo-1568667256549-094345857637?q=80&w=320&auto=format&fit=crop" },
+  "Convert from PDF": { variant: "primary", img: "https://images.unsplash.com/photo-1586281380349-632531db7ed4?q=80&w=320&auto=format&fit=crop" },
+  "Edit PDF": { variant: "default", img: "https://images.unsplash.com/photo-1455390582262-044cdead277a?q=80&w=320&auto=format&fit=crop" },
+  "PDF Security": { variant: "gray", img: "https://images.unsplash.com/photo-1563986768609-322da13575f3?q=80&w=320&auto=format&fit=crop" },
+  "PDF Intelligence": { variant: "blue", img: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?q=80&w=320&auto=format&fit=crop" }
 };
 
 const Tools = () => {
@@ -48,24 +28,23 @@ const Tools = () => {
           {toolsData.map((cat, idx) => (
             <div key={idx} className={`tools-category-section fade-in delay-${Math.min(idx + 1, 9)}`}>
               <h3 className="category-heading">{cat.category}</h3>
-              <div className="tool-cards-grid">
-                {cat.items.map((item, i) => (
-                  <Tilt3DCard
-                    key={i}
-                    to={item.path}
-                    className={`tool-card${item.comingSoon ? ' coming-soon' : ''}`}
-                    style={{ '--card-color': item.color }}
-                    disabled={item.comingSoon}
-                  >
-                    <div className="tool-card-icon">{item.icon}</div>
-                    <h3>
-                      {item.name}
-                      {item.isNew && <span className="badge badge-new">New</span>}
-                    </h3>
-                    <p>{item.desc}</p>
-                    {!item.comingSoon && <span className="tool-card-cta">Use Tool →</span>}
-                  </Tilt3DCard>
-                ))}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {cat.items.map((item, i) => {
+                  const style = CATEGORY_STYLE_MAP[cat.category] || { variant: "default", img: "" };
+                  return (
+                    <ServiceCard
+                      key={i}
+                      title={item.name}
+                      href={item.path}
+                      imgSrc={style.img}
+                      imgAlt={item.name}
+                      variant={style.variant}
+                      description={item.desc}
+                      isNew={item.isNew}
+                      className={item.comingSoon ? 'opacity-50 pointer-events-none' : ''}
+                    />
+                  );
+                })}
               </div>
             </div>
           ))}

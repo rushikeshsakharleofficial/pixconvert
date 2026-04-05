@@ -1,3 +1,4 @@
+@import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 /* ===== Reset & Base ===== */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -9,6 +10,19 @@
   --bg3:   #18181c;
   --card:  #1c1c22;
   --card-hover: #222228;
+
+  /* shadcn/ui compatible mapping */
+  --background: #09090b;
+  --foreground: #f4f4f5;
+  --card-foreground: #f4f4f5;
+  --muted: #18181c;
+  --muted-foreground: #a1a1aa;
+  --accent: #18181c;
+  --accent-foreground: #f4f4f5;
+  --secondary: #111116;
+  --secondary-foreground: #f4f4f5;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
 
   /* Borders */
   --border:        rgba(255,255,255,0.07);
