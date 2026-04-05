@@ -1,9 +1,5 @@
 import { useState, useRef } from 'react';
 
-import PrismFluxLoader from './ui/prism-flux-loader';
-
-const UPLOAD_STATUSES = ['Uploading', 'Reading', 'Checking', 'Preparing', 'Syncing', 'Placing'];
-
 const DropZone = ({ onFiles, multiple = true, accept = 'image/*', maxFiles = 99999, label }) => {
   const [dragOver, setDragOver] = useState(false);
   const inputRef = useRef();
@@ -49,8 +45,11 @@ const DropZone = ({ onFiles, multiple = true, accept = 'image/*', maxFiles = 999
       <div className="drop-zone-frame" aria-hidden="true" />
 
       <div className="drop-zone-inner">
-        <div className="drop-zone-loader-wrap">
-          <PrismFluxLoader size={36} speed={dragOver ? 7 : 4.5} textSize={12} statuses={UPLOAD_STATUSES} />
+        <div className="drop-zone-icon-stack">
+          <div className="drop-zone-icon-main">
+            <span className="icon-upload" aria-hidden="true">↑</span>
+          </div>
+          <div className="drop-zone-icon-badge" aria-hidden="true">+</div>
         </div>
 
         <div className="drop-zone-copy">

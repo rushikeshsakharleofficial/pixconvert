@@ -20,7 +20,7 @@ const DemoOne = () => {
   }, []);
 
   const convertPageToScreenshot = async (page, pageNumber) => {
-    const viewport = page.getViewport({ scale: 1.1 });
+    const viewport = page.getViewport({ scale: 1.5 });
     const canvas = document.createElement('canvas');
     const context = canvas.getContext('2d');
 
@@ -56,17 +56,16 @@ const DemoOne = () => {
       const arrayBuffer = await file.arrayBuffer();
       const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
       const nextScreenshots = [];
-      const pageLimit = Math.min(pdf.numPages, 4);
 
-      for (let pageNum = 1; pageNum <= pageLimit; pageNum += 1) {
+      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum += 1) {
         const page = await pdf.getPage(pageNum);
         nextScreenshots.push(await convertPageToScreenshot(page, pageNum));
       }
 
       setScreenshots(nextScreenshots);
     } catch (err) {
-      console.error(err);
-      setError('Failed to process PDF file.');
+      console.error('Error processing PDF:', err);
+      setError('Failed to process PDF file');
     } finally {
       setIsProcessing(false);
     }
@@ -79,16 +78,20 @@ const DemoOne = () => {
   };
 
   return (
-    <div className="mx-auto mb-10 w-full max-w-6xl">
-      <FileUpload
-        onFileUpload={handleFileUpload}
-        onClear={clearScreenshots}
-        isProcessing={isProcessing}
-        pdfLibLoaded={pdfLibLoaded}
-        error={error}
-        file={uploadedFile}
-        screenshots={screenshots}
-      />
+    <div className="mt-5 min-h-screen w-full bg-gray-50">
+      <div className="mx-auto max-w-7xl px-4 py-12">
+        <div className="space-y-8">
+          <FileUpload
+            onFileUpload={handleFileUpload}
+            onClear={clearScreenshots}
+            isProcessing={isProcessing}
+            pdfLibLoaded={pdfLibLoaded}
+            error={error}
+            file={uploadedFile}
+            screenshots={screenshots}
+          />
+        </div>
+      </div>
     </div>
   );
 };
