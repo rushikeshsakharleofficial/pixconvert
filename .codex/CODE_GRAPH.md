@@ -2,6 +2,8 @@
 
 Use this file before broad file reads. It is a compact routing and dependency map for PixConvert.
 
+For exact ownership while editing, read `.codex/FILE_OUTLINE_MAP.md` after this file.
+
 ## Entry Points
 - `src/main.jsx`: mounts the React app and imports `src/index.css`.
 - `src/App.jsx`: top-level router, page titles, lazy-loaded tool routes, navbar/footer shell.
@@ -39,6 +41,7 @@ Use this file before broad file reads. It is a compact routing and dependency ma
 
 ## Token-Saving Workflow
 1. Read this file first.
-2. Open `src/App.jsx` only if the route map or lazy imports matter.
-3. Jump directly to the relevant component/helper pair instead of scanning `src/components/` broadly.
-4. For PDF tasks, check `pdfRasterizer.js`, `formatSize.js`, and the nearest sibling PDF tool before exploring elsewhere.
+2. Read `.codex/FILE_OUTLINE_MAP.md` to identify the owning file.
+3. Open `src/App.jsx` only if the route map or lazy imports matter.
+4. Jump directly to the relevant component/helper pair instead of scanning `src/components/` broadly.
+5. For PDF tasks, check `pdfRasterizer.js`, `formatSize.js`, and the nearest sibling PDF tool before exploring elsewhere.

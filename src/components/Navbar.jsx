@@ -1,20 +1,22 @@
 import { Link, NavLink } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+
 import { toolsData } from '../data/toolsData';
+import AppMenuBar from './ui/app-menu-bar';
 
 const SunIcon = () => (
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="5"/>
-    <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
-    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-    <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
-    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+    <circle cx="12" cy="12" r="5" />
+    <line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" />
+    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+    <line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" />
+    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
   </svg>
 );
 
 const MoonIcon = () => (
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
   </svg>
 );
 
@@ -26,7 +28,9 @@ const Navbar = () => {
   const [isDark, setIsDark] = useState(() => {
     try {
       return (localStorage.getItem(THEME_KEY) ?? 'dark') !== 'light';
-    } catch { return true; }
+    } catch {
+      return true;
+    }
   });
 
   const closeMenu = () => {
@@ -38,27 +42,35 @@ const Navbar = () => {
     const next = isDark ? 'light' : 'dark';
     setIsDark(!isDark);
     document.documentElement.setAttribute('data-theme', next);
-    try { localStorage.setItem(THEME_KEY, next); } catch (e) { /* ignore */ }
+    try {
+      localStorage.setItem(THEME_KEY, next);
+    } catch {
+      // ignore storage write failures
+    }
   };
 
-  // Apply theme on mount
   useEffect(() => {
-    const saved = (() => { try { return localStorage.getItem(THEME_KEY); } catch { return null; } })();
+    const saved = (() => {
+      try {
+        return localStorage.getItem(THEME_KEY);
+      } catch {
+        return null;
+      }
+    })();
     const theme = saved ?? 'dark';
     document.documentElement.setAttribute('data-theme', theme);
-    // eslint-disable-next-line
     setIsDark(theme !== 'light');
   }, []);
 
-  // Lock body scroll when mobile menu is open
   useEffect(() => {
     document.body.style.overflow = menuOpen ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
+    return () => {
+      document.body.style.overflow = '';
+    };
   }, [menuOpen]);
 
   return (
     <>
-      {/* Backdrop overlay for mobile drawer */}
       <div
         className={`nav-overlay${menuOpen ? ' active' : ''}`}
         onClick={closeMenu}
@@ -66,97 +78,43 @@ const Navbar = () => {
       />
 
       <nav className="navbar">
-        <Link to="/" className="nav-logo" onClick={closeMenu}>
-          <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: '32px', height: '32px' }}>
-            <defs>
-              <linearGradient id="origami-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#818cf8" />
-                <stop offset="100%" stopColor="#4f46e5" />
-              </linearGradient>
-            </defs>
-            {/* Background geometric accent */}
-            <rect x="4" y="4" width="24" height="24" rx="6" fill="var(--primary-glow)" />
-            {/* The Origami 'P' Fold */}
-            <path d="M10 8V24H14V16H18C21.3137 16 24 13.3137 24 10C24 6.68629 21.3137 4 18 4H14V8H10Z" fill="url(#origami-grad)" />
-            <path d="M14 8L18 4V12L14 8Z" fill="#4338ca" />
-            {/* Dynamic Sparkle */}
-            <circle cx="24" cy="8" r="1.5" fill="#818cf8" />
-          </svg>
-          Pix<span className="logo-mark">Convert</span>
-        </Link>
+        <div className="nav-left">
+          <Link to="/" className="nav-logo" onClick={closeMenu}>
+            <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: '32px', height: '32px' }}>
+              <defs>
+                <linearGradient id="origami-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#818cf8" />
+                  <stop offset="100%" stopColor="#4f46e5" />
+                </linearGradient>
+              </defs>
+              <rect x="4" y="4" width="24" height="24" rx="6" fill="var(--primary-glow)" />
+              <path d="M10 8V24H14V16H18C21.3137 16 24 13.3137 24 10C24 6.68629 21.3137 4 18 4H14V8H10Z" fill="url(#origami-grad)" />
+              <path d="M14 8L18 4V12L14 8Z" fill="#4338ca" />
+              <circle cx="24" cy="8" r="1.5" fill="#818cf8" />
+            </svg>
+            Pix<span className="logo-mark">Convert</span>
+          </Link>
+
+          <AppMenuBar onNavigate={closeMenu} />
+        </div>
 
         <ul className={`nav-links${menuOpen ? ' open' : ''}`}>
-          <li className="desktop-only">
-            <NavLink to="/" end onClick={closeMenu} className={({ isActive }) => isActive ? 'active' : ''}>Home</NavLink>
-          </li>
-          
-          {/* Desktop Tools Dropdown */}
-          <li className="nav-dropdown desktop-only">
-            <span className="nav-dropdown-trigger">Tools ▾</span>
-            <div className="tools-dropdown">
-              <div className="tools-dd-popular">
-                <span className="tools-dd-popular-label">Popular</span>
-                <div className="tools-dd-popular-grid">
-                  <Link to="/tools/converter" className="tools-dd-pill" onClick={closeMenu}>
-                    <span className="tdi-icon">🔄</span> Converter
-                  </Link>
-                  <Link to="/tools/merge-pdf" className="tools-dd-pill" onClick={closeMenu}>
-                    <span className="tdi-icon">📁</span> Merge PDF
-                  </Link>
-                  <Link to="/tools/split-pdf" className="tools-dd-pill" onClick={closeMenu}>
-                    <span className="tdi-icon">✂️</span> Split PDF
-                  </Link>
-                  <Link to="/tools/pdf" className="tools-dd-pill" onClick={closeMenu}>
-                    <span className="tdi-icon">🔓</span> Unlock PDF
-                  </Link>
-                  <Link to="/tools/pdf-to-jpg" className="tools-dd-pill" onClick={closeMenu}>
-                    <span className="tdi-icon">🖼️</span> PDF → JPG
-                  </Link>
-                  <Link to="/tools/gif" className="tools-dd-pill" onClick={closeMenu}>
-                    <span className="tdi-icon">🎞️</span> GIF Maker
-                  </Link>
-                </div>
-              </div>
-              <div className="tools-dropdown-grid">
-                {toolsData.map((cat, idx) => {
-                   const active = cat.items.filter(i => !i.comingSoon);
-                   if (!active.length) return null;
-                   return (
-                     <div key={idx} className="tools-dropdown-group">
-                       <span className="tools-dropdown-label">{cat.category}</span>
-                       {active.map(item => (
-                         <Link key={item.path} to={item.path} className="tools-dropdown-item" onClick={closeMenu}>
-                           <span className="tdi-icon">{item.icon}</span>
-                           <span className="tdi-name">{item.name} {item.isNew && <span className="badge badge-new">New</span>}</span>
-                         </Link>
-                       ))}
-                     </div>
-                   );
-                })}
-              </div>
-              <div className="tools-dropdown-footer">
-                <Link to="/tools" className="tools-dropdown-browse" onClick={closeMenu}>Browse all tools →</Link>
-              </div>
-            </div>
-          </li>
-
           <li className="mobile-only">
-            <NavLink to="/" end onClick={closeMenu}
-              className={({ isActive }) => isActive ? 'active' : ''}>
+            <NavLink to="/" end onClick={closeMenu} className={({ isActive }) => (isActive ? 'active' : '')}>
               Home
             </NavLink>
           </li>
 
-          {/* Mobile tools accordion */}
           <li className="mobile-only">
-            <button className="mobile-tools-toggle"
-              onClick={() => setMobileToolsOpen(o => !o)}
-              aria-expanded={mobileToolsOpen}>
+            <button
+              className="mobile-tools-toggle"
+              onClick={() => setMobileToolsOpen((open) => !open)}
+              aria-expanded={mobileToolsOpen}
+            >
               Tools {mobileToolsOpen ? '▴' : '▾'}
             </button>
             {mobileToolsOpen && (
               <div className="mobile-tools-list">
-                {/* Popular quick links on mobile */}
                 <div className="mobile-tools-popular">
                   {[
                     { icon: '🔄', name: 'Converter', path: '/tools/converter' },
@@ -165,18 +123,20 @@ const Navbar = () => {
                     { icon: '🔓', name: 'Unlock PDF', path: '/tools/pdf' },
                     { icon: '🖼️', name: 'PDF → JPG', path: '/tools/pdf-to-jpg' },
                     { icon: '🎞️', name: 'GIF Maker', path: '/tools/gif' },
-                  ].map(t => (
-                    <NavLink key={t.path} to={t.path} onClick={closeMenu} className="mobile-popular-pill">
-                      {t.icon} {t.name}
+                  ].map((tool) => (
+                    <NavLink key={tool.path} to={tool.path} onClick={closeMenu} className="mobile-popular-pill">
+                      {tool.icon} {tool.name}
                     </NavLink>
                   ))}
                 </div>
-                {toolsData.map((cat) => {
-                  const active = cat.items.filter(i => !i.comingSoon);
+
+                {toolsData.map((category) => {
+                  const active = category.items.filter((item) => !item.comingSoon);
                   if (!active.length) return null;
+
                   return (
-                    <div key={cat.category} className="mobile-tools-cat">
-                      <h4>{cat.category}</h4>
+                    <div key={category.category} className="mobile-tools-cat">
+                      <h4>{category.category}</h4>
                       {active.map((item) => (
                         <NavLink key={item.path} to={item.path} onClick={closeMenu}>
                           {item.icon} {item.name}
@@ -186,6 +146,7 @@ const Navbar = () => {
                     </div>
                   );
                 })}
+
                 <Link to="/tools" onClick={closeMenu} className="mobile-browse-all">
                   Browse all tools →
                 </Link>
@@ -193,40 +154,32 @@ const Navbar = () => {
             )}
           </li>
 
-          <li className="desktop-only">
-            <NavLink to="/about" onClick={closeMenu} className={({ isActive }) => isActive ? 'active' : ''}>About</NavLink>
-          </li>
-          <li className="desktop-only">
-            <NavLink to="/privacy" onClick={closeMenu} className={({ isActive }) => isActive ? 'active' : ''}>Privacy</NavLink>
-          </li>
-          <li className="desktop-only">
-            <NavLink to="/contact" onClick={closeMenu} className={({ isActive }) => isActive ? 'active' : ''}>Contact</NavLink>
-          </li>
-
           <li className="mobile-only">
-            <NavLink to="/about" onClick={closeMenu} className={({ isActive }) => isActive ? 'active' : ''}>About</NavLink>
+            <NavLink to="/about" onClick={closeMenu} className={({ isActive }) => (isActive ? 'active' : '')}>About</NavLink>
           </li>
           <li className="mobile-only">
-            <NavLink to="/privacy" onClick={closeMenu} className={({ isActive }) => isActive ? 'active' : ''}>Privacy</NavLink>
+            <NavLink to="/privacy" onClick={closeMenu} className={({ isActive }) => (isActive ? 'active' : '')}>Privacy</NavLink>
           </li>
           <li className="mobile-only">
-            <NavLink to="/contact" onClick={closeMenu} className={({ isActive }) => isActive ? 'active' : ''}>Contact</NavLink>
+            <NavLink to="/contact" onClick={closeMenu} className={({ isActive }) => (isActive ? 'active' : '')}>Contact</NavLink>
           </li>
         </ul>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+        <div className="nav-actions">
           <button
             className="theme-toggle"
             onClick={toggleTheme}
             aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-            title={isDark ? 'Light mode' : 'Dark mode'}>
+            title={isDark ? 'Light mode' : 'Dark mode'}
+          >
             {isDark ? <SunIcon /> : <MoonIcon />}
           </button>
           <button
             className={`hamburger${menuOpen ? ' open' : ''}`}
-            onClick={() => setMenuOpen(o => !o)}
+            onClick={() => setMenuOpen((open) => !open)}
             aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-            aria-expanded={menuOpen}>
+            aria-expanded={menuOpen}
+          >
             <span /><span /><span />
           </button>
         </div>
