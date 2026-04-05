@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useRef, useCallback } from 'react';
+import DemoOne from './ui/demo';
 
 const FEATURES = [
   { icon: '🔄', title: 'Universal Converter', desc: 'Convert between PNG, JPG, WebP, AVIF, HEIC and more — fully in-browser.', link: '/tools/converter' },
@@ -9,8 +10,6 @@ const FEATURES = [
   { icon: '🖼️', title: 'PDF to JPG',           desc: 'Export every PDF page as a high-quality JPG image.',                     link: '/tools/pdf-to-jpg' },
   { icon: '📝', title: 'PDF to Word',          desc: 'Extract text from PDFs into editable .docx documents.',                  link: '/tools/pdf-to-word' },
 ];
-
-const CUBE_FACES = ['PDF', 'JPG', 'PNG', 'WebP', 'DOCX', 'GIF'];
 
 const TRUST = [
   'No Sign-up Required',
@@ -72,16 +71,7 @@ const Home = () => (
     <div className="hero-orb hero-orb-3" aria-hidden="true" />
 
     <div className="container fade-in">
-      {/* 3D Rotating Cube */}
-      <div className="hero-3d-scene" aria-hidden="true">
-        <div className="hero-cube">
-          {CUBE_FACES.map((label, i) => (
-            <div className={`hero-cube-face hero-cube-face-${i}`} key={i}>
-              <span>{label}</span>
-            </div>
-          ))}
-        </div>
-      </div>
+      <DemoOne />
 
       <div className="hero-eyebrow">✦ 100% free &amp; private — no account needed</div>
 

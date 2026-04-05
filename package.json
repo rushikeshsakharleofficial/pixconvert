@@ -14,6 +14,7 @@
     "@pdfsmaller/pdf-decrypt": "^1.0.1",
     "@pdfsmaller/pdf-encrypt-lite": "^1.0.2",
     "@radix-ui/react-navigation-menu": "^1.2.14",
+    "@radix-ui/react-slot": "^1.2.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cors": "^2.8.6",
@@ -54,7 +55,9 @@
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.4.0",
     "postcss": "^8.5.8",
+    "tailwindcss": "^3.4.17",
     "tailwindcss-animate": "^1.0.7",
+    "typescript": "^6.0.2",
     "vite": "^8.0.1"
   }
 }

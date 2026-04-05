@@ -5,12 +5,15 @@ This repository is a Vite + React application with a small Node/Express server.
 
 - `src/` contains the frontend application.
 - `src/components/` holds route-level tools and shared UI such as `DropZone.jsx`.
+- `src/components/ui/` holds shadcn-style UI primitives and the PDF preview upload card.
 - `src/data/` stores static tool metadata such as `toolsData.js`.
 - `src/lib/` and `src/utils/` contain reusable PDF and conversion helpers.
 - `public/` contains static assets served as-is.
 - `docs/` stores design notes and implementation plans.
 - `server.js` runs the backend endpoints used by contact or server-side flows.
 - `dist/` is build output and should not be edited manually.
+
+Before broad exploration, read [.codex/CODE_GRAPH.md](/C:/Users/rishi.DESKTOP-3IFP6MN.000/projects/fileconverter/.codex/CODE_GRAPH.md). It is the repo-local code graph shortcut for route mapping, PDF tool hotspots, and shared helpers.
 
 ## Build, Test, and Development Commands
 - `npm run dev`: start the Vite dev server for the frontend.
