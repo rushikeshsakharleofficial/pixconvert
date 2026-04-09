@@ -9,8 +9,8 @@
 :root {
   /* Backgrounds */
   --bg: #FFFEFB;
-  --bg2:   #F5F5F7;
-  --bg3:   #EAEAEE;
+  --bg2: #F5F5F7;
+  --bg3: #EAEAEE;
   --card: #FFFFFF;
   --card-hover: #F8F8FC;
 
@@ -1379,6 +1379,38 @@ section { padding: 5rem 2rem 4rem; }
   --shadow-lg: 0 20px 60px rgba(0,0,0,0.14);
 }
 
+[data-theme="dark"] {
+  --bg: #201515;
+  --bg2: #2D2B28;
+  --bg3: #36342E;
+  --card: #36342E;
+  --card-hover: #3D3B35;
+
+  --background: #201515;
+  --foreground: #FFFEFB;
+  --card-foreground: #FFFEFB;
+  --muted: #2D2B28;
+  --muted-foreground: #C5C0B1;
+  --accent: #2D2B28;
+  --accent-foreground: #FFFEFB;
+  --secondary: #2D2B28;
+  --secondary-foreground: #FFFEFB;
+
+  --border: #939084;
+  --border-active: #C5C0B1;
+
+  --text: #FFFEFB;
+  --text2: #C5C0B1;
+  --text3: #939084;
+
+  --primary-glow: rgba(255,79,0,0.15);
+  --primary-glow-md: rgba(255,79,0,0.30);
+
+  --shadow: 0 1px 3px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.4);
+  --shadow-lg: 0 20px 60px rgba(0,0,0,0.5);
+}
+
 [data-theme="light"] .navbar::before {
   background: rgba(255,255,255,0.92);
   border-bottom-color: rgba(0,0,0,0.07);
@@ -1890,4 +1922,12 @@ section { padding: 5rem 2rem 4rem; }
   .process-box-loader:after {
     animation: none;
   }
+}
+
+
+[data-theme="dark"] body::before {
+  background:
+    radial-gradient(ellipse 700px 500px at 15% -10%, rgba(255,79,0,0.08) 0%, transparent 70%),
+    radial-gradient(ellipse 600px 500px at 85% 5%, rgba(255,79,0,0.05) 0%, transparent 70%),
+    radial-gradient(ellipse 500px 400px at 50% 110%, rgba(255,79,0,0.04) 0%, transparent 70%);
 }
