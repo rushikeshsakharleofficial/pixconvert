@@ -8,7 +8,7 @@ This document provides technical details for interacting with the PixConvert bac
 
 ## 🔐 Base URL & Headers
 
-- **Base URL**: `http://localhost:4000` (Local) or your production domain.
+- **Base URL**: `https://api.example.com` (Local) or your production domain.
 - **Content-Type**: `application/json` (unless uploading files)
 
 ---
@@ -24,7 +24,7 @@ Upload one or more files to the server's temporary storage.
 
 **Example (Curl):**
 ```bash
-curl -X POST -F "files=@/path/to/your/document.pdf" http://localhost:4000/api/upload
+curl -X POST -F "files=@/path/to/your/document.pdf" https://api.example.com/api/upload
 ```
 
 **Response:**
@@ -51,7 +51,7 @@ Retrieve a list of all files currently in the temporary storage.
 
 **Example (Curl):**
 ```bash
-curl -H "x-admin-key: your_secret_key" http://localhost:4000/api/files
+curl -H "x-admin-key: your_secret_key" https://api.example.com/api/files
 ```
 
 ### 3. Delete a File (Admin)
@@ -63,7 +63,7 @@ Remove a specific file from the server.
 
 **Example (Curl):**
 ```bash
-curl -X DELETE -H "x-admin-key: your_secret_key" http://localhost:4000/api/files/1712966400000_document.pdf
+curl -X DELETE -H "x-admin-key: your_secret_key" https://api.example.com/api/files/1712966400000_document.pdf
 ```
 
 ---
@@ -86,7 +86,7 @@ Record the processing of files for a specific tool.
 ```bash
 curl -X POST -H "Content-Type: application/json" \
      -d '{"tool": "merge-pdf", "count": 1}' \
-     http://localhost:4000/api/metrics/track
+     https://api.example.com/api/metrics/track
 ```
 
 ### 2. Get Real-time Stats
@@ -98,7 +98,7 @@ Retrieve aggregated usage statistics.
 
 **Example (Curl):**
 ```bash
-curl http://localhost:4000/api/metrics/stats?period=weekly
+curl https://api.example.com/api/metrics/stats?period=weekly
 ```
 
 ---
