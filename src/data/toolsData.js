@@ -75,12 +75,5 @@ export const toolsData = [
       { name: "Redact PDF",  path: "/tools/redact-pdf",   icon: "⬛", color: "#e74c3c", isNew: true, desc: "Permanently remove sensitive content from your PDF documents." },
       { name: "Compare PDF", path: "/tools/compare-pdf",  icon: "⚖️", color: "#e74c3c", isNew: true, desc: "Compare two PDF documents side by side and find the differences." }
     ]
-  },
-  {
-    category: "PDF Intelligence",
-    items: [
-      { name: "AI Summarizer", path: "/tools/ai-summarizer", icon: "🤖", color: "#9b59b6", comingSoon: true, desc: "Get AI-powered summaries of your PDF documents instantly." },
-      { name: "Translate PDF", path: "/tools/translate-pdf", icon: "🌐", color: "#9b59b6", comingSoon: true, desc: "Translate your PDF documents to any language while preserving formatting." }
-    ]
   }
 ];

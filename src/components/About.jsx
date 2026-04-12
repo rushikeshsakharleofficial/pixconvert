@@ -1,42 +1,92 @@
+import React from 'react';
+
 const About = () => (
-  <section>
-    <div className="container">
-      <h2 className="section-title fade-in visible">About PixConvert</h2>
-      <p className="section-subtitle fade-in visible">Why we built this — and what makes it different</p>
-      <div className="glass content-card fade-in visible">
-        <h3>🎯 Our Mission</h3>
-        <p>PixConvert was built with one simple belief:{' '}
-          <strong style={{ color: 'var(--white)' }}>image conversion should be free, instant, and completely private.</strong>{' '}
-          No sign-ups, no watermarks, no shady servers processing your photos.
+  <section className="py-20">
+    <div className="container max-w-4xl">
+      {/* Header Section */}
+      <div className="text-center mb-16">
+        <div className="text-xs font-bold text-primary/50 uppercase tracking-[0.2em] mb-2">Version 2.0</div>
+        <h2 className="section-title fade-in">About PixConvert</h2>
+        <p className="section-subtitle fade-in delay-1">
+          The privacy-focused, 100% browser-based toolkit for all your file needs.
         </p>
+      </div>
 
-        <h3>🤔 Why We Built This</h3>
-        <p>Every online converter we tried either uploaded our files to unknown servers, bombarded us with ads,
-          or required payment for basic features. We thought — why not just do it all in the browser?
-          Canvas API, FileReader, and modern JavaScript make it possible to convert images entirely on your device.
-        </p>
+      {/* Mission Section */}
+      <div className="space-y-12">
+        <div className="fade-in delay-2">
+          <h3 className="text-2xl font-heading font-bold mb-4 flex items-center gap-3">
+            ⚡ Our Mission
+          </h3>
+          <p className="text-lg text-muted-foreground leading-relaxed">
+            PixConvert was built with a single, uncompromising goal: to make file conversion and PDF manipulation 
+            <span className="text-foreground font-semibold"> free, instant, and completely private.</span> We believe 
+            you shouldn't have to sacrifice your data privacy just to resize an image or sign a document.
+          </p>
+        </div>
 
-        <h3>🔐 What Makes Us Different</h3>
-        <div className="values-grid">
+        {/* Core Pillars */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 py-8">
           {[
-            { icon: '🖥️', title: '100% Client-Side',   desc: 'Every conversion happens in your browser using Canvas API. Zero server processing.' },
-            { icon: '🚫', title: 'No Data Collection', desc: "We don't collect, store, or transmit any data. No cookies, no analytics, no tracking." },
-            { icon: '⚡', title: 'Instant Results',     desc: 'No upload/download wait times. Conversion is as fast as your device can process.' },
-            { icon: '🧰', title: 'Multiple Tools',      desc: 'Universal converter, GIF maker, and WhatsApp sticker generator — all in one place.' }
-          ].map((v, i) => (
-            <div className="glass" key={i} style={{ textAlign: 'center', padding: '1.5rem 1rem' }}>
-              <div style={{ fontSize: '1.5rem', marginBottom: '.5rem' }}>{v.icon}</div>
-              <h3 style={{ fontSize: '1rem', marginBottom: '.25rem' }}>{v.title}</h3>
-              <p style={{ fontSize: '.85rem' }}>{v.desc}</p>
+            {
+              icon: "🛡️",
+              title: "Privacy First",
+              desc: "Your files never leave your device. We use modern web technologies to process everything locally in your browser."
+            },
+            {
+              icon: "💻",
+              title: "Client-Side Power",
+              desc: "By leveraging Canvas API, WebAssembly, and local processing, we eliminate the need for server-side uploads."
+            },
+            {
+              icon: "🔐",
+              title: "No Accounts",
+              desc: "No sign-up, no email required, and no hidden subscriptions. Just open the tool and start working."
+            },
+            {
+              icon: "📂",
+              title: "Open Source",
+              desc: "Built with transparency in mind. PixConvert is open-source friendly and relies on established, secure libraries."
+            }
+          ].map((item, i) => (
+            <div key={i} className="flex flex-col gap-4 p-6 rounded-2xl border border-border bg-card/50 hover:bg-card transition-colors fade-in" style={{ animationDelay: `${0.3 + i*0.1}s` }}>
+              <div className="text-3xl">{item.icon}</div>
+              <h4 className="text-xl font-bold">{item.title}</h4>
+              <p className="text-muted-foreground">{item.desc}</p>
             </div>
           ))}
         </div>
 
-        <h3 style={{ marginTop: '2rem' }}>🌍 Open &amp; Transparent</h3>
-        <p>PixConvert is a straightforward tool built with React, Canvas API, and gif.js.
-          The entire application runs as static files — there's no backend, no database, no API calls.
-          What you see is exactly what you get.
-        </p>
+        {/* Technology Section */}
+        <div className="fade-in delay-7 pt-8">
+          <h3 className="text-2xl font-heading font-bold mb-6 flex items-center gap-3">
+            📄 What's Under the Hood?
+          </h3>
+          <div className="prose prose-slate dark:prose-invert max-w-none text-muted-foreground space-y-4">
+            <p>
+              PixConvert isn't just another wrapper for a server-side API. It's a sophisticated Progressive Web App 
+              that utilizes the full potential of your computer's hardware through your browser:
+            </p>
+            <ul className="list-disc pl-6 space-y-2">
+              <li><strong className="text-foreground">pdf-lib & pdfjs-dist:</strong> Robust PDF manipulation without server calls.</li>
+              <li><strong className="text-foreground">Tesseract.js:</strong> Optical Character Recognition (OCR) running via WebAssembly on your CPU.</li>
+              <li><strong className="text-foreground">Canvas API:</strong> High-performance image processing and format conversion.</li>
+              <li><strong className="text-foreground">Playwright:</strong> Headless browser technology for accurate HTML-to-PDF rendering.</li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Closing */}
+        <div className="text-center pt-16 fade-in delay-9">
+          <div className="inline-block p-1 rounded-full bg-primary/10 mb-4">
+            <div className="px-4 py-1 rounded-full bg-primary text-white text-sm font-bold">
+              100% Free Forever
+            </div>
+          </div>
+          <p className="text-muted-foreground italic">
+            "We didn't build PixConvert to collect data. We built it to solve a problem."
+          </p>
+        </div>
       </div>
     </div>
   </section>

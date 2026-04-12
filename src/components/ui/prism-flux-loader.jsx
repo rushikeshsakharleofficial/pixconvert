@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react';
-import { PlusIcon } from 'lucide-react';
 
 const DEFAULT_STATUSES = ['Uploading', 'Parsing', 'Processing', 'Syncing', 'Preparing', 'Placing'];
 
@@ -15,59 +14,40 @@ export const PrismFluxLoader = ({
   const items = useMemo(() => (statuses.length ? statuses.slice(0, 6) : DEFAULT_STATUSES), [statuses]);
 
   useEffect(() => {
-    const interval = window.setInterval(() => {
-      setTime((prev) => prev + 0.02 * speed);
-    }, 16);
-
-    return () => window.clearInterval(interval);
-  }, [speed]);
+    const startTime = Date.now();
+    let frame;
+    const update = () => {
+      setTime(Date.now() - startTime);
+      frame = requestAnimationFrame(update);
+    };
+    frame = requestAnimationFrame(update);
+    return () => cancelAnimationFrame(frame);
+  }, []);
 
   useEffect(() => {
-    const statusInterval = window.setInterval(() => {
+    const interval = setInterval(() => {
       setStatusIndex((prev) => (prev + 1) % items.length);
-    }, 600);
-
-    return () => window.clearInterval(statusInterval);
-  }, [items]);
-
-  const half = size / 2;
-  const currentStatus = items[statusIndex] || DEFAULT_STATUSES[0];
-  const faceTransforms = [
-    `rotateY(0deg) translateZ(${half}px)`,
-    `rotateY(180deg) translateZ(${half}px)`,
-    `rotateY(90deg) translateZ(${half}px)`,
-    `rotateY(-90deg) translateZ(${half}px)`,
-    `rotateX(90deg) translateZ(${half}px)`,
-    `rotateX(-90deg) translateZ(${half}px)`,
-  ];
+    }, 2000);
+    return () => clearInterval(interval);
+  }, [items.length]);
 
   return (
-    <div className="prism-flux-loader">
-      <div
-        className="prism-flux-cube"
-        style={{
-          width: size,
-          height: size,
-          transform: `rotateY(${time * 30}deg) rotateX(${time * 30}deg)`,
-        }}
-      >
-        {items.map((text, i) => (
-          <div
-            key={`${text}-${i}`}
-            className="prism-flux-face"
-            style={{
-              width: size,
-              height: size,
-              transform: faceTransforms[i],
-            }}
-          >
-            <PlusIcon size={Math.max(14, size * 0.45)} strokeWidth={2} />
-          </div>
-        ))}
+    <div className="flex flex-col items-center justify-center gap-4 py-8">
+      <div className="relative" style={{ width: size * 2, height: size * 2 }}>
+        <div className="absolute inset-0 animate-spin flex items-center justify-center">
+           <span className="text-primary text-2xl font-bold">⬡</span>
+        </div>
       </div>
-
-      <div className="prism-flux-status" style={{ fontSize: `${textSize}px` }}>
-        {currentStatus}...
+      <div className="flex flex-col items-center gap-1">
+        <span className="text-foreground font-semibold" style={{ fontSize: textSize }}>
+          {items[statusIndex]}...
+        </span>
+        <div className="w-32 h-1 bg-muted rounded-full overflow-hidden">
+          <div 
+            className="h-full bg-primary transition-all duration-500 ease-out"
+            style={{ width: `${((statusIndex + 1) / items.length) * 100}%` }}
+          />
+        </div>
       </div>
     </div>
   );

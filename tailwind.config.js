@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: ['selector', '[data-theme="dark"]'],
   content: ['./index.html', './src/**/*.{js,jsx,ts,tsx}'],
   corePlugins: {
     preflight: false,
@@ -24,10 +25,15 @@ export default {
         'primary-foreground': '#ffffff',
         input: 'var(--border)',
         ring: 'var(--primary)',
+        'base-content': 'var(--base-content)',
+        'neutral': '#222222',
+        'neutral-50': 'var(--neutral-50)',
+        'base-300': 'var(--base-300)',
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
         heading: ['Outfit', 'sans-serif'],
+        display: ['var(--font-display)'],
       },
       borderRadius: {
         lg: 'var(--radius)',

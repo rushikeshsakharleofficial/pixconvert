@@ -1,51 +1,94 @@
+import React from 'react';
 import { Link } from 'react-router-dom';
 
 const Privacy = () => (
-  <section>
-    <div className="container">
-      <h2 className="section-title fade-in visible">Privacy Policy</h2>
-      <p className="section-subtitle fade-in visible">Last updated: March 2026</p>
-      <div className="glass content-card fade-in visible">
-        <div className="tldr-box">
-          <h3>TL;DR</h3>
-          <p>We collect nothing. Period.</p>
+  <section className="py-20">
+    <div className="container max-w-4xl">
+      {/* Header Section */}
+      <div className="text-center mb-16">
+        <div className="text-xs font-bold text-primary/50 uppercase tracking-[0.2em] mb-2">Version 2.0</div>
+        <h2 className="section-title fade-in">Privacy Policy</h2>
+        <p className="section-subtitle fade-in delay-1">
+          Last updated: April 2026. Your privacy is not a feature; it's our foundation.
+        </p>
+      </div>
+
+      <div className="space-y-16">
+        {/* TL;DR Section */}
+        <div className="p-8 rounded-3xl bg-primary/5 border border-primary/10 fade-in delay-2 text-center">
+          <h3 className="text-xl font-bold text-primary mb-2 flex items-center justify-center gap-2">
+            🙈 The PixConvert Promise
+          </h3>
+          <p className="text-lg text-foreground font-medium">
+            We don't track you. We don't store your files. We don't even know who you are.
+          </p>
         </div>
 
-        <h3>📋 What Data We Collect</h3>
-        <p><strong style={{ color: 'var(--teal)' }}>None.</strong> PixConvert does not collect, store, process,
-          or transmit any personal data or files. Your images are processed entirely within your browser
-          using the Canvas API and JavaScript. No data ever leaves your device.</p>
+        {/* Detailed Points */}
+        <div className="grid gap-12">
+          {/* Files */}
+          <div className="fade-in delay-3">
+            <h3 className="text-2xl font-bold mb-4 flex items-center gap-3">
+              💾 Your Files
+            </h3>
+            <p className="text-muted-foreground text-lg leading-relaxed">
+              When you use our PDF and image tools, your files are processed <span className="text-foreground font-semibold">locally in your browser memory.</span> They are never uploaded to our servers. Once you close the tab, the files are gone from memory. The only exception is the contact form, where data you explicitly provide is sent to us via email.
+            </p>
+          </div>
 
-        <h3>🍪 Cookies</h3>
-        <p>PixConvert does not use cookies. Not first-party, not third-party, not analytics cookies,
-          not tracking cookies. Zero cookies.</p>
+          {/* Data Collection */}
+          <div className="fade-in delay-4">
+            <h3 className="text-2xl font-bold mb-4 flex items-center gap-3">
+              👤 Personal Data
+            </h3>
+            <p className="text-muted-foreground text-lg leading-relaxed">
+              We do not require registration. We do not collect names, email addresses, or IP addresses for tracking purposes. We have zero interest in building a profile of our users.
+            </p>
+          </div>
 
-        <h3>📊 Analytics &amp; Tracking</h3>
-        <p>We do not use Google Analytics, Facebook Pixel, or any other tracking or analytics service.
-          We have no interest in tracking your behavior.</p>
+          {/* Cookies */}
+          <div className="fade-in delay-5">
+            <h3 className="text-2xl font-bold mb-4 flex items-center gap-3">
+              🍪 Cookies & Tracking
+            </h3>
+            <p className="text-muted-foreground text-lg leading-relaxed">
+              PixConvert is a cookie-free zone. We do not use persistent cookies, session cookies, or tracking pixels. We do not use third-party analytics services like Google Analytics.
+            </p>
+          </div>
 
-        <h3>🔗 Third-Party Services</h3>
-        <p>PixConvert loads the following CDN resources to function:</p>
-        <ul>
-          <li>gif.js worker (from cdnjs.cloudflare.com) — used only when generating GIFs</li>
-          <li>Google Fonts (Space Grotesk &amp; DM Sans)</li>
-        </ul>
-        <p>These CDNs may log standard access information (IP address, user agent) as part of their own
-          services. We have no control over or access to this data. No other third-party services are used.</p>
+          {/* Third Parties */}
+          <div className="fade-in delay-6">
+            <h3 className="text-2xl font-bold mb-4 flex items-center gap-3">
+              🌐 Third-Party Infrastructure
+            </h3>
+            <p className="text-muted-foreground text-lg leading-relaxed">
+              To keep PixConvert running smoothly, we use standard infrastructure providers:
+            </p>
+            <ul className="mt-4 space-y-3 text-muted-foreground">
+              <li className="flex items-start gap-2">
+                <span className="text-primary mt-1">•</span>
+                <span><strong>Hosting:</strong> Our site is served through established CDNs which may log standard request data (like IP and user-agent) for security and delivery optimization.</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-primary mt-1">•</span>
+                <span><strong>Assets:</strong> We load fonts from Google Fonts and certain libraries from Cloudflare CDN. These providers have their own privacy policies.</span>
+              </li>
+            </ul>
+          </div>
+        </div>
 
-        <h3>🖼️ Your Images</h3>
-        <p>Your images never leave your device. All conversion happens using the browser's Canvas API and
-          FileReader. Files are read into memory, processed, and the output is created as a Blob URL —
-          entirely in JavaScript running on your machine.</p>
-
-        <h3>👤 Children's Privacy</h3>
-        <p>Since we collect no data whatsoever, there are no special provisions needed.
-          PixConvert is safe for users of all ages.</p>
-
-        <h3>📬 Contact</h3>
-        <p>If you have questions about this privacy policy, use the{' '}
-          <Link to="/contact" style={{ color: 'var(--teal)' }}>Contact form</Link>.
-        </p>
+        {/* Contact */}
+        <div className="pt-8 border-t border-border fade-in delay-7">
+          <h3 className="text-2xl font-bold mb-4 flex items-center gap-3">
+            ✉️ Questions?
+          </h3>
+          <p className="text-muted-foreground text-lg leading-relaxed">
+            If you have any questions about our privacy practices, please reach out to us through our{' '}
+            <Link to="/contact" className="text-primary hover:underline font-semibold italic">
+              contact form
+            </Link>.
+          </p>
+        </div>
       </div>
     </div>
   </section>

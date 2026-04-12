@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useRef, useCallback } from 'react';
 
 import BoxLoader from './ui/box-loader';
+import ToolMarquee from './ui/tool-marquee';
 
 const FEATURES = [
   { icon: '🔄', title: 'Universal Converter', desc: 'Convert between PNG, JPG, WebP, AVIF, HEIC and more - fully in-browser.', link: '/tools/converter' },
@@ -35,49 +36,6 @@ const STATS = [
   { num: '15+', lbl: 'File formats' },
   { num: '100%', lbl: 'Free forever' },
 ];
-
-const TiltCard = ({ children, className, to, style }) => {
-  const ref = useRef(null);
-  const rafRef = useRef(null);
-
-  const handleMove = useCallback((e) => {
-    if (rafRef.current) return;
-    rafRef.current = requestAnimationFrame(() => {
-      const el = ref.current;
-      if (!el) {
-        rafRef.current = null;
-        return;
-      }
-      const rect = el.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / rect.width - 0.5;
-      const y = (e.clientY - rect.top) / rect.height - 0.5;
-      el.style.transform = `perspective(600px) rotateY(${x * 12}deg) rotateX(${-y * 12}deg) scale3d(1.03,1.03,1.03)`;
-      rafRef.current = null;
-    });
-  }, []);
-
-  const handleLeave = useCallback(() => {
-    const el = ref.current;
-    if (el) el.style.transform = '';
-    if (rafRef.current) {
-      cancelAnimationFrame(rafRef.current);
-      rafRef.current = null;
-    }
-  }, []);
-
-  return (
-    <Link
-      to={to}
-      className={className}
-      ref={ref}
-      style={{ ...style, transformStyle: 'preserve-3d', transition: 'transform 0.2s ease-out' }}
-      onMouseMove={handleMove}
-      onMouseLeave={handleLeave}
-    >
-      {children}
-    </Link>
-  );
-};
 
 const Home = () => (
   <section className="hero" style={{ position: 'relative', overflow: 'hidden' }}>
@@ -117,16 +75,7 @@ const Home = () => (
         ))}
       </div>
 
-      <div className="features-grid" style={{ marginTop: '3.5rem' }}>
-        {FEATURES.map((f, i) => (
-          <TiltCard to={f.link} className="feature-card" key={i}>
-            <div className="icon">{f.icon}</div>
-            <h3>{f.title}</h3>
-            <p>{f.desc}</p>
-            <span className="feature-card-arrow" aria-hidden="true">→</span>
-          </TiltCard>
-        ))}
-      </div>
+      <ToolMarquee />
 
       <div className="section-divider" />
 
@@ -157,6 +106,8 @@ const Home = () => (
           ))}
         </div>
       </div>
+
+      <div className="section-divider" />
     </div>
   </section>
 );
