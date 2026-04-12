@@ -113,7 +113,7 @@ const NotFound = () => {
         >
           <div className="flex items-center justify-center gap-4 md:gap-6 mb-8 md:mb-12">
             <motion.span 
-              className="text-[80px] md:text-[120px] font-bold text-foreground opacity-70 font-signika select-none"
+              className="text-[80px] md:text-[120px] font-bold text-foreground opacity-90 font-signika select-none"
               variants={numberVariants}
               custom={-1}
             >
@@ -134,7 +134,7 @@ const NotFound = () => {
               />
             </motion.div>
             <motion.span 
-              className="text-[80px] md:text-[120px] font-bold text-foreground opacity-70 font-signika select-none"
+              className="text-[80px] md:text-[120px] font-bold text-foreground opacity-90 font-signika select-none"
               variants={numberVariants}
               custom={1}
             >
@@ -143,14 +143,14 @@ const NotFound = () => {
           </div>
           
           <motion.h1 
-            className="text-3xl md:text-5xl font-bold text-foreground mb-4 md:mb-6 opacity-70 font-heading select-none"
+            className="text-3xl md:text-5xl font-bold text-foreground mb-4 md:mb-6 opacity-90 font-heading select-none"
             variants={itemVariants}
           >
             Boo! Page missing!
           </motion.h1>
           
           <motion.p 
-            className="text-lg md:text-xl text-foreground mb-8 md:mb-12 opacity-50 font-sans select-none"
+            className="text-lg md:text-xl text-foreground mb-8 md:mb-12 opacity-70 font-sans select-none"
             variants={itemVariants}
           >
             Whoops! This page must be a ghost - it&apos;s not here!
@@ -178,7 +178,7 @@ const NotFound = () => {
           >
             <Link
               to="/about"
-              className="text-foreground opacity-50 hover:opacity-70 transition-opacity underline select-none"
+              className="text-foreground opacity-70 hover:opacity-90 transition-opacity underline select-none"
             >
               What means 404?
             </Link>
