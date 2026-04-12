@@ -1,6 +1,20 @@
+import { useEffect, useRef } from 'react';
 import ProcessBoxLoader from './ui/process-box-loader';
+import { trackToolUsage } from '../utils/trackUsage';
 
 const ToolProgressBar = ({ active, label = 'Processing...', value, className = '', style: wrapStyle }) => {
+  const trackedRef = useRef(false);
+
+  useEffect(() => {
+    if (active && !trackedRef.current) {
+      trackedRef.current = true;
+      const toolSlug = window.location.pathname.split('/').pop() || 'unknown';
+      trackToolUsage(toolSlug);
+    } else if (!active) {
+      trackedRef.current = false; // reset for next run
+    }
+  }, [active]);
+
   if (!active) return null;
 
   const indeterminate = value == null || Number.isNaN(Number(value));

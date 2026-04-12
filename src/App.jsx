@@ -43,6 +43,7 @@ const Contact = lazy(() => import('./components/Contact'));
 const SignPdf = lazy(() => import('./components/SignPdf'));
 const RedactPdf = lazy(() => import('./components/RedactPdf'));
 const ComparePdf = lazy(() => import('./components/ComparePdf'));
+const Analytics = lazy(() => import('./components/Analytics'));
 
 const PAGE_TITLES = {
   '/': 'PixConvert — Free Online PDF & Image Converter',
@@ -85,6 +86,7 @@ const PAGE_TITLES = {
   '/tools/sign-pdf': 'Sign PDF — PixConvert',
   '/tools/redact-pdf': 'Redact PDF — PixConvert',
   '/tools/compare-pdf': 'Compare PDF — PixConvert',
+  '/analytics': 'Analytics — PixConvert',
 };
 
 const ScrollToTop = () => {
@@ -224,6 +226,7 @@ const App = () => (
 
             <Route path="*" element={<NotFound />} />
           </Route>
+          <Route path="/analytics" element={<LazyRoute><Analytics /></LazyRoute>} />
           <Route path="/about" element={<About />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/contact" element={<Contact />} />

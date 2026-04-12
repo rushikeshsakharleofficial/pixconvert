@@ -16,6 +16,7 @@ services:
       - "4000"
     volumes:
       - uploads-data:/app/uploads
+      - metrics-data:/app/data
 
   nginx:
     image: nginx:1.27-alpine
@@ -29,3 +30,4 @@ services:
 
 volumes:
   uploads-data:
+  metrics-data:

@@ -23,6 +23,7 @@ const THEME_KEY = 'pixconvert-theme';
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileToolsOpen, setMobileToolsOpen] = useState(false);
+  const [expandedCat, setExpandedCat] = useState(null);
   const [isDark, setIsDark] = useState(() => {
     try {
       return (localStorage.getItem(THEME_KEY) ?? 'dark') !== 'light';
@@ -34,6 +35,7 @@ const Navbar = () => {
   const closeMenu = () => {
     setMenuOpen(false);
     setMobileToolsOpen(false);
+    setExpandedCat(null);
   };
 
   const toggleTheme = () => {
@@ -90,7 +92,10 @@ const Navbar = () => {
               <NavLink to="/" end onClick={closeMenu} className={({ isActive }) => (isActive ? 'active' : '')}>Home</NavLink>
             </li>
 
-            <li className="nav-dropdown desktop-only">
+            <li
+              className="nav-dropdown desktop-only"
+              onMouseLeave={() => setExpandedCat(null)}
+            >
               <span className="nav-dropdown-trigger">Tools ▾</span>
               <div className="tools-dropdown">
                 <div className="tools-dd-popular">
@@ -121,19 +126,32 @@ const Navbar = () => {
                   {toolsData.map((category, index) => {
                     const active = category.items.filter((item) => !item.comingSoon);
                     if (!active.length) return null;
+                    const isOpen = expandedCat === index;
 
                     return (
-                      <div key={index} className="tools-dropdown-group">
-                        <span className="tools-dropdown-label">{category.category}</span>
-                        {active.map((item) => (
-                          <Link key={item.path} to={item.path} className="tools-dropdown-item" onClick={closeMenu}>
-                            <span className="tdi-icon">{item.icon}</span>
-                            <span className="tdi-name">
-                              {item.name}
-                              {item.isNew && <span className="badge badge-new">New</span>}
-                            </span>
-                          </Link>
-                        ))}
+                      <div key={index} className={`tools-dd-cat${isOpen ? ' open' : ''}`}>
+                        <button
+                          className="tools-dd-cat-header"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setExpandedCat(isOpen ? null : index);
+                          }}
+                        >
+                          <span className="tools-dd-cat-label">{category.category}</span>
+                          <span className="tools-dd-cat-count">{active.length}</span>
+                          <span className={`tools-dd-chevron${isOpen ? ' rotated' : ''}`}>›</span>
+                        </button>
+                        <div className="tools-dd-cat-items" style={{ maxHeight: isOpen ? `${active.length * 34}px` : '0' }}>
+                          {active.map((item) => (
+                            <Link key={item.path} to={item.path} className="tools-dropdown-item" onClick={closeMenu}>
+                              <span className="tdi-icon">{item.icon}</span>
+                              <span className="tdi-name">
+                                {item.name}
+                                {item.isNew && <span className="badge badge-new">New</span>}
+                              </span>
+                            </Link>
+                          ))}
+                        </div>
                       </div>
                     );
                   })}
@@ -153,6 +171,9 @@ const Navbar = () => {
             </li>
             <li className="desktop-only">
               <NavLink to="/contact" onClick={closeMenu} className={({ isActive }) => (isActive ? 'active' : '')}>Contact</NavLink>
+            </li>
+            <li className="desktop-only">
+              <NavLink to="/analytics" onClick={closeMenu} className={({ isActive }) => (isActive ? 'active' : '')}>Analytics</NavLink>
             </li>
 
             <li className="mobile-only">
@@ -212,6 +233,9 @@ const Navbar = () => {
             </li>
             <li className="mobile-only">
               <NavLink to="/contact" onClick={closeMenu} className={({ isActive }) => (isActive ? 'active' : '')}>Contact</NavLink>
+            </li>
+            <li className="mobile-only">
+              <NavLink to="/analytics" onClick={closeMenu} className={({ isActive }) => (isActive ? 'active' : '')}>Analytics</NavLink>
             </li>
           </ul>
         </div>
