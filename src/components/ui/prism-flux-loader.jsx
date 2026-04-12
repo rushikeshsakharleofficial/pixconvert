@@ -4,7 +4,6 @@ const DEFAULT_STATUSES = ['Uploading', 'Parsing', 'Processing', 'Syncing', 'Prep
 
 export const PrismFluxLoader = ({
   size = 30,
-  speed = 5,
   textSize = 13,
   statuses = DEFAULT_STATUSES,
 }) => {

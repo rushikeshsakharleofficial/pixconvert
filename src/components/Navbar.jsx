@@ -77,17 +77,10 @@ const Navbar = () => {
 
       <nav className="navbar">
         <Link to="/" className="nav-logo" onClick={closeMenu}>
-          <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: '32px', height: '32px' }}>
-            <defs>
-              <linearGradient id="origami-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#818cf8" />
-                <stop offset="100%" stopColor="#4f46e5" />
-              </linearGradient>
-            </defs>
-            <rect x="4" y="4" width="24" height="24" rx="6" fill="var(--primary-glow)" />
-            <path d="M10 8V24H14V16H18C21.3137 16 24 13.3137 24 10C24 6.68629 21.3137 4 18 4H14V8H10Z" fill="url(#origami-grad)" />
-            <path d="M14 8L18 4V12L14 8Z" fill="#4338ca" />
-            <circle cx="24" cy="8" r="1.5" fill="#818cf8" />
+          <svg viewBox="0 0 28 28" fill="none" style={{ width: '28px', height: '28px', flexShrink: 0 }}>
+            <rect x="2" y="2" width="24" height="24" rx="6" stroke="#FF4F00" strokeWidth="2.5"/>
+            <path d="M8 20l4-6 3 4 2-3 3 5" stroke="#FF4F00" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <circle cx="10" cy="10" r="2" fill="#FF4F00"/>
           </svg>
           Pix<span className="logo-mark">Convert</span>
         </Link>

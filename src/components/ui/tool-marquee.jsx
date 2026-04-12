@@ -17,10 +17,13 @@ const ToolCard = ({ tool }) => (
       <CardHeader className="p-4 flex flex-col gap-3">
         <div className="flex items-center gap-3">
           <div 
-            className="size-10 rounded-lg flex items-center justify-center text-xl"
-            style={{ backgroundColor: `${tool.color}20`, color: tool.color }}
+            className="size-10 rounded-lg flex items-center justify-center text-xl relative"
           >
-            {tool.icon}
+            <div 
+              className="absolute inset-0 rounded-lg opacity-20"
+              style={{ backgroundColor: tool.color || 'var(--primary)' }}
+            />
+            <span className="relative z-10">{tool.icon}</span>
           </div>
           <div className="flex flex-col overflow-hidden">
             <CardTitle className="text-sm font-semibold text-foreground truncate group-hover:text-primary transition-colors">
