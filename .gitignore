@@ -3,7 +3,11 @@ dist/
 uploads/*
 !uploads/.gitkeep
 logs/
+*.log
 .env
 .env.local
 .worktrees/
 .claude/settings.local.json
+.codex/
+.gemini/CODE_GRAPH.md
+docs/superpowers/
