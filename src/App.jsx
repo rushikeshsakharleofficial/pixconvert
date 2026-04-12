@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
-import { useEffect, lazy, Suspense } from 'react';
+import { useEffect, lazy, Suspense, useRef } from 'react';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -90,31 +90,52 @@ const PAGE_TITLES = {
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
+  const observerRef = useRef(null);
+  const timerRef = useRef(null);
+  const observedElementsRef = useRef([]);
 
+  // Effect for scroll-to-top and title changes on route change
   useEffect(() => {
     window.scrollTo(0, 0);
     document.title = PAGE_TITLES[pathname] || 'PixConvert — Free Online PDF & Image Converter';
   }, [pathname]);
 
+  // Effect for reveal animations - runs once on mount
   useEffect(() => {
-    const observer = new IntersectionObserver(
+    observerRef.current = new IntersectionObserver(
       (entries) => entries.forEach(entry => {
         if (entry.isIntersecting) {
           entry.target.classList.add('in-view');
-          observer.unobserve(entry.target);
+          observerRef.current?.unobserve(entry.target);
+          // Remove from tracked elements
+          observedElementsRef.current = observedElementsRef.current.filter(el => el !== entry.target);
         }
       }),
       { threshold: 0.12, rootMargin: '0px 0px -30px 0px' }
     );
-    const timer = setTimeout(() => {
-      document.querySelectorAll('.reveal:not(.in-view)').forEach(el => observer.observe(el));
+
+    timerRef.current = setTimeout(() => {
+      document.querySelectorAll('.reveal:not(.in-view)').forEach(el => {
+        if (observerRef.current) {
+          observerRef.current.observe(el);
+          observedElementsRef.current.push(el);
+        }
+      });
     }, 80);
-    return () => { clearTimeout(timer); observer.disconnect(); };
-  }, [pathname]);
+
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+      // Unobserve all tracked elements before disconnecting
+      observedElementsRef.current.forEach(el => observerRef.current?.unobserve(el));
+      observerRef.current?.disconnect();
+      observedElementsRef.current = [];
+    };
+  }, []);
 
   return null;
 };
 
+// Spinner component defined outside App to prevent recreation on render
 const Spinner = () => (
   <svg width="18" height="18" viewBox="0 0 18 18" fill="none"
     style={{ animation: 'spin 0.8s linear infinite', flexShrink: 0 }}>
@@ -132,79 +153,84 @@ const LoadingFallback = () => (
   </div>
 );
 
+// Wrapper component that combines ErrorBoundary with lazy-loaded components
+const LazyRoute = ({ children }) => (
+  <ErrorBoundary>{children}</ErrorBoundary>
+);
+
 const App = () => (
   <BrowserRouter>
     <ScrollToTop />
     <Navbar />
     <ErrorBoundary>
-    <Suspense fallback={<LoadingFallback />}>
-      <Routes>
-        <Route path="/"        element={<Home />} />
-        <Route path="/tools"   element={<Tools />}>
-          <Route path="converter" element={<UniversalConverter />} />
-          <Route path="gif" element={<GifMaker />} />
-          <Route path="pdf" element={<PdfUnlocker />} />
-          <Route path="pdf-lock" element={<PdfLocker />} />
+      <Suspense fallback={<LoadingFallback />}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/tools" element={<Tools />}>
+            <Route path="converter" element={<LazyRoute><UniversalConverter /></LazyRoute>} />
+            <Route path="gif" element={<LazyRoute><GifMaker /></LazyRoute>} />
+            <Route path="pdf" element={<LazyRoute><PdfUnlocker /></LazyRoute>} />
+            <Route path="pdf-lock" element={<LazyRoute><PdfLocker /></LazyRoute>} />
 
-          {/* Image Conversion */}
-          <Route path="jpg-to-png" element={<UniversalConverter defaultOutputFormat="image/png" />} />
-          <Route path="png-to-jpg" element={<UniversalConverter defaultOutputFormat="image/jpeg" />} />
-          <Route path="webp-to-jpg" element={<UniversalConverter defaultOutputFormat="image/jpeg" />} />
-          <Route path="heic-to-jpg" element={<UniversalConverter defaultOutputFormat="image/jpeg" />} />
-          <Route path="bmp-to-png" element={<UniversalConverter defaultOutputFormat="image/png" />} />
-          <Route path="photo-to-markdown" element={<OcrTool type="image" />} />
+            {/* Image Conversion */}
+            <Route path="jpg-to-png" element={<LazyRoute><UniversalConverter defaultOutputFormat="image/png" /></LazyRoute>} />
+            <Route path="png-to-jpg" element={<LazyRoute><UniversalConverter defaultOutputFormat="image/jpeg" /></LazyRoute>} />
+            <Route path="webp-to-jpg" element={<LazyRoute><UniversalConverter defaultOutputFormat="image/jpeg" /></LazyRoute>} />
+            <Route path="heic-to-jpg" element={<LazyRoute><UniversalConverter defaultOutputFormat="image/jpeg" /></LazyRoute>} />
+            <Route path="bmp-to-png" element={<LazyRoute><UniversalConverter defaultOutputFormat="image/png" /></LazyRoute>} />
+            <Route path="photo-to-markdown" element={<LazyRoute><OcrTool type="image" /></LazyRoute>} />
 
-          {/* Convert from PDF tools */}
-          <Route path="pdf-to-jpg" element={<PdfToJpg />} />
-          <Route path="pdf-to-word" element={<PdfToWord />} />
-          <Route path="pdf-to-powerpoint" element={<PdfToPowerpoint />} />
-          <Route path="pdf-to-excel" element={<PdfToExcel />} />
-          <Route path="pdf-to-pdf-a" element={<PdfToPdfA />} />
+            {/* Convert from PDF tools */}
+            <Route path="pdf-to-jpg" element={<LazyRoute><PdfToJpg /></LazyRoute>} />
+            <Route path="pdf-to-word" element={<LazyRoute><PdfToWord /></LazyRoute>} />
+            <Route path="pdf-to-powerpoint" element={<LazyRoute><PdfToPowerpoint /></LazyRoute>} />
+            <Route path="pdf-to-excel" element={<LazyRoute><PdfToExcel /></LazyRoute>} />
+            <Route path="pdf-to-pdf-a" element={<LazyRoute><PdfToPdfA /></LazyRoute>} />
 
-          {/* Organize PDF */}
-          <Route path="merge-pdf" element={<MergePdf />} />
-          <Route path="split-pdf" element={<SplitPdf />} />
-          <Route path="remove-pages" element={<RemovePages />} />
-          <Route path="extract-pages" element={<ExtractPages />} />
-          <Route path="organize-pdf" element={<OrganizePdf />} />
-          <Route path="scan-to-pdf" element={<ScanToPdf />} />
+            {/* Organize PDF */}
+            <Route path="merge-pdf" element={<LazyRoute><MergePdf /></LazyRoute>} />
+            <Route path="split-pdf" element={<LazyRoute><SplitPdf /></LazyRoute>} />
+            <Route path="remove-pages" element={<LazyRoute><RemovePages /></LazyRoute>} />
+            <Route path="extract-pages" element={<LazyRoute><ExtractPages /></LazyRoute>} />
+            <Route path="organize-pdf" element={<LazyRoute><OrganizePdf /></LazyRoute>} />
+            <Route path="scan-to-pdf" element={<LazyRoute><ScanToPdf /></LazyRoute>} />
 
-          {/* Optimize PDF */}
-          <Route path="compress-pdf" element={<ComingSoon />} />
-          <Route path="repair-pdf" element={<ComingSoon />} />
-          <Route path="ocr-pdf" element={<OcrTool type="pdf" />} />
+            {/* Optimize PDF */}
+            <Route path="compress-pdf" element={<LazyRoute><ComingSoon /></LazyRoute>} />
+            <Route path="repair-pdf" element={<LazyRoute><ComingSoon /></LazyRoute>} />
+            <Route path="ocr-pdf" element={<LazyRoute><OcrTool type="pdf" /></LazyRoute>} />
 
-          {/* Convert to PDF */}
-          <Route path="jpg-to-pdf" element={<JpgToPdf />} />
-          <Route path="word-to-pdf" element={<WordToPdf />} />
-          <Route path="powerpoint-to-pdf" element={<PowerpointToPdf />} />
-          <Route path="excel-to-pdf" element={<ExcelToPdf />} />
-          <Route path="html-to-pdf" element={<HtmlToPdf />} />
+            {/* Convert to PDF */}
+            <Route path="jpg-to-pdf" element={<LazyRoute><JpgToPdf /></LazyRoute>} />
+            <Route path="word-to-pdf" element={<LazyRoute><WordToPdf /></LazyRoute>} />
+            <Route path="powerpoint-to-pdf" element={<LazyRoute><PowerpointToPdf /></LazyRoute>} />
+            <Route path="excel-to-pdf" element={<LazyRoute><ExcelToPdf /></LazyRoute>} />
+            <Route path="html-to-pdf" element={<LazyRoute><HtmlToPdf /></LazyRoute>} />
 
-          {/* Edit PDF */}
-          <Route path="rotate-pdf" element={<RotatePdf />} />
-          <Route path="add-page-numbers" element={<AddPageNumbers />} />
-          <Route path="add-watermark" element={<AddWatermark />} />
-          <Route path="crop-pdf" element={<CropPdf />} />
-          <Route path="edit-pdf" element={<EditPdf />} />
+            {/* Edit PDF */}
+            <Route path="rotate-pdf" element={<LazyRoute><RotatePdf /></LazyRoute>} />
+            <Route path="add-page-numbers" element={<LazyRoute><AddPageNumbers /></LazyRoute>} />
+            <Route path="add-watermark" element={<LazyRoute><AddWatermark /></LazyRoute>} />
+            <Route path="crop-pdf" element={<LazyRoute><CropPdf /></LazyRoute>} />
+            <Route path="edit-pdf" element={<LazyRoute><EditPdf /></LazyRoute>} />
 
-          {/* PDF Security */}
-          <Route path="sign-pdf" element={<SignPdf />} />
-          <Route path="redact-pdf" element={<RedactPdf />} />
-          <Route path="compare-pdf" element={<ComparePdf />} />
+            {/* PDF Security */}
+            <Route path="sign-pdf" element={<LazyRoute><SignPdf /></LazyRoute>} />
+            <Route path="redact-pdf" element={<LazyRoute><RedactPdf /></LazyRoute>} />
+            <Route path="compare-pdf" element={<LazyRoute><ComparePdf /></LazyRoute>} />
 
-          {/* PDF Intelligence */}
-          <Route path="ai-summarizer" element={<ComingSoon />} />
-          <Route path="translate-pdf" element={<ComingSoon />} />
+            {/* PDF Intelligence */}
+            <Route path="ai-summarizer" element={<LazyRoute><ComingSoon /></LazyRoute>} />
+            <Route path="translate-pdf" element={<LazyRoute><ComingSoon /></LazyRoute>} />
 
+            <Route path="*" element={<NotFound />} />
+          </Route>
+          <Route path="/about" element={<About />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/contact" element={<Contact />} />
           <Route path="*" element={<NotFound />} />
-        </Route>
-        <Route path="/about"   element={<About />} />
-        <Route path="/privacy" element={<Privacy />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </Suspense>
+        </Routes>
+      </Suspense>
     </ErrorBoundary>
     <Footer />
   </BrowserRouter>

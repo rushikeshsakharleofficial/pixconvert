@@ -1,32 +1,8 @@
 import { Link } from 'react-router-dom';
-import { useRef, useCallback } from 'react';
+import { useRef, useState, useCallback, useEffect } from 'react';
 
 import BoxLoader from './ui/box-loader';
 import ToolMarquee from './ui/tool-marquee';
-import {
-  Stepper,
-  StepperContent,
-  StepperIndicator,
-  StepperItem,
-  StepperNav,
-  StepperPanel,
-  StepperSeparator,
-  StepperTitle,
-  StepperTrigger,
-} from './ui/stepper';
-
-const FEATURES = [
-  { icon: '🔄', title: 'Universal Converter', desc: 'Convert between PNG, JPG, WebP, AVIF, HEIC and more - fully in-browser.', link: '/tools/converter' },
-  { icon: '🎞️', title: 'GIF Maker', desc: 'Turn any sequence of images into a smooth, looping animated GIF.', link: '/tools/gif' },
-  { icon: '🔓', title: 'Unlock PDF', desc: 'Remove password protection from any PDF file instantly.', link: '/tools/pdf' },
-  { icon: '🔐', title: 'Protect PDF', desc: 'Add strong password encryption to your PDF documents.', link: '/tools/pdf-lock' },
-  { icon: '🖼️', title: 'PDF to JPG', desc: 'Export every PDF page as a high-quality JPG image.', link: '/tools/pdf-to-jpg' },
-  { icon: '📝', title: 'PDF to Word', desc: 'Extract text from PDFs into editable .docx documents.', link: '/tools/pdf-to-word' },
-  { icon: '✍️', title: 'Sign PDF', desc: 'Sign yourself or request electronic signatures from others.', link: '/tools/sign-pdf' },
-  { icon: '⬛', title: 'Redact PDF', desc: 'Permanently remove sensitive content from your PDF documents.', link: '/tools/redact-pdf' },
-  { icon: '⚖️', title: 'Compare PDF', desc: 'Compare two PDF documents side by side and find the differences.', link: '/tools/compare-pdf' },
-  { icon: '📁', title: 'Merge PDF', desc: 'Combine PDFs in the order you want with an easy in-browser merger.', link: '/tools/merge-pdf' },
-];
 
 const TRUST = [
   'No Sign-up Required',
@@ -37,9 +13,9 @@ const TRUST = [
 ];
 
 const STEPS = [
-  { n: '01', title: 'Pick a Tool', desc: 'Choose from our collection of PDF & image tools' },
-  { n: '02', title: 'Upload Files', desc: 'Drag & drop or click to select your files' },
-  { n: '03', title: 'Download', desc: 'Get your processed file instantly - no waiting' },
+  { n: '01', title: 'Pick a Tool', desc: 'Choose from our collection of PDF & image tools', icon: '🛠️' },
+  { n: '02', title: 'Upload Files', desc: 'Drag & drop or click to select your files', icon: '📁' },
+  { n: '03', title: 'Download', desc: 'Get your processed file instantly - no waiting', icon: '⬇️' },
 ];
 
 const STATS = [
@@ -47,6 +23,114 @@ const STATS = [
   { num: '15+', lbl: 'File formats' },
   { num: '100%', lbl: 'Free forever' },
 ];
+
+/* ── Drag-based How It Works Timeline ── */
+function HowItWorksTimeline() {
+  const [activeStep, setActiveStep] = useState(0);
+  const trackRef = useRef(null);
+  const isDragging = useRef(false);
+
+  const getStepFromPosition = useCallback((clientX) => {
+    const track = trackRef.current;
+    if (!track) return 0;
+    const rect = track.getBoundingClientRect();
+    const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+    return Math.round(ratio * (STEPS.length - 1));
+  }, []);
+
+  const handlePointerDown = useCallback((e) => {
+    isDragging.current = true;
+    trackRef.current?.setPointerCapture(e.pointerId);
+    setActiveStep(getStepFromPosition(e.clientX));
+  }, [getStepFromPosition]);
+
+  const handlePointerMove = useCallback((e) => {
+    if (!isDragging.current) return;
+    setActiveStep(getStepFromPosition(e.clientX));
+  }, [getStepFromPosition]);
+
+  const handlePointerUp = useCallback((e) => {
+    isDragging.current = false;
+    trackRef.current?.releasePointerCapture(e.pointerId);
+  }, []);
+
+  // Auto-advance every 3s when not dragging
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!isDragging.current) {
+        setActiveStep((prev) => (prev + 1) % STEPS.length);
+      }
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const progressPercent = (activeStep / (STEPS.length - 1)) * 100;
+
+  return (
+    <div className="hiw-timeline">
+      {/* Drag track */}
+      <div
+        className="hiw-track"
+        ref={trackRef}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerUp}
+        role="slider"
+        aria-label="Step selector"
+        aria-valuemin={1}
+        aria-valuemax={STEPS.length}
+        aria-valuenow={activeStep + 1}
+        aria-valuetext={STEPS[activeStep].title}
+        tabIndex={0}
+      >
+        {/* Track background */}
+        <div className="hiw-track-bg" />
+        {/* Filled portion */}
+        <div className="hiw-track-fill" style={{ width: `${progressPercent}%` }} />
+        {/* Drag thumb */}
+        <div
+          className="hiw-thumb"
+          style={{ left: `${progressPercent}%` }}
+        />
+        {/* Step dots */}
+        {STEPS.map((step, i) => {
+          const leftPct = (i / (STEPS.length - 1)) * 100;
+          const state = i < activeStep ? 'completed' : i === activeStep ? 'active' : 'inactive';
+          return (
+            <div
+              key={i}
+              className={`hiw-dot hiw-dot--${state}`}
+              style={{ left: `${leftPct}%` }}
+            >
+              <span className="hiw-dot-inner">
+                {state === 'completed' ? '✓' : i + 1}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Labels row */}
+      <div className="hiw-labels">
+        {STEPS.map((step, i) => (
+          <div
+            key={i}
+            className={`hiw-label ${i === activeStep ? 'hiw-label--active' : ''}`}
+          >
+            {step.title}
+          </div>
+        ))}
+      </div>
+
+      {/* Description panel */}
+      <div className="hiw-panel" key={activeStep}>
+        <span className="hiw-panel-icon">{STEPS[activeStep].icon}</span>
+        <p className="hiw-panel-text">{STEPS[activeStep].desc}</p>
+      </div>
+    </div>
+  );
+}
 
 const Home = () => (
   <section className="hero" style={{ position: 'relative', overflow: 'hidden' }}>
@@ -99,45 +183,10 @@ const Home = () => (
         ))}
       </div>
 
-      <div className="how-it-works fade-in delay-5 py-20">
-        <h2 className="text-center">How It Works</h2>
-        <p className="subtitle text-center mb-12">Three steps. No account. Completely private.</p>
-        
-        <div className="max-w-3xl mx-auto px-4">
-          <Stepper
-            defaultValue={1}
-            indicators={{
-              completed: <span className="text-[10px]">✓</span>,
-            }}
-            className="space-y-12"
-          >
-            <StepperNav className="justify-between">
-              {STEPS.map((step, index) => (
-                <StepperItem key={index} step={index + 1} className="relative">
-                  <StepperTrigger className="flex flex-col md:flex-row items-center gap-3">
-                    <StepperIndicator className="size-10 text-base" />
-                    <div className="flex flex-col items-center md:items-start">
-                      <StepperTitle className="text-lg">{step.title}</StepperTitle>
-                    </div>
-                  </StepperTrigger>
-                  {STEPS.length > index + 1 && (
-                    <StepperSeparator className="hidden md:block mx-4" />
-                  )}
-                </StepperItem>
-              ))}
-            </StepperNav>
-
-            <StepperPanel className="bg-card/50 border border-border p-8 rounded-[2rem] text-center min-h-[120px] flex items-center justify-center">
-              {STEPS.map((step, index) => (
-                <StepperContent key={index} value={index + 1}>
-                  <p className="text-xl text-muted-foreground font-medium max-w-lg mx-auto">
-                    {step.desc}
-                  </p>
-                </StepperContent>
-              ))}
-            </StepperPanel>
-          </Stepper>
-        </div>
+      <div className="how-it-works fade-in delay-5">
+        <h2>How It Works</h2>
+        <p className="subtitle">Three steps. No account. Completely private.</p>
+        <HowItWorksTimeline />
       </div>
 
       <div className="section-divider" />

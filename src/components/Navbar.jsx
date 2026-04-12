@@ -57,7 +57,6 @@ const Navbar = () => {
     })();
     const theme = saved ?? 'dark';
     document.documentElement.setAttribute('data-theme', theme);
-    setIsDark(theme !== 'light');
   }, []);
 
   useEffect(() => {

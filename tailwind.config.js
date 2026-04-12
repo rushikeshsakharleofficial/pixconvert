@@ -29,6 +29,13 @@ export default {
         'neutral': '#222222',
         'neutral-50': 'var(--neutral-50)',
         'base-300': 'var(--base-300)',
+        highlight: 'var(--color-hightlight-light)',
+        'accent-light': 'var(--color-accent-light)',
+        'primary-light': 'var(--color-primary-light)',
+        'secondary-light': 'var(--color-secondary-light)',
+        'primary-new': 'var(--color-primary-new)',
+        'accent-new': 'var(--color-accent-new)',
+        'secondary-new': 'var(--color-secondary-new)',
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],

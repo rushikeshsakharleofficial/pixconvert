@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
+/* Google Fonts - Inter for body, Outfit for headings */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&display=swap');
 @tailwind base;
 @tailwind components;
@@ -90,9 +90,8 @@
   --color-primary-new: #FF0F67;
   --color-accent-new: #439775;
   --color-secondary-new: #FFF07C;
-}
 
-:root {
+  /* Typography - aliases for consistency */
   --font-display: 'Outfit', sans-serif;
   --font-sans: 'Inter', sans-serif;
 }
@@ -380,6 +379,7 @@ section { padding: 5rem 2rem 4rem; }
 .hero-orb {
   position: absolute; border-radius: 50%; pointer-events: none; will-change: transform;
   filter: blur(60px);
+  contain: layout paint;
 }
 .hero-orb-1 {
   width: 700px; height: 500px; top: -150px; left: -150px;
@@ -754,22 +754,112 @@ section { padding: 5rem 2rem 4rem; }
 }
 .how-it-works .subtitle { color: var(--text2); font-size: 0.9rem; margin-bottom: 2.5rem; }
 
-.steps { display: flex; gap: 0; justify-content: center; position: relative; }
-.steps::before {
-  content: ''; position: absolute;
-  top: 23px; left: calc(16.67% + 24px); right: calc(16.67% + 24px);
-  height: 1px; background: var(--border);
+/* ── Drag Timeline ── */
+.hiw-timeline { max-width: 520px; margin: 0 auto; }
+
+.hiw-track {
+  position: relative; height: 48px;
+  display: flex; align-items: center;
+  cursor: grab; touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
-.step { flex: 1; min-width: 160px; max-width: 240px; text-align: center; padding: 0 1.5rem; }
-.step-num {
-  width: 46px; height: 46px; border-radius: 50%;
-  background: var(--bg3); border: 1px solid var(--border);
-  color: var(--text2); font-family: var(--heading); font-weight: 700; font-size: 0.95rem;
+.hiw-track:active { cursor: grabbing; }
+
+.hiw-track-bg {
+  position: absolute; left: 0; right: 0;
+  height: 3px; border-radius: 2px;
+  background: var(--border);
+}
+
+.hiw-track-fill {
+  position: absolute; left: 0;
+  height: 3px; border-radius: 2px;
+  background: var(--primary);
+  transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hiw-thumb {
+  position: absolute; top: 50%;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: var(--primary);
+  border: 2px solid var(--bg);
+  box-shadow: 0 0 0 3px rgba(255, 79, 0, 0.25), 0 2px 6px rgba(0,0,0,0.3);
+  transform: translate(-50%, -50%);
+  transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s;
+  z-index: 3;
+  pointer-events: none;
+}
+.hiw-track:active .hiw-thumb {
+  box-shadow: 0 0 0 5px rgba(255, 79, 0, 0.35), 0 2px 8px rgba(0,0,0,0.4);
+  width: 18px; height: 18px;
+}
+
+/* Step dots on the track */
+.hiw-dot {
+  position: absolute; top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2; pointer-events: none;
+}
+.hiw-dot-inner {
+  width: 28px; height: 28px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  margin: 0 auto 1rem; position: relative; z-index: 1;
+  font-family: var(--heading); font-weight: 700; font-size: 0.7rem;
+  transition: all 0.3s ease;
 }
-.step h3 { font-family: var(--heading); font-size: 0.9rem; font-weight: 700; color: var(--text); margin-bottom: 0.3rem; }
-.step p  { color: var(--text2); font-size: 0.82rem; }
+
+.hiw-dot--inactive .hiw-dot-inner {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  color: var(--text3);
+}
+.hiw-dot--active .hiw-dot-inner {
+  background: var(--primary);
+  border: 1px solid var(--primary);
+  color: #fff;
+  box-shadow: 0 0 12px rgba(255, 79, 0, 0.3);
+}
+.hiw-dot--completed .hiw-dot-inner {
+  background: var(--success);
+  border: 1px solid var(--success);
+  color: #fff;
+  font-size: 0.65rem;
+}
+
+/* Labels */
+.hiw-labels {
+  display: flex; justify-content: space-between;
+  margin-top: 0.25rem;
+}
+.hiw-label {
+  flex: 1; text-align: center;
+  font-family: var(--heading); font-size: 0.8rem;
+  font-weight: 600; color: var(--text3);
+  transition: color 0.3s;
+}
+.hiw-label--active { color: var(--text); }
+
+/* Description panel — theme-matching */
+.hiw-panel {
+  margin-top: 1.5rem;
+  padding: 1.25rem 1.5rem;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  display: flex; align-items: center; gap: 0.85rem;
+  animation: hiwPanelIn 0.35s ease;
+}
+.hiw-panel-icon { font-size: 1.4rem; flex-shrink: 0; }
+.hiw-panel-text {
+  font-size: 0.92rem; color: var(--text2);
+  line-height: 1.6; text-align: left; margin: 0;
+}
+
+@keyframes hiwPanelIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
 /* ===== Section Titles ===== */
 .section-title {

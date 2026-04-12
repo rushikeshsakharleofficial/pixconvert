@@ -9,7 +9,8 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "autoscale:docker": "node scripts/docker-autoscale.mjs"
+    "autoscale:docker": "node scripts/docker-autoscale.mjs",
+    "sync-memory": "node scripts/sync-memory.mjs"
   },
   "dependencies": {
     "@pdfsmaller/pdf-decrypt": "^1.0.1",
