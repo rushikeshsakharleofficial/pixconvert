@@ -15,14 +15,18 @@ A custom-built, drag-based timeline that guides users through the simple 3-step 
 | :---: | :---: |
 | ![Home Timeline Dark](./docs/screenshots/home-timeline-dark.png) | ![Home Timeline Light](./docs/screenshots/home-timeline-light.png) |
 
-### 2. Real-time Analytics Dashboard (Per-File Tracking)
-Powered by Server-Sent Events (SSE), the dashboard provides live metrics on file processing trends. Every single file processed counts toward the real-time global counter.
+### 2. Real-time Analytics Dashboard
+Powered by Server-Sent Events (SSE), the dashboard provides live metrics on file processing trends. Features high-performance **Glowing Line Charts** and **Animated Donut Charts**.
 
-| Analytics Dashboard (Dark) | Data Visualization |
-| :---: | :---: |
-| ![Analytics Dark](./docs/screenshots/analytics-dark.png) | ![Analytics Chart](./docs/screenshots/analytics-chart-dark.png) |
+![Analytics Final](./docs/screenshots/analytics-final-dark.png)
+*(Full analytics suite with live SSE updates)*
 
-### 3. Collapsible Smart Dropdown
+### 3. Animated "Ghost" 404 Page
+A high-quality, animated 404 error page featuring a floating ghost mascot and an interactive **FlowButton** for quick redirection back to shelter.
+
+![404 Page](./docs/screenshots/404-dark.png)
+
+### 4. Collapsible Smart Dropdown
 A compact, organized navigation system that categorizes 40+ tools into collapsible sections, making it effortless to find the exact tool you need.
 
 ![Tools Dropdown](./docs/screenshots/dropdown-dark.png)
@@ -43,11 +47,11 @@ The entire application is built with a responsive, high-performance UI that supp
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: React 19, Vite, TailwindCSS (for foundational styling), Vanilla CSS (for custom interactions).
-- **Backend**: Node.js, Express 5 (Serverless-ready).
+- **Frontend**: React 19, Vite, TailwindCSS, Framer Motion (for high-end animations).
+- **Charts**: Recharts with custom SVG filters.
+- **Backend**: Node.js, Express 5.
 - **Real-time**: Server-Sent Events (SSE) for live metric streaming.
 - **Persistence**: Atomic JSON-based local storage with automatic 2-year data purging.
-- **Visuals**: Pure SVG charts and custom CSS animations.
 - **DevOps**: Docker, Nginx (Load Balancing), and custom Auto-scaling scripts.
 
 ---
@@ -59,7 +63,6 @@ The repo includes a portable production container setup:
 - `Dockerfile`: Multi-stage build for frontend and Express server.
 - `docker-compose.yml`: Full stack with Nginx edge and persistent volumes for metrics.
 - `nginx.scaling.conf`: Reverse proxy configured for SSE support and load balancing.
-- `scripts/docker-autoscale.mjs`: CPU/RAM-based autoscaler for the application service.
 
 ### Quick Start (Local)
 
