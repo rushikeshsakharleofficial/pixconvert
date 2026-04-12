@@ -3,6 +3,17 @@ import { useRef, useCallback } from 'react';
 
 import BoxLoader from './ui/box-loader';
 import ToolMarquee from './ui/tool-marquee';
+import {
+  Stepper,
+  StepperContent,
+  StepperIndicator,
+  StepperItem,
+  StepperNav,
+  StepperPanel,
+  StepperSeparator,
+  StepperTitle,
+  StepperTrigger,
+} from './ui/stepper';
 
 const FEATURES = [
   { icon: '🔄', title: 'Universal Converter', desc: 'Convert between PNG, JPG, WebP, AVIF, HEIC and more - fully in-browser.', link: '/tools/converter' },
@@ -88,22 +99,44 @@ const Home = () => (
         ))}
       </div>
 
-      <div className="how-it-works fade-in delay-5">
-        <h2>How It Works</h2>
-        <p className="subtitle">Three steps. No account. Completely private.</p>
-        <div className="steps">
-          {STEPS.map((s, i) => (
-            <div className="step step-3d" key={i}>
-              <div className="step-num-3d">
-                <div className="step-num-inner">
-                  <div className="step-num-front">{s.n}</div>
-                  <div className="step-num-back">✓</div>
-                </div>
-              </div>
-              <h3>{s.title}</h3>
-              <p>{s.desc}</p>
-            </div>
-          ))}
+      <div className="how-it-works fade-in delay-5 py-20">
+        <h2 className="text-center">How It Works</h2>
+        <p className="subtitle text-center mb-12">Three steps. No account. Completely private.</p>
+        
+        <div className="max-w-3xl mx-auto px-4">
+          <Stepper
+            defaultValue={1}
+            indicators={{
+              completed: <span className="text-[10px]">✓</span>,
+            }}
+            className="space-y-12"
+          >
+            <StepperNav className="justify-between">
+              {STEPS.map((step, index) => (
+                <StepperItem key={index} step={index + 1} className="relative">
+                  <StepperTrigger className="flex flex-col md:flex-row items-center gap-3">
+                    <StepperIndicator className="size-10 text-base" />
+                    <div className="flex flex-col items-center md:items-start">
+                      <StepperTitle className="text-lg">{step.title}</StepperTitle>
+                    </div>
+                  </StepperTrigger>
+                  {STEPS.length > index + 1 && (
+                    <StepperSeparator className="hidden md:block mx-4" />
+                  )}
+                </StepperItem>
+              ))}
+            </StepperNav>
+
+            <StepperPanel className="bg-card/50 border border-border p-8 rounded-[2rem] text-center min-h-[120px] flex items-center justify-center">
+              {STEPS.map((step, index) => (
+                <StepperContent key={index} value={index + 1}>
+                  <p className="text-xl text-muted-foreground font-medium max-w-lg mx-auto">
+                    {step.desc}
+                  </p>
+                </StepperContent>
+              ))}
+            </StepperPanel>
+          </Stepper>
         </div>
       </div>
 

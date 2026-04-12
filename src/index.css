@@ -81,6 +81,15 @@
   --base-content: #0A0A0A;
   --neutral-50: rgba(34, 34, 34, 0.5);
   --base-300: #F2F2F2;
+
+  /* Stepper & Design Theme Colors */
+  --color-hightlight-light: #DADBF8;
+  --color-accent-light: #D9EAE3;
+  --color-primary-light: #FFCFE1;
+  --color-secondary-light: #FFFCE5;
+  --color-primary-new: #FF0F67;
+  --color-accent-new: #439775;
+  --color-secondary-new: #FFF07C;
 }
 
 :root {
