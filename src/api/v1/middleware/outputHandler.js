@@ -21,6 +21,9 @@ const FILE_TTL_HOURS = parseInt(process.env.FILE_TTL_HOURS || '1', 10);
  * @param {string} filename - Suggested download filename
  * @param {string} contentType - MIME type
  */
+// Strip CR, LF, and quotes from filename to prevent CRLF injection (CWE-93)
+const sanitizeFilename = (name) => String(name).replace(/[\r\n"]/g, '');
+
 export async function sendResult(req, res, data, filename, contentType) {
   const outputMode = req.query.output;
 
@@ -52,7 +55,7 @@ export async function sendResult(req, res, data, filename, contentType) {
 
   // Default: binary stream
   res.setHeader('Content-Type', contentType);
-  res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+  res.setHeader('Content-Disposition', `attachment; filename="${sanitizeFilename(filename)}"`);
 
   if (typeof data === 'string' && fs.existsSync(data)) {
     const stat = fs.statSync(data);
@@ -99,7 +102,7 @@ export async function sendZipResult(req, res, files, zipFilename) {
 
   // Stream ZIP directly
   res.setHeader('Content-Type', 'application/zip');
-  res.setHeader('Content-Disposition', `attachment; filename="${zipFilename}"`);
+  res.setHeader('Content-Disposition', `attachment; filename="${sanitizeFilename(zipFilename)}"`);
 
   const archive = archiver('zip', { zlib: { level: 6 } });
   archive.pipe(res);
