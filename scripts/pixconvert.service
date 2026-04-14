@@ -5,8 +5,8 @@ After=network.target
 [Service]
 Type=simple
 User=www-data
-WorkingDirectory=/opt/pixconvert
-ExecStart=/usr/bin/node server.js
+ExecStart=/usr/bin/node /usr/local/lib/node_modules/pixconvert/server.js
+ExecStartPre=/bin/mkdir -p /var/log/pixconvert
 Restart=on-failure
 RestartSec=5
 
@@ -17,8 +17,8 @@ Environment=FILE_SIZE_LIMIT_MB=50
 Environment=FILE_TTL_HOURS=1
 
 # Logging
-StandardOutput=journal
-StandardError=journal
+StandardOutput=append:/var/log/pixconvert/pixconvert_access.log
+StandardError=append:/var/log/pixconvert/pixconvert_error.log
 SyslogIdentifier=pixconvert
 
 [Install]
