@@ -38,12 +38,9 @@ function install() {
   }
 
   const nodeBin = process.execPath;
-  // Use the actual calling user (SUDO_USER), fallback to 'root' if not via sudo
-  const serviceUser = process.env.SUDO_USER || 'root';
 
-  // Create log directory and allow the service user to write to it
+  // Create log directory
   mkdirSync(LOG_DIR, { recursive: true });
-  try { execSync(`chown ${serviceUser}:${serviceUser} ${LOG_DIR}`); } catch {}
   console.log(`Created ${LOG_DIR}`);
 
   const service = `[Unit]
@@ -52,7 +49,7 @@ After=network.target
 
 [Service]
 Type=simple
-User=${serviceUser}
+User=root
 ExecStart=${nodeBin} ${serverPath}
 ExecStartPre=/bin/mkdir -p ${LOG_DIR}
 Restart=on-failure
