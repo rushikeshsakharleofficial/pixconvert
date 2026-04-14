@@ -7,6 +7,8 @@ import nodemailer from 'nodemailer';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import rateLimit from 'express-rate-limit';
+import v1Router from './src/api/v1/index.js';
+import { cleanupDownloads } from './src/api/v1/middleware/outputHandler.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const UPLOADS_DIR = path.resolve(__dirname, 'uploads');
@@ -381,8 +383,25 @@ app.get('/api/metrics/stream', (req, res) => {
   req.on('close', () => sseClients.delete(res));
 });
 
+// --- API docs page ---
+app.get('/api/docs', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'api-docs.html'));
+});
+
+// --- API v1 routes ---
+app.use('/api/v1', v1Router);
+
+// Serve downloads folder (for ?output=url mode)
+const DOWNLOADS_DIR = path.resolve(__dirname, process.env.DOWNLOADS_DIR || 'downloads');
+fs.mkdirSync(DOWNLOADS_DIR, { recursive: true });
+app.use('/downloads', express.static(DOWNLOADS_DIR));
+
+// Cleanup downloads on schedule
+cleanupDownloads();
+setInterval(cleanupDownloads, 10 * 60 * 1000); // every 10 minutes
+
 if (fs.existsSync(DIST_DIR)) {
-  app.get(/^(?!\/api\/|\/uploads\/).*/, (req, res) => {
+  app.get(/^(?!\/api\/|\/uploads\/|\/downloads\/).*/, (req, res) => {
     res.sendFile(path.join(DIST_DIR, 'index.html'));
   });
 }

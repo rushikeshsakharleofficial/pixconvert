@@ -2325,6 +2325,12 @@ section { padding: 5rem 2rem 4rem; }
   font-weight: 500;
 }
 
+.page-canvas-placeholder {
+  background: #f0f0f0;
+  border-radius: 4px;
+}
+[data-theme="dark"] .page-canvas-placeholder { background: #2a2a2a; }
+
 .page-canvas-wrapper {
   position: relative;
   box-shadow: 0 4px 20px rgba(0,0,0,0.15);

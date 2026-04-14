@@ -16,13 +16,29 @@ export default function PageCanvas({
 }) {
   const canvasRef = useRef(null);
   const overlayRef = useRef(null);
+  const wrapperRef = useRef(null);
   const [viewport, setViewport] = useState(null);
   const [dragStart, setDragStart] = useState(null);
   const [dragCurrent, setDragCurrent] = useState(null);
+  const [isVisible, setIsVisible] = useState(false);
+  const renderedRef = useRef(false);
 
-  // Render PDF page to canvas
+  // Observe visibility — only render when near viewport
   useEffect(() => {
-    if (!pdfDoc) return;
+    const el = wrapperRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsVisible(entry.isIntersecting),
+      { rootMargin: '200px' }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  // Render PDF page to canvas only when visible (and not already rendered)
+  useEffect(() => {
+    if (!pdfDoc || !isVisible || renderedRef.current) return;
     let cancelled = false;
 
     const render = async () => {
@@ -44,11 +60,22 @@ export default function PageCanvas({
       const ctx = canvas.getContext('2d');
       ctx.clearRect(0, 0, vp.width, vp.height);
       await page.render({ canvasContext: ctx, viewport: vp }).promise;
+      if (!cancelled) renderedRef.current = true;
     };
 
     render();
     return () => { cancelled = true; };
-  }, [pdfDoc, pageIndex]);
+  }, [pdfDoc, pageIndex, isVisible]);
+
+  // Get viewport dimensions even before rendering (for placeholder sizing)
+  useEffect(() => {
+    if (!pdfDoc || viewport) return;
+    let cancelled = false;
+    pdfDoc.getPage(pageIndex + 1).then((page) => {
+      if (!cancelled) setViewport(page.getViewport({ scale: 1 }));
+    });
+    return () => { cancelled = true; };
+  }, [pdfDoc, pageIndex, viewport]);
 
   const getRelativePos = useCallback((e) => {
     const rect = overlayRef.current.getBoundingClientRect();
@@ -144,17 +171,19 @@ export default function PageCanvas({
   } : null;
 
   return (
-    <div className="page-canvas-wrapper" style={viewport ? { width: viewport.width, height: viewport.height } : {}}>
-      <canvas ref={canvasRef} className="page-canvas" />
-      <div
-        ref={overlayRef}
-        className="page-overlay"
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
-        style={viewport ? { width: viewport.width, height: viewport.height } : {}}
-      >
+    <div ref={wrapperRef} className="page-canvas-wrapper" style={viewport ? { width: viewport.width, height: viewport.height } : { width: 595, height: 842 }}>
+      {isVisible ? (
+        <>
+        <canvas ref={canvasRef} className="page-canvas" />
+        <div
+          ref={overlayRef}
+          className="page-overlay"
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseUp}
+          style={viewport ? { width: viewport.width, height: viewport.height } : {}}
+        >
         {pageAnnotations.map((ann) => (
           <AnnotationElement
             key={ann.id}
@@ -180,7 +209,11 @@ export default function PageCanvas({
             }}
           />
         )}
-      </div>
+        </div>
+        </>
+      ) : (
+        <div className="page-canvas-placeholder" style={viewport ? { width: viewport.width, height: viewport.height } : { width: '100%', height: '100%' }} />
+      )}
     </div>
   );
 }

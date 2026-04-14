@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PixConvert API Documentation</title>
+  <style>
+    :root { --bg: #0a0a0a; --surface: #141414; --surface2: #1e1e1e; --border: #2a2a2a; --text: #e5e5e5; --text2: #999; --accent: #ff6b35; --green: #22c55e; --blue: #3b82f6; --code-bg: #1a1a2e; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; }
+    h1 { font-size: 2.5rem; font-weight: 800; margin-bottom: 0.5rem; }
+    h1 span { color: var(--accent); }
+    .subtitle { color: var(--text2); font-size: 1.1rem; margin-bottom: 2rem; }
+    .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 3rem; }
+    .info-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; }
+    .info-card h3 { font-size: 0.85rem; color: var(--text2); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+    .info-card p { font-size: 1.1rem; font-weight: 600; }
+    .section { margin-bottom: 3rem; }
+    .section h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
+    .endpoint { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 1rem; overflow: hidden; }
+    .endpoint-header { display: flex; align-items: center; gap: 0.75rem; padding: 1rem 1.25rem; cursor: pointer; }
+    .endpoint-header:hover { background: var(--surface2); }
+    .method { background: var(--green); color: #000; font-weight: 700; font-size: 0.75rem; padding: 0.25rem 0.6rem; border-radius: 4px; font-family: monospace; }
+    .method.post { background: var(--blue); color: #fff; }
+    .endpoint-path { font-family: monospace; font-weight: 600; font-size: 0.95rem; }
+    .endpoint-desc { color: var(--text2); font-size: 0.9rem; margin-left: auto; }
+    .endpoint-body { padding: 1rem 1.25rem; border-top: 1px solid var(--border); display: none; }
+    .endpoint.open .endpoint-body { display: block; }
+    pre { background: var(--code-bg); border-radius: 8px; padding: 1rem; overflow-x: auto; font-size: 0.85rem; line-height: 1.5; margin: 0.75rem 0; }
+    code { font-family: 'JetBrains Mono', 'Fira Code', monospace; color: #e5e5e5; }
+    .param-table { width: 100%; border-collapse: collapse; margin: 0.75rem 0; }
+    .param-table th { text-align: left; font-size: 0.8rem; color: var(--text2); text-transform: uppercase; padding: 0.5rem; border-bottom: 1px solid var(--border); }
+    .param-table td { padding: 0.5rem; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+    .param-table td:first-child { font-family: monospace; color: var(--accent); font-weight: 600; }
+    .badge { font-size: 0.7rem; padding: 0.15rem 0.4rem; border-radius: 3px; font-weight: 600; }
+    .badge.required { background: #dc262620; color: #ef4444; }
+    .badge.optional { background: #22c55e20; color: #22c55e; }
+    .input-section { margin-bottom: 1rem; }
+    .input-section h4 { font-size: 0.9rem; margin-bottom: 0.5rem; color: var(--text2); }
+    footer { text-align: center; padding: 2rem; color: var(--text2); font-size: 0.85rem; border-top: 1px solid var(--border); }
+    @media (max-width: 768px) { h1 { font-size: 1.8rem; } .endpoint-desc { display: none; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1><span>PixConvert</span> API</h1>
+    <p class="subtitle">Open-source PDF & image processing API. No authentication required.</p>
+
+    <div class="info-grid">
+      <div class="info-card"><h3>Base URL</h3><p><code>/api/v1</code></p></div>
+      <div class="info-card"><h3>Rate Limit</h3><p>10 req/sec</p></div>
+      <div class="info-card"><h3>Max File Size</h3><p>50 MB</p></div>
+      <div class="info-card"><h3>Auth</h3><p>None (open)</p></div>
+    </div>
+
+    <div class="section">
+      <h2>Quick Start</h2>
+      <pre><code># Compress a PDF
+curl -X POST http://localhost:4000/api/v1/compress-pdf \
+  -F "files=@document.pdf" -o compressed.pdf
+
+# Merge two PDFs
+curl -X POST http://localhost:4000/api/v1/merge-pdf \
+  -F "files=@doc1.pdf" -F "files=@doc2.pdf" -o merged.pdf
+
+# Convert from URL
+curl -X POST http://localhost:4000/api/v1/compress-pdf \
+  -H "Content-Type: application/json" \
+  -d '{"urls":["https://example.com/doc.pdf"]}' -o result.pdf
+
+# Get download URL instead of binary
+curl -X POST "http://localhost:4000/api/v1/compress-pdf?output=url" \
+  -F "files=@document.pdf"</code></pre>
+    </div>
+
+    <div class="section">
+      <h2>Input Methods</h2>
+      <pre><code># 1. File upload (multipart/form-data)
+-F "files=@local-file.pdf"
+
+# 2. URL input (JSON body)
+-H "Content-Type: application/json" -d '{"urls":["https://..."]}'
+
+# 3. Mixed (upload + URL)
+-F "files=@local.pdf" -F "urls=https://example.com/remote.pdf"</code></pre>
+    </div>
+
+    <div class="section">
+      <h2>Output Modes</h2>
+      <pre><code># Default: binary stream (pipe to file)
+curl ... -o result.pdf
+
+# URL mode: returns JSON with download link
+curl ... "?output=url"
+# → {"success":true,"url":"/downloads/abc123.pdf","filename":"compressed.pdf","size":42000,"expiresAt":"..."}</code></pre>
+    </div>
+
+    <div class="section" id="endpoints">
+      <h2>Endpoints</h2>
+      <div id="endpoint-list"></div>
+    </div>
+
+    <div class="section">
+      <h2>Error Responses</h2>
+      <pre><code>// 400 Bad Request
+{"success": false, "error": "At least 1 file(s) required. Got 0."}
+
+// 413 Payload Too Large
+{"success": false, "error": "File too large. Max 50MB allowed."}
+
+// 429 Rate Limited
+{"success": false, "error": "Rate limit exceeded. Max 10 requests per second."}
+
+// 502 Processing Error
+{"success": false, "error": "Ghostscript failed: ..."}</code></pre>
+    </div>
+
+    <div class="section">
+      <h2>n8n Integration</h2>
+      <pre><code>// n8n HTTP Request Node configuration:
+// Method: POST
+// URL: https://your-server.com/api/v1/compress-pdf
+// Body Content Type: Form-Data/Multipart
+// Add field: files (type: file, from previous node)
+// Options → Response Format: File</code></pre>
+    </div>
+  </div>
+
+  <footer>PixConvert API v1.0 — Open Source</footer>
+
+  <script>
+    const tools = [
+      { cat: 'Organize PDF', items: [
+        { path: '/merge-pdf', desc: 'Merge multiple PDFs', curl: 'curl -X POST /api/v1/merge-pdf -F "files=@doc1.pdf" -F "files=@doc2.pdf" -o merged.pdf', params: [] },
+        { path: '/split-pdf', desc: 'Split PDF into pages', curl: 'curl -X POST "/api/v1/split-pdf?pages=1-3,5" -F "files=@doc.pdf" -o split.pdf', params: [{ name: 'pages', type: 'string', req: false, desc: 'Page range (e.g. "1-3,5,8"). Omit to split all.' }] },
+        { path: '/remove-pages', desc: 'Remove pages from PDF', curl: 'curl -X POST "/api/v1/remove-pages?pages=2,4" -F "files=@doc.pdf" -o result.pdf', params: [{ name: 'pages', type: 'string', req: true, desc: 'Pages to remove (e.g. "2,4,6")' }] },
+        { path: '/extract-pages', desc: 'Extract specific pages', curl: 'curl -X POST "/api/v1/extract-pages?pages=1-3" -F "files=@doc.pdf" -o extracted.pdf', params: [{ name: 'pages', type: 'string', req: true, desc: 'Pages to extract (e.g. "1-3,5")' }] },
+        { path: '/organize-pdf', desc: 'Reorder pages', curl: 'curl -X POST /api/v1/organize-pdf -F "files=@doc.pdf" -F "order=[2,0,1]" -o reordered.pdf', params: [{ name: 'order', type: 'JSON array', req: true, desc: '0-based page indices in desired order' }] },
+        { path: '/scan-to-pdf', desc: 'Images to PDF', curl: 'curl -X POST /api/v1/scan-to-pdf -F "files=@scan1.jpg" -F "files=@scan2.jpg" -o scanned.pdf', params: [] },
+      ]},
+      { cat: 'Optimize PDF', items: [
+        { path: '/compress-pdf', desc: 'Compress PDF', curl: 'curl -X POST "/api/v1/compress-pdf?quality=medium" -F "files=@doc.pdf" -o small.pdf', params: [{ name: 'quality', type: 'string', req: false, desc: 'low | medium (default) | high' }] },
+        { path: '/repair-pdf', desc: 'Repair damaged PDF', curl: 'curl -X POST /api/v1/repair-pdf -F "files=@broken.pdf" -o fixed.pdf', params: [] },
+        { path: '/ocr-pdf', desc: 'OCR text recognition', curl: 'curl -X POST "/api/v1/ocr-pdf?lang=eng" -F "files=@scan.pdf" -o searchable.pdf', params: [{ name: 'lang', type: 'string', req: false, desc: 'Language (eng, fra, deu, spa...)' }, { name: 'format', type: 'string', req: false, desc: 'pdf (default) | txt' }] },
+      ]},
+      { cat: 'Convert to PDF', items: [
+        { path: '/jpg-to-pdf', desc: 'Images to PDF', curl: 'curl -X POST /api/v1/jpg-to-pdf -F "files=@photo.jpg" -o output.pdf', params: [{ name: 'orientation', type: 'string', req: false, desc: 'portrait (default) | landscape' }, { name: 'margin', type: 'number', req: false, desc: 'Margin in px (default: 0)' }] },
+        { path: '/word-to-pdf', desc: 'Word to PDF', curl: 'curl -X POST /api/v1/word-to-pdf -F "files=@doc.docx" -o output.pdf', params: [] },
+        { path: '/powerpoint-to-pdf', desc: 'PPT to PDF', curl: 'curl -X POST /api/v1/powerpoint-to-pdf -F "files=@slides.pptx" -o output.pdf', params: [] },
+        { path: '/excel-to-pdf', desc: 'Excel to PDF', curl: 'curl -X POST /api/v1/excel-to-pdf -F "files=@sheet.xlsx" -o output.pdf', params: [] },
+        { path: '/html-to-pdf', desc: 'HTML to PDF', curl: 'curl -X POST /api/v1/html-to-pdf -H "Content-Type: application/json" -d \'{"htmlUrl":"https://example.com"}\' -o page.pdf', params: [{ name: 'htmlUrl', type: 'string', req: false, desc: 'URL to convert (alternative to file upload)' }, { name: 'format', type: 'string', req: false, desc: 'A4 (default) | Letter' }, { name: 'landscape', type: 'boolean', req: false, desc: 'true | false (default)' }] },
+      ]},
+      { cat: 'Convert from PDF', items: [
+        { path: '/pdf-to-jpg', desc: 'PDF to JPG images', curl: 'curl -X POST "/api/v1/pdf-to-jpg?dpi=200" -F "files=@doc.pdf" -o pages.zip', params: [{ name: 'dpi', type: 'number', req: false, desc: '72-600 (default: 150)' }, { name: 'quality', type: 'number', req: false, desc: '1-100 (default: 90)' }] },
+        { path: '/pdf-to-word', desc: 'PDF to Word', curl: 'curl -X POST /api/v1/pdf-to-word -F "files=@doc.pdf" -o output.docx', params: [] },
+        { path: '/pdf-to-powerpoint', desc: 'PDF to PowerPoint', curl: 'curl -X POST /api/v1/pdf-to-powerpoint -F "files=@doc.pdf" -o output.pptx', params: [] },
+        { path: '/pdf-to-excel', desc: 'PDF to Excel', curl: 'curl -X POST /api/v1/pdf-to-excel -F "files=@doc.pdf" -o output.xlsx', params: [] },
+        { path: '/pdf-to-pdfa', desc: 'PDF to PDF/A', curl: 'curl -X POST /api/v1/pdf-to-pdfa -F "files=@doc.pdf" -o archived.pdf', params: [] },
+      ]},
+      { cat: 'Edit PDF', items: [
+        { path: '/rotate-pdf', desc: 'Rotate pages', curl: 'curl -X POST "/api/v1/rotate-pdf?angle=90" -F "files=@doc.pdf" -o rotated.pdf', params: [{ name: 'angle', type: 'number', req: true, desc: '90 | 180 | 270' }, { name: 'pages', type: 'string', req: false, desc: 'Specific pages (default: all)' }] },
+        { path: '/add-page-numbers', desc: 'Add page numbers', curl: 'curl -X POST "/api/v1/add-page-numbers?position=bottom-center" -F "files=@doc.pdf" -o numbered.pdf', params: [{ name: 'position', type: 'string', req: false, desc: 'top-left, bottom-center (default), etc.' }, { name: 'startFrom', type: 'number', req: false, desc: 'Starting number (default: 1)' }, { name: 'format', type: 'string', req: false, desc: 'Format string, e.g. "Page {n} of {total}"' }] },
+        { path: '/add-watermark', desc: 'Add watermark', curl: 'curl -X POST "/api/v1/add-watermark?text=DRAFT&opacity=0.3" -F "files=@doc.pdf" -o watermarked.pdf', params: [{ name: 'text', type: 'string', req: false, desc: 'Watermark text' }, { name: 'opacity', type: 'number', req: false, desc: '0.01-1 (default: 0.3)' }, { name: 'rotation', type: 'number', req: false, desc: 'Degrees (default: -45)' }] },
+        { path: '/crop-pdf', desc: 'Crop margins', curl: 'curl -X POST "/api/v1/crop-pdf?top=50&bottom=50" -F "files=@doc.pdf" -o cropped.pdf', params: [{ name: 'top/right/bottom/left', type: 'number', req: false, desc: 'Crop amount in points' }] },
+        { path: '/edit-pdf', desc: 'Apply annotations', curl: 'curl -X POST /api/v1/edit-pdf -F "files=@doc.pdf" -F \'annotations=[{"type":"text","pageIndex":0,"x":100,"y":100,"content":"Hello","color":"#000000","fontSize":16}]\' -o edited.pdf', params: [{ name: 'annotations', type: 'JSON array', req: true, desc: 'Array of annotation objects' }] },
+      ]},
+      { cat: 'PDF Security', items: [
+        { path: '/unlock-pdf', desc: 'Remove password', curl: 'curl -X POST /api/v1/unlock-pdf -F "files=@locked.pdf" -o unlocked.pdf', params: [{ name: 'password', type: 'string', req: false, desc: 'PDF password' }] },
+        { path: '/lock-pdf', desc: 'Password-protect', curl: 'curl -X POST "/api/v1/lock-pdf?password=secret123" -F "files=@doc.pdf" -o locked.pdf', params: [{ name: 'password', type: 'string', req: true, desc: 'Password to set' }] },
+        { path: '/sign-pdf', desc: 'Add signature', curl: 'curl -X POST /api/v1/sign-pdf -F "files=@doc.pdf" -F "files=@signature.png" -o signed.pdf', params: [{ name: 'page', type: 'number', req: false, desc: 'Page number (default: last)' }, { name: 'x/y/width/height', type: 'number', req: false, desc: 'Signature position & size' }] },
+        { path: '/redact-pdf', desc: 'Redact regions', curl: 'curl -X POST /api/v1/redact-pdf -F "files=@doc.pdf" -F \'regions=[{"page":1,"x":100,"y":200,"w":300,"h":50}]\' -o redacted.pdf', params: [{ name: 'regions', type: 'JSON array', req: true, desc: 'Array of {page, x, y, w, h}' }] },
+        { path: '/compare-pdf', desc: 'Visual comparison', curl: 'curl -X POST /api/v1/compare-pdf -F "files=@v1.pdf" -F "files=@v2.pdf" -o diff.zip', params: [] },
+      ]},
+      { cat: 'Image Conversion', items: [
+        { path: '/jpg-to-png', desc: 'JPG → PNG', curl: 'curl -X POST /api/v1/jpg-to-png -F "files=@photo.jpg" -o photo.png', params: [{ name: 'quality', type: 'number', req: false, desc: '1-100 (default: 90)' }] },
+        { path: '/png-to-jpg', desc: 'PNG → JPG', curl: 'curl -X POST /api/v1/png-to-jpg -F "files=@image.png" -o image.jpg', params: [{ name: 'quality', type: 'number', req: false, desc: '1-100 (default: 90)' }] },
+        { path: '/webp-to-jpg', desc: 'WebP → JPG', curl: 'curl -X POST /api/v1/webp-to-jpg -F "files=@image.webp" -o image.jpg', params: [{ name: 'quality', type: 'number', req: false, desc: '1-100 (default: 90)' }] },
+        { path: '/heic-to-jpg', desc: 'HEIC → JPG', curl: 'curl -X POST /api/v1/heic-to-jpg -F "files=@photo.heic" -o photo.jpg', params: [{ name: 'quality', type: 'number', req: false, desc: '1-100 (default: 90)' }] },
+        { path: '/bmp-to-png', desc: 'BMP → PNG', curl: 'curl -X POST /api/v1/bmp-to-png -F "files=@image.bmp" -o image.png', params: [] },
+        { path: '/photo-to-markdown', desc: 'OCR → Markdown', curl: 'curl -X POST /api/v1/photo-to-markdown -F "files=@photo.jpg" -o result.md', params: [{ name: 'lang', type: 'string', req: false, desc: 'Language (default: eng)' }] },
+      ]},
+      { cat: 'Media', items: [
+        { path: '/convert', desc: 'Universal converter', curl: 'curl -X POST "/api/v1/convert?to=png" -F "files=@image.jpg" -o result.png', params: [{ name: 'to', type: 'string', req: true, desc: 'Target format (jpg, png, pdf, docx, etc.)' }] },
+        { path: '/gif', desc: 'Create GIF', curl: 'curl -X POST "/api/v1/gif?delay=300" -F "files=@frame1.jpg" -F "files=@frame2.jpg" -o anim.gif', params: [{ name: 'delay', type: 'number', req: false, desc: 'Frame delay in ms (default: 500)' }, { name: 'loop', type: 'boolean', req: false, desc: 'Loop animation (default: true)' }] },
+      ]},
+    ];
+
+    const list = document.getElementById('endpoint-list');
+    for (const cat of tools) {
+      const h3 = document.createElement('h3');
+      h3.style.cssText = 'margin: 1.5rem 0 0.75rem; color: var(--accent); font-size: 1.1rem;';
+      h3.textContent = cat.cat;
+      list.appendChild(h3);
+
+      for (const item of cat.items) {
+        const div = document.createElement('div');
+        div.className = 'endpoint';
+        div.innerHTML = `
+          <div class="endpoint-header" onclick="this.parentElement.classList.toggle('open')">
+            <span class="method post">POST</span>
+            <span class="endpoint-path">/api/v1${item.path}</span>
+            <span class="endpoint-desc">${item.desc}</span>
+          </div>
+          <div class="endpoint-body">
+            <pre><code>${item.curl}</code></pre>
+            ${item.params.length ? `
+              <table class="param-table">
+                <thead><tr><th>Parameter</th><th>Type</th><th></th><th>Description</th></tr></thead>
+                <tbody>${item.params.map(p => `
+                  <tr>
+                    <td>${p.name}</td>
+                    <td>${p.type}</td>
+                    <td><span class="badge ${p.req ? 'required' : 'optional'}">${p.req ? 'required' : 'optional'}</span></td>
+                    <td>${p.desc}</td>
+                  </tr>`).join('')}
+                </tbody>
+              </table>` : ''}
+          </div>`;
+        list.appendChild(div);
+      }
+    }
+  </script>
+</body>
+</html>

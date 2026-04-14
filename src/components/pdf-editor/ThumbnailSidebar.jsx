@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const THUMB_WIDTH = 120;
 
@@ -23,10 +23,24 @@ export default function ThumbnailSidebar({ pdfDoc, numPages, activePage, onPageS
 
 function Thumbnail({ pdfDoc, pageIndex, isActive, onClick }) {
   const canvasRef = useRef(null);
+  const wrapperRef = useRef(null);
   const renderedRef = useRef(false);
+  const [isVisible, setIsVisible] = useState(false);
+
+  // Lazy visibility detection
+  useEffect(() => {
+    const el = wrapperRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) setIsVisible(true); },
+      { rootMargin: '100px' }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
-    if (!pdfDoc || renderedRef.current) return;
+    if (!pdfDoc || !isVisible || renderedRef.current) return;
 
     let cancelled = false;
 
@@ -50,10 +64,11 @@ function Thumbnail({ pdfDoc, pageIndex, isActive, onClick }) {
 
     render();
     return () => { cancelled = true; };
-  }, [pdfDoc, pageIndex]);
+  }, [pdfDoc, pageIndex, isVisible]);
 
   return (
     <button
+      ref={wrapperRef}
       className={`thumbnail-item${isActive ? ' active' : ''}`}
       onClick={onClick}
       title={`Page ${pageIndex + 1}`}
