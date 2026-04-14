@@ -12,15 +12,28 @@ logs/
 .claude/
 .gemini/
 .codex/
+.cursor/
+.cursorrules
+.mcp.json
+.opencode.json
+.windsurfrules
 AGENTS.md
 GEMINI.md
 caveman/
+conductor/
+zapier-skill.md
 
 # Data & Scripts
 data/*
 !data/.gitkeep
 extract_metadata.js
 *.mjs
+vectors.db
+config.json
+nohup.out
+
+# Downloads (temp API output files)
+downloads/
 
 # Documentation / Internal Plans
 docs/superpowers/
