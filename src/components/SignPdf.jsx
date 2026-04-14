@@ -3,28 +3,25 @@ import { PDFDocument } from 'pdf-lib';
 import DropZone from './DropZone';
 import ToolProgressBar from './ToolProgressBar';
 import formatSize from '../utils/formatSize';
-import { rasterizePage } from '../utils/pdfRasterizer';
+import { useFileTool } from '../hooks/useFileTool';
+import { readFile, loadImg } from '../utils/fileHelpers';
+import PdfInteractivePreview from './PdfInteractivePreview';
 
 const DRAW_WIDTH = 480;
 const DRAW_HEIGHT = 180;
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
-const readFileAsDataUrl = (file) =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = () => reject(new Error('Failed to read the selected image.'));
-    reader.readAsDataURL(file);
-  });
-
-const loadImage = (src) =>
-  new Promise((resolve, reject) => {
-    const image = new Image();
-    image.onload = () => resolve(image);
-    image.onerror = () => reject(new Error('Could not load image.'));
-    image.src = src;
-  });
+const dataUrlToUint8Array = (dataUrl) => {
+  const base64 = dataUrl.split(',')[1];
+  const binaryString = window.atob(base64);
+  const len = binaryString.length;
+  const bytes = new Uint8Array(len);
+  for (let i = 0; i < len; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  return bytes;
+};
 
 const makeTypedSignature = async (text) => {
   const canvas = document.createElement('canvas');
@@ -55,26 +52,29 @@ const makeTypedSignature = async (text) => {
 };
 
 const SignPdf = () => {
+  const {
+    file,
+    pdfBytes,
+    resultUrl, setResultUrl,
+    isProcessing, setIsProcessing,
+    error, setError,
+    reset,
+    setFileWithBytes
+  } = useFileTool();
+
   const drawRef = useRef(null);
+  const ctxRef = useRef(null);
   const drawingStateRef = useRef({ active: false, x: 0, y: 0 });
 
-  const [file, setFile] = useState(null);
-  const [pdfBytes, setPdfBytes] = useState(null);
   const [pageCount, setPageCount] = useState(0);
   const [selectedPage, setSelectedPage] = useState(1);
-  const [previewUrl, setPreviewUrl] = useState('');
-  const [previewBusy, setPreviewBusy] = useState(false);
   const [signatureMode, setSignatureMode] = useState('draw');
   const [typedSignature, setTypedSignature] = useState('Rishi');
   const [uploadedSignature, setUploadedSignature] = useState('');
   const [drawnSignatureUrl, setDrawnSignatureUrl] = useState('');
   const [placement, setPlacement] = useState({ x: 0.5, y: 0.55, width: 0.34 });
-  const [resultUrl, setResultUrl] = useState(null);
   const [resultSize, setResultSize] = useState(0);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [error, setError] = useState('');
-  void DropZone;
-  void ToolProgressBar;
+  const [applyToAll, setApplyToAll] = useState(false);
 
   useEffect(() => {
     const canvas = drawRef.current;
@@ -82,6 +82,7 @@ const SignPdf = () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return undefined;
 
+    ctxRef.current = ctx;
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.lineCap = 'round';
@@ -92,55 +93,19 @@ const SignPdf = () => {
     return undefined;
   }, []);
 
-  useEffect(() => () => {
-    if (resultUrl) URL.revokeObjectURL(resultUrl);
-  }, [resultUrl]);
-
-  useEffect(() => {
-    if (!pdfBytes || !selectedPage) return undefined;
-    let cancelled = false;
-
-    const renderPreview = async () => {
-      setPreviewBusy(true);
-      try {
-        const canvas = await rasterizePage(pdfBytes, selectedPage, { scale: 1.3, useDPR: false });
-        if (!cancelled) {
-          setPreviewUrl(canvas.toDataURL('image/png'));
-        }
-      } catch (err) {
-        console.error(err);
-        if (!cancelled) {
-          setError('Failed to render the PDF preview.');
-        }
-      } finally {
-        if (!cancelled) setPreviewBusy(false);
-      }
-    };
-
-    renderPreview();
-    return () => {
-      cancelled = true;
-    };
-  }, [pdfBytes, selectedPage]);
-
   const handleFiles = async (files) => {
     if (!files.length) return;
     const nextFile = files[0];
 
     try {
+      await setFileWithBytes(nextFile);
       const bytes = new Uint8Array(await nextFile.arrayBuffer());
       const pdfDoc = await PDFDocument.load(bytes, { ignoreEncryption: true });
 
-      setFile(nextFile);
-      setPdfBytes(bytes);
       setPageCount(pdfDoc.getPageCount());
       setSelectedPage(1);
       setPlacement({ x: 0.5, y: 0.55, width: 0.34 });
-      setError('');
-      if (resultUrl) {
-        URL.revokeObjectURL(resultUrl);
-        setResultUrl(null);
-      }
+      setResultUrl(null);
     } catch (err) {
       console.error(err);
       setError('Could not open that PDF. Please choose a valid file.');
@@ -160,9 +125,8 @@ const SignPdf = () => {
   };
 
   const startDrawing = (event) => {
-    const canvas = drawRef.current;
-    const ctx = canvas?.getContext('2d');
-    if (!canvas || !ctx) return;
+    const ctx = ctxRef.current;
+    if (!ctx) return;
 
     const point = getDrawPoint(event);
     drawingStateRef.current = { active: true, x: point.x, y: point.y };
@@ -172,9 +136,8 @@ const SignPdf = () => {
 
   const continueDrawing = (event) => {
     if (!drawingStateRef.current.active) return;
-    const canvas = drawRef.current;
-    const ctx = canvas?.getContext('2d');
-    if (!canvas || !ctx) return;
+    const ctx = ctxRef.current;
+    if (!ctx) return;
 
     const point = getDrawPoint(event);
     ctx.lineTo(point.x, point.y);
@@ -191,8 +154,8 @@ const SignPdf = () => {
   };
 
   const clearDrawnSignature = () => {
+    const ctx = ctxRef.current;
     const canvas = drawRef.current;
-    const ctx = canvas?.getContext('2d');
     if (!canvas || !ctx) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = '#ffffff';
@@ -203,7 +166,7 @@ const SignPdf = () => {
   const handleSignatureUpload = async (files) => {
     if (!files.length) return;
     try {
-      const dataUrl = await readFileAsDataUrl(files[0]);
+      const dataUrl = await readFile(files[0]);
       setUploadedSignature(dataUrl);
       setSignatureMode('upload');
       setError('');
@@ -213,11 +176,12 @@ const SignPdf = () => {
     }
   };
 
-  const handlePreviewClick = (event) => {
-    const rect = event.currentTarget.getBoundingClientRect();
-    const x = clamp((event.clientX - rect.left) / rect.width, 0.05, 0.95);
-    const y = clamp((event.clientY - rect.top) / rect.height, 0.05, 0.95);
-    setPlacement((prev) => ({ ...prev, x, y }));
+  const handlePointSelect = ({ x, y }) => {
+    setPlacement((prev) => ({ 
+      ...prev, 
+      x: clamp(x, 0.02, 0.98), 
+      y: clamp(y, 0.02, 0.98) 
+    }));
   };
 
   const buildSignatureAsset = async () => {
@@ -242,12 +206,25 @@ const SignPdf = () => {
       throw new Error('Upload a signature image first.');
     }
 
-    const image = await loadImage(uploadedSignature);
+    const image = await loadImg(uploadedSignature);
     return {
       dataUrl: uploadedSignature,
       width: image.naturalWidth,
       height: image.naturalHeight,
     };
+  };
+
+  const handleReset = () => {
+    reset();
+    setPageCount(0);
+    setSelectedPage(1);
+    setSignatureMode('draw');
+    setTypedSignature('Rishi');
+    setUploadedSignature('');
+    setPlacement({ x: 0.5, y: 0.55, width: 0.34 });
+    setResultSize(0);
+    setApplyToAll(false);
+    clearDrawnSignature();
   };
 
   const exportSignedPdf = async () => {
@@ -259,30 +236,34 @@ const SignPdf = () => {
     try {
       const signatureAsset = await buildSignatureAsset();
       const pdfDoc = await PDFDocument.load(pdfBytes, { ignoreEncryption: true });
-      const page = pdfDoc.getPage(selectedPage - 1);
-      const pageSize = page.getSize();
 
-      const signatureWidth = pageSize.width * placement.width;
-      const signatureHeight = signatureWidth * (signatureAsset.height / signatureAsset.width);
-      const x = pageSize.width * placement.x - signatureWidth / 2;
-      const y = pageSize.height * (1 - placement.y) - signatureHeight / 2;
-      const imageBytes = await fetch(signatureAsset.dataUrl).then((response) => response.arrayBuffer());
-
+      const imageBytes = dataUrlToUint8Array(signatureAsset.dataUrl);
       const image = signatureAsset.dataUrl.startsWith('data:image/jpeg')
         ? await pdfDoc.embedJpg(imageBytes)
         : await pdfDoc.embedPng(imageBytes);
 
-      page.drawImage(image, {
-        x: clamp(x, 0, Math.max(pageSize.width - signatureWidth, 0)),
-        y: clamp(y, 0, Math.max(pageSize.height - signatureHeight, 0)),
-        width: signatureWidth,
-        height: signatureHeight,
+      const pagesToSign = applyToAll
+        ? pdfDoc.getPages()
+        : [pdfDoc.getPage(selectedPage - 1)];
+
+      pagesToSign.forEach((page) => {
+        const pageSize = page.getSize();
+        const signatureWidth = pageSize.width * placement.width;
+        const signatureHeight = signatureWidth * (signatureAsset.height / signatureAsset.width);
+        const x = pageSize.width * placement.x - signatureWidth / 2;
+        const y = pageSize.height * (1 - placement.y) - signatureHeight / 2;
+
+        page.drawImage(image, {
+          x: clamp(x, 0, Math.max(pageSize.width - signatureWidth, 0)),
+          y: clamp(y, 0, Math.max(pageSize.height - signatureHeight, 0)),
+          width: signatureWidth,
+          height: signatureHeight,
+        });
       });
 
       const outputBytes = await pdfDoc.save();
       const blob = new Blob([outputBytes], { type: 'application/pdf' });
 
-      if (resultUrl) URL.revokeObjectURL(resultUrl);
       setResultUrl(URL.createObjectURL(blob));
       setResultSize(blob.size);
     } catch (err) {
@@ -323,7 +304,7 @@ const SignPdf = () => {
       />
 
       {file && (
-        <div className="tool-info-bar fade-in" style={{ marginTop: '1rem' }}>
+        <div className="tool-info-bar fade-in" style={{ marginTop: '1.25rem', gap: '1.25rem' }}>
           <div className="tool-file-info" style={{ margin: 0 }}>
             <span className="file-icon">PDF</span>
             <div>
@@ -332,11 +313,11 @@ const SignPdf = () => {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'minmax(280px, 420px) minmax(320px, 1fr)' }}>
-            <div style={{ display: 'grid', gap: '0.75rem' }}>
+          <div style={{ display: 'grid', gap: '1.5rem', gridTemplateColumns: 'minmax(280px, 420px) minmax(320px, 1fr)' }}>
+            <div style={{ display: 'grid', gap: '1rem', alignContent: 'start' }}>
               <div className="form-group" style={{ marginBottom: 0 }}>
                 <label>Signature source</label>
-                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', gap: '0.65rem', flexWrap: 'wrap' }}>
                   <button className={`btn ${signatureMode === 'draw' ? 'btn-primary' : 'btn-outline'}`} onClick={() => setSignatureMode('draw')}>Draw</button>
                   <button className={`btn ${signatureMode === 'type' ? 'btn-primary' : 'btn-outline'}`} onClick={() => setSignatureMode('type')}>Type</button>
                   <button className={`btn ${signatureMode === 'upload' ? 'btn-primary' : 'btn-outline'}`} onClick={() => setSignatureMode('upload')}>Upload</button>
@@ -344,7 +325,7 @@ const SignPdf = () => {
               </div>
 
               {signatureMode === 'draw' && (
-                <div style={{ display: 'grid', gap: '0.5rem' }}>
+                <div style={{ display: 'grid', gap: '0.65rem' }}>
                   <canvas
                     ref={drawRef}
                     width={DRAW_WIDTH}
@@ -364,7 +345,7 @@ const SignPdf = () => {
                     }}
                   />
                   <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                    <button className="btn btn-outline" onClick={clearDrawnSignature}>Clear signature</button>
+                    <button className="btn btn-outline btn-sm" onClick={clearDrawnSignature}>Clear signature</button>
                   </div>
                 </div>
               )}
@@ -382,7 +363,7 @@ const SignPdf = () => {
               )}
 
               {signatureMode === 'upload' && (
-                <div style={{ display: 'grid', gap: '0.75rem' }}>
+                <div style={{ display: 'grid', gap: '0.85rem' }}>
                   <DropZone
                     onFiles={handleSignatureUpload}
                     multiple={false}
@@ -397,16 +378,36 @@ const SignPdf = () => {
                 </div>
               )}
 
-              <div style={{ display: 'grid', gap: '0.65rem' }}>
+              <div style={{ display: 'grid', gap: '0.85rem' }}>
                 <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label>Page</label>
-                  <select value={selectedPage} onChange={(event) => setSelectedPage(Number(event.target.value))}>
-                    {Array.from({ length: pageCount }, (_, index) => (
-                      <option key={index + 1} value={index + 1}>
-                        Page {index + 1}
-                      </option>
-                    ))}
-                  </select>
+                  <label>{applyToAll ? 'Preview Page' : 'Page'}</label>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                    <select value={selectedPage} onChange={(event) => setSelectedPage(Number(event.target.value))} style={{ minWidth: '120px' }}>
+                      {Array.from({ length: pageCount }, (_, index) => (
+                        <option key={index + 1} value={index + 1}>
+                          Page {index + 1}
+                        </option>
+                      ))}
+                    </select>
+                    <label 
+                      style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '0.5rem', 
+                        cursor: pageCount <= 1 ? 'not-allowed' : 'pointer', 
+                        fontWeight: 600,
+                        opacity: pageCount <= 1 ? 0.6 : 1
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={applyToAll}
+                        onChange={(e) => setApplyToAll(e.target.checked)}
+                        disabled={pageCount <= 1}
+                      />
+                      Apply to all pages
+                    </label>
+                  </div>
                 </div>
 
                 <div className="form-group" style={{ marginBottom: 0 }}>
@@ -422,72 +423,45 @@ const SignPdf = () => {
               </div>
             </div>
 
-            <div style={{ display: 'grid', gap: '0.75rem' }}>
-              <p className="tool-info-desc" style={{ marginBottom: 0 }}>
+            <div style={{ display: 'grid', gap: '1rem' }}>
+              <p className="tool-info-desc" style={{ marginBottom: 0, fontSize: '0.9rem' }}>
                 Click the preview to place the signature.
               </p>
-              <div
-                onClick={handlePreviewClick}
-                style={{
-                  position: 'relative',
-                  border: '1px solid var(--border)',
-                  borderRadius: '16px',
-                  overflow: 'hidden',
-                  background: '#ffffff',
-                  minHeight: '280px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'crosshair',
-                }}
+              
+              <PdfInteractivePreview
+                pdfBytes={pdfBytes}
+                page={selectedPage}
+                onPointSelect={handlePointSelect}
               >
-                {previewUrl ? (
-                  <>
-                    <img src={previewUrl} alt={`Preview of page ${selectedPage}`} style={{ width: '100%', display: 'block' }} />
-                    <div
-                      style={{
-                        position: 'absolute',
-                        left: `${placement.x * 100}%`,
-                        top: `${placement.y * 100}%`,
-                        width: `${placement.width * 100}%`,
-                        transform: 'translate(-50%, -50%)',
-                        pointerEvents: 'none',
-                      }}
-                    >
-                      {signatureMode === 'upload' && uploadedSignature ? (
-                        <img src={uploadedSignature} alt="Signature placement preview" style={{ width: '100%', display: 'block', objectFit: 'contain' }} />
-                      ) : signatureMode === 'type' ? (
-                        <div style={{ width: '100%', textAlign: 'center', fontSize: 'clamp(1.6rem, 4vw, 3rem)', color: '#111111', fontFamily: '"Brush Script MT", "Segoe Script", cursive' }}>
-                          {typedSignature || 'Signature'}
-                        </div>
-                      ) : (
-                        <img src={drawnSignatureUrl} alt="Drawn signature placement preview" style={{ width: '100%', display: 'block', opacity: 0.88 }} />
-                      )}
+                <div
+                  style={{
+                    position: 'absolute',
+                    left: `${placement.x * 100}%`,
+                    top: `${placement.y * 100}%`,
+                    width: `${placement.width * 100}%`,
+                    transform: 'translate(-50%, -50%)',
+                    pointerEvents: 'none',
+                  }}
+                >
+                  {signatureMode === 'upload' && uploadedSignature ? (
+                    <img src={uploadedSignature} alt="Signature placement preview" style={{ width: '100%', display: 'block', objectFit: 'contain' }} />
+                  ) : signatureMode === 'type' ? (
+                    <div style={{ width: '100%', textAlign: 'center', fontSize: 'clamp(1.6rem, 4vw, 3rem)', color: '#111111', fontFamily: '"Brush Script MT", "Segoe Script", cursive' }}>
+                      {typedSignature || 'Signature'}
                     </div>
-                  </>
-                ) : (
-                  <div style={{ color: 'var(--text3)', fontSize: '0.95rem' }}>
-                    {previewBusy ? 'Rendering preview...' : 'Preview will appear here.'}
-                  </div>
-                )}
-              </div>
+                  ) : (
+                    <img src={drawnSignatureUrl} alt="Drawn signature placement preview" style={{ width: '100%', display: 'block', opacity: 0.88 }} />
+                  )}
+                </div>
+              </PdfInteractivePreview>
 
-              <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', gap: '0.85rem', flexWrap: 'wrap', marginTop: '0.5rem' }}>
                 <button className="btn btn-primary" onClick={exportSignedPdf} disabled={isProcessing || !pdfBytes}>
                   {isProcessing ? 'Signing...' : 'Export signed PDF'}
                 </button>
                 <button
                   className="btn btn-outline"
-                  onClick={() => {
-                    setFile(null);
-                    setPdfBytes(null);
-                    setPreviewUrl('');
-                    setError('');
-                    if (resultUrl) {
-                      URL.revokeObjectURL(resultUrl);
-                      setResultUrl(null);
-                    }
-                  }}
+                  onClick={handleReset}
                 >
                   Reset
                 </button>

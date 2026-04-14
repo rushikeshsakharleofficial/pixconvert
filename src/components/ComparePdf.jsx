@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { PDFDocument } from 'pdf-lib';
+import pixelmatch from 'pixelmatch';
 import DropZone from './DropZone';
 import ToolProgressBar from './ToolProgressBar';
 import formatSize from '../utils/formatSize';
 import { rasterizePage } from '../utils/pdfRasterizer';
+import { useFileTool } from '../hooks/useFileTool';
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
@@ -58,31 +60,15 @@ const buildDiffCanvas = (leftCanvas, rightCanvas) => {
   if (!diffCtx) throw new Error('Could not create a diff canvas.');
 
   const diffPixels = diffCtx.createImageData(width, height);
-  const leftData = leftPixels.data;
-  const rightData = rightPixels.data;
-  const diffData = diffPixels.data;
 
-  let changedPixels = 0;
-  for (let i = 0; i < leftData.length; i += 4) {
-    const delta =
-      Math.abs(leftData[i] - rightData[i]) +
-      Math.abs(leftData[i + 1] - rightData[i + 1]) +
-      Math.abs(leftData[i + 2] - rightData[i + 2]) +
-      Math.abs(leftData[i + 3] - rightData[i + 3]);
-
-    if (delta > 32) {
-      changedPixels += 1;
-      diffData[i] = 255;
-      diffData[i + 1] = 55;
-      diffData[i + 2] = 95;
-      diffData[i + 3] = 255;
-    } else {
-      diffData[i] = 255;
-      diffData[i + 1] = 255;
-      diffData[i + 2] = 255;
-      diffData[i + 3] = 0;
-    }
-  }
+  const changedPixels = pixelmatch(
+    leftPixels.data,
+    rightPixels.data,
+    diffPixels.data,
+    width,
+    height,
+    { threshold: 0.12, includeAA: false }
+  );
 
   diffCtx.putImageData(diffPixels, 0, 0);
 
@@ -97,29 +83,43 @@ const buildDiffCanvas = (leftCanvas, rightCanvas) => {
   };
 };
 
-const loadPdfMeta = async (file) => {
-  const bytes = new Uint8Array(await file.arrayBuffer());
-  const pdfDoc = await PDFDocument.load(bytes, { ignoreEncryption: true });
-  return {
-    bytes,
-    pageCount: pdfDoc.getPageCount(),
-  };
-};
-
 const ComparePdf = () => {
-  const [fileA, setFileA] = useState(null);
-  const [fileB, setFileB] = useState(null);
-  const [bytesA, setBytesA] = useState(null);
-  const [bytesB, setBytesB] = useState(null);
+  const toolA = useFileTool();
+  const toolB = useFileTool();
+
   const [pageCountA, setPageCountA] = useState(0);
   const [pageCountB, setPageCountB] = useState(0);
   const [pageA, setPageA] = useState(1);
   const [pageB, setPageB] = useState(1);
   const [zoom, setZoom] = useState(100);
-  const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [error, setError] = useState('');
   const [result, setResult] = useState(null);
+
+  useEffect(() => {
+    if (toolA.pdfBytes) {
+      PDFDocument.load(toolA.pdfBytes, { ignoreEncryption: true }).then(doc => {
+        setPageCountA(doc.getPageCount());
+        setPageA(1);
+      });
+    } else {
+      setPageCountA(0);
+      setPageA(1);
+    }
+    setResult(null);
+  }, [toolA.pdfBytes]);
+
+  useEffect(() => {
+    if (toolB.pdfBytes) {
+      PDFDocument.load(toolB.pdfBytes, { ignoreEncryption: true }).then(doc => {
+        setPageCountB(doc.getPageCount());
+        setPageB(1);
+      });
+    } else {
+      setPageCountB(0);
+      setPageB(1);
+    }
+    setResult(null);
+  }, [toolB.pdfBytes]);
 
   useEffect(() => {
     return () => {
@@ -139,56 +139,32 @@ const ComparePdf = () => {
     setResult(null);
   };
 
-  const handleFilesA = async (files) => {
-    const nextFile = files[0];
-    if (!nextFile) return;
-
-    try {
-      const meta = await loadPdfMeta(nextFile);
-      setFileA(nextFile);
-      setBytesA(meta.bytes);
-      setPageCountA(meta.pageCount);
-      setPageA(1);
-      setError('');
-      resetResult();
-    } catch (err) {
-      console.error(err);
-      setError('Could not open PDF A. Please upload a valid PDF.');
-    }
+  const handleFilesA = (files) => {
+    if (files[0]) toolA.setFileWithBytes(files[0]);
+    resetResult();
   };
 
-  const handleFilesB = async (files) => {
-    const nextFile = files[0];
-    if (!nextFile) return;
-
-    try {
-      const meta = await loadPdfMeta(nextFile);
-      setFileB(nextFile);
-      setBytesB(meta.bytes);
-      setPageCountB(meta.pageCount);
-      setPageB(1);
-      setError('');
-      resetResult();
-    } catch (err) {
-      console.error(err);
-      setError('Could not open PDF B. Please upload a valid PDF.');
-    }
+  const handleFilesB = (files) => {
+    if (files[0]) toolB.setFileWithBytes(files[0]);
+    resetResult();
   };
 
   const comparePages = async () => {
-    if (!bytesA || !bytesB) return;
+    if (!toolA.pdfBytes || !toolB.pdfBytes) return;
 
     const comparePageA = clamp(pageA, 1, pageCountA || 1);
     const comparePageB = clamp(pageB, 1, pageCountB || 1);
-    setIsProcessing(true);
+    
+    toolA.setIsProcessing(true);
+    toolB.setIsProcessing(true);
     setProgress(5);
-    setError('');
+    toolA.setError('');
     resetResult();
 
     try {
       const [renderA, renderB] = await Promise.all([
-        rasterizePage(bytesA, comparePageA, { scale: 1.5, useDPR: false }),
-        rasterizePage(bytesB, comparePageB, { scale: 1.5, useDPR: false }),
+        rasterizePage(toolA.pdfBytes, comparePageA, { scale: 1.5, useDPR: false }),
+        rasterizePage(toolB.pdfBytes, comparePageB, { scale: 1.5, useDPR: false }),
       ]);
       setProgress(55);
 
@@ -217,17 +193,28 @@ const ComparePdf = () => {
       setProgress(100);
     } catch (err) {
       console.error(err);
-      setError(err.message || 'Failed to compare the selected pages.');
+      toolA.setError(err.message || 'Failed to compare the selected pages.');
     } finally {
-      setIsProcessing(false);
+      toolA.setIsProcessing(false);
+      toolB.setIsProcessing(false);
       setTimeout(() => setProgress(0), 700);
     }
   };
 
-  const canCompare = Boolean(bytesA && bytesB && pageCountA && pageCountB);
-  const hasPageMismatch = pageCountA !== pageCountB;
-  void DropZone;
-  void ToolProgressBar;
+  const resetAll = () => {
+    toolA.reset();
+    toolB.reset();
+    setPageCountA(0);
+    setPageCountB(0);
+    setPageA(1);
+    setPageB(1);
+    setZoom(100);
+    resetResult();
+  };
+
+  const canCompare = Boolean(toolA.pdfBytes && toolB.pdfBytes);
+  const isProcessing = toolA.isProcessing || toolB.isProcessing;
+  const hasPageMismatch = pageCountA > 0 && pageCountB > 0 && pageCountA !== pageCountB;
 
   return (
     <div>
@@ -244,49 +231,51 @@ const ComparePdf = () => {
       </div>
 
       <div style={{ display: 'grid', gap: '1rem' }}>
-        <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
+        <div style={{ display: 'grid', gap: '1.25rem', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
           <DropZone onFiles={handleFilesA} multiple={false} accept=".pdf,application/pdf" label="Drop PDF A here or click to browse" />
           <DropZone onFiles={handleFilesB} multiple={false} accept=".pdf,application/pdf" label="Drop PDF B here or click to browse" />
         </div>
 
-        {(fileA || fileB) && (
-          <div className="tool-info-bar fade-in" style={{ gap: '0.9rem' }}>
-            <div style={{ display: 'grid', gap: '0.75rem', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))' }}>
+        {(toolA.file || toolB.file) && (
+          <div className="tool-info-bar fade-in" style={{ gap: '1.1rem' }}>
+            <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))' }}>
               <div className="tool-file-info" style={{ margin: 0 }}>
                 <span className="file-icon">A</span>
                 <div>
-                  <div className="tool-file-name">{fileA?.name || 'Waiting for PDF A'}</div>
-                  <div className="tool-file-size">{fileA ? formatSize(fileA.size) : 'No file selected'}</div>
+                  <div className="tool-file-name">{toolA.file?.name || 'Waiting for PDF A'}</div>
+                  <div className="tool-file-size">{toolA.file ? formatSize(toolA.file.size) : 'No file selected'}</div>
                 </div>
               </div>
               <div className="tool-file-info" style={{ margin: 0 }}>
                 <span className="file-icon">B</span>
                 <div>
-                  <div className="tool-file-name">{fileB?.name || 'Waiting for PDF B'}</div>
-                  <div className="tool-file-size">{fileB ? formatSize(fileB.size) : 'No file selected'}</div>
+                  <div className="tool-file-name">{toolB.file?.name || 'Waiting for PDF B'}</div>
+                  <div className="tool-file-size">{toolB.file ? formatSize(toolB.file.size) : 'No file selected'}</div>
                 </div>
               </div>
             </div>
 
-            <div style={{ display: 'grid', gap: '0.75rem', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))' }}>
+            <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))' }}>
               <div className="form-group" style={{ marginBottom: 0 }}>
-                <label>Page A</label>
+                <label>Page A (of {pageCountA || 1})</label>
                 <input
                   type="number"
                   min="1"
                   max={pageCountA || 1}
                   value={pageA}
                   onChange={(event) => setPageA(clamp(Number(event.target.value) || 1, 1, pageCountA || 1))}
+                  disabled={!toolA.file}
                 />
               </div>
               <div className="form-group" style={{ marginBottom: 0 }}>
-                <label>Page B</label>
+                <label>Page B (of {pageCountB || 1})</label>
                 <input
                   type="number"
                   min="1"
                   max={pageCountB || 1}
                   value={pageB}
                   onChange={(event) => setPageB(clamp(Number(event.target.value) || 1, 1, pageCountB || 1))}
+                  disabled={!toolB.file}
                 />
               </div>
               <div className="form-group" style={{ marginBottom: 0 }}>
@@ -301,25 +290,11 @@ const ComparePdf = () => {
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: '0.85rem', flexWrap: 'wrap', marginTop: '0.5rem' }}>
               <button className="btn btn-primary" onClick={comparePages} disabled={!canCompare || isProcessing}>
                 {isProcessing ? 'Comparing...' : 'Compare pages'}
               </button>
-              <button
-                className="btn btn-outline"
-                onClick={() => {
-                  setFileA(null);
-                  setFileB(null);
-                  setBytesA(null);
-                  setBytesB(null);
-                  setPageCountA(0);
-                  setPageCountB(0);
-                  setPageA(1);
-                  setPageB(1);
-                  setError('');
-                  resetResult();
-                }}
-              >
+              <button className="btn btn-outline" onClick={resetAll}>
                 Reset
               </button>
             </div>
@@ -327,14 +302,14 @@ const ComparePdf = () => {
             <ToolProgressBar active={isProcessing} label="Rendering and diffing pages..." value={progress} />
 
             {hasPageMismatch && (
-              <p className="text-danger" style={{ marginBottom: 0, fontWeight: 600 }}>
-                Page counts differ. The compare action uses the selected page from each file and clamps to the shortest document.
+              <p className="text-danger" style={{ marginBottom: 0, fontWeight: 600, fontSize: '0.9rem' }}>
+                Note: Page counts differ. Comparison works best on similar documents.
               </p>
             )}
           </div>
         )}
 
-        {error && <p className="text-danger" style={{ marginTop: '0.25rem', fontWeight: 600 }}>{error}</p>}
+        {(toolA.error || toolB.error) && <p className="text-danger" style={{ marginTop: '0.25rem', fontWeight: 600 }}>{toolA.error || toolB.error}</p>}
 
         {result && (
           <div className="tool-info-bar fade-in" style={{ gap: '1rem' }}>
