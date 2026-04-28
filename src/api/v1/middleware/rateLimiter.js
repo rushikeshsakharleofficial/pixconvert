@@ -35,6 +35,10 @@ export const apiRateLimiter = rateLimit({
   max: API_RATE_LIMIT,
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req) => {
+    // Skip rate limiting for health check and tools list
+    return req.path === '/health' || req.path === '/tools';
+  },
   message: { success: false, error: `Rate limit exceeded. Max ${API_RATE_LIMIT} requests per second.` },
 });
 
@@ -43,7 +47,6 @@ export const processLimiter = rateLimit({
   max: PROCESS_LIMIT,
   standardHeaders: true,
   legacyHeaders: false,
-  keyGenerator: (req) => req.ip,
   skip: (req) => {
     // Skip rate limiting check but still count the request
     return false;

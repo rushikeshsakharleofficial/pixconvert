@@ -228,6 +228,16 @@ const generalLimiter = rateLimit({
   windowMs: 60 * 1000,
   max: 60,
   message: { error: 'Too many requests. Please slow down.' },
+  skip: (req) => {
+    // Skip rate limiting for documentation and metrics as they are frontend-support calls
+    const path = req.originalUrl.split('?')[0];
+    return path === '/api/docs' || path.startsWith('/api/metrics');
+  }
+});
+
+// --- API docs page ---
+app.get('/api/docs', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'api-docs.html'));
 });
 
 app.use('/api/', generalLimiter);
@@ -393,11 +403,6 @@ app.get('/api/metrics/stream', (req, res) => {
   res.write(`data: ${JSON.stringify({ type: 'connected', totalAllTime: metricsEvents.length })}\n\n`);
   sseClients.add(res);
   req.on('close', () => sseClients.delete(res));
-});
-
-// --- API docs page ---
-app.get('/api/docs', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'api-docs.html'));
 });
 
 // --- API v1 routes ---

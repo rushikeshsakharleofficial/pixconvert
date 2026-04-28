@@ -94,11 +94,11 @@ async function run() {
     assert.equal(statsBody.totalAllTime, 10, 'metrics count should be capped per request');
 
     const burst = await Promise.all(
-      Array.from({ length: 12 }, () => request('/api/v1/health'))
+      Array.from({ length: 12 }, () => request('/api/v1/merge-pdf', { method: 'POST' }))
     );
     assert.ok(
       burst.some((res) => res.status === 429),
-      'API rate limiter should return 429 during a burst'
+      'API rate limiter should return 429 during a burst on non-exempted routes'
     );
 
     console.log('Security/DDOS checks passed');
