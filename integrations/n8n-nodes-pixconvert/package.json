@@ -1,0 +1,45 @@
+{
+  "name": "n8n-nodes-pixconvert",
+  "version": "0.1.0",
+  "description": "n8n community node for PixConvert file conversion, PDF tools, image tools, metrics, and admin APIs.",
+  "license": "MIT",
+  "homepage": "https://github.com/rushikeshsakharleofficial/pixconvert",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rushikeshsakharleofficial/pixconvert.git",
+    "directory": "integrations/n8n-nodes-pixconvert"
+  },
+  "keywords": [
+    "n8n-community-node-package",
+    "n8n",
+    "pixconvert",
+    "pdf",
+    "file-converter",
+    "image-converter"
+  ],
+  "main": "dist/nodes/PixConvert/PixConvert.node.js",
+  "types": "dist/nodes/PixConvert/PixConvert.node.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json && npm run copy:assets",
+    "copy:assets": "mkdir -p dist/nodes/PixConvert && cp nodes/PixConvert/pixconvert.svg dist/nodes/PixConvert/pixconvert.svg",
+    "clean": "rm -rf dist",
+    "prepack": "npm run build"
+  },
+  "files": [
+    "dist"
+  ],
+  "n8n": {
+    "n8nNodesApiVersion": 1,
+    "credentials": [
+      "dist/credentials/PixConvertApi.credentials.js"
+    ],
+    "nodes": [
+      "dist/nodes/PixConvert/PixConvert.node.js"
+    ]
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.2",
+    "n8n-workflow": "^1.101.1",
+    "typescript": "^6.0.2"
+  }
+}
