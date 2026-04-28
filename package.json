@@ -19,8 +19,9 @@
     "server": "node server.js",
     "build": "vite build",
     "lint": "eslint .",
+    "test:security": "node scripts/security-ddos-test.js",
     "preview": "vite preview",
-    "postinstall": "node -e \"import('fs').then(fs=>fs.mkdirSync('/var/log/pixconvert',{recursive:true})).catch(()=>{})\"",
+    "postinstall": "node -e \"import('fs').then(fs=>['uploads','downloads','data'].forEach(d=>fs.mkdirSync(d,{recursive:true}))).catch(()=>{})\"",
     "autoscale:docker": "node scripts/docker-autoscale.mjs",
     "sync-memory": "node scripts/sync-memory.mjs"
   },

@@ -18,7 +18,8 @@ export async function runGhostscript(args) {
     const { stdout, stderr } = await execFileAsync(GS_PATH, args, { timeout: EXEC_TIMEOUT });
     return { stdout, stderr };
   } catch (err) {
-    throw new Error(`Ghostscript failed: ${err.stderr || err.message}`);
+    console.error('[ghostscript] failed:', err.stderr || err.message);
+    throw new Error('Ghostscript processing failed');
   }
 }
 
@@ -38,7 +39,8 @@ export async function runLibreOffice(inputPath, outputDir, format = 'pdf') {
     ], { timeout: EXEC_TIMEOUT });
     return { stdout, stderr };
   } catch (err) {
-    throw new Error(`LibreOffice failed: ${err.stderr || err.message}`);
+    console.error('[libreoffice] failed:', err.stderr || err.message);
+    throw new Error('LibreOffice processing failed');
   }
 }
 
@@ -56,7 +58,8 @@ export async function runTesseract(inputPath, outputBase, lang = 'eng', outputFo
     ], { timeout: EXEC_TIMEOUT });
     return { stdout, stderr };
   } catch (err) {
-    throw new Error(`Tesseract failed: ${err.stderr || err.message}`);
+    console.error('[tesseract] failed:', err.stderr || err.message);
+    throw new Error('OCR processing failed');
   }
 }
 
@@ -68,7 +71,8 @@ export async function runImageMagick(args) {
     const { stdout, stderr } = await execFileAsync(CONVERT_PATH, args, { timeout: EXEC_TIMEOUT });
     return { stdout, stderr };
   } catch (err) {
-    throw new Error(`ImageMagick failed: ${err.stderr || err.message}`);
+    console.error('[imagemagick] failed:', err.stderr || err.message);
+    throw new Error('Image processing failed');
   }
 }
 

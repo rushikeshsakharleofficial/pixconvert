@@ -5,19 +5,22 @@ import cors from 'cors';
 import fs from 'fs';
 import nodemailer from 'nodemailer';
 import path from 'path';
+import crypto from 'crypto';
 import { fileURLToPath } from 'url';
 import rateLimit from 'express-rate-limit';
 import v1Router from './src/api/v1/index.js';
 import { cleanupDownloads } from './src/api/v1/middleware/outputHandler.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const UPLOADS_DIR = path.resolve(__dirname, 'uploads');
+const UPLOADS_DIR = path.resolve(__dirname, process.env.UPLOADS_DIR || 'uploads');
 const DIST_DIR = path.resolve(__dirname, 'dist');
 const MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 const API_PORT = parseInt(process.env.API_PORT || process.env.PORT || 3000, 10);
 const FRONTEND_PORT = parseInt(process.env.FRONTEND_PORT || 8080, 10);
-const METRICS_FILE = path.resolve(__dirname, 'data', 'metrics.json');
+const METRICS_FILE = path.resolve(__dirname, process.env.METRICS_FILE || path.join('data', 'metrics.json'));
 const TWO_YEARS_MS = 2 * 365.25 * 24 * 60 * 60 * 1000;
+const MAX_METRICS_EVENTS = parseInt(process.env.MAX_METRICS_EVENTS || '100000', 10);
+const MAX_METRICS_COUNT = parseInt(process.env.MAX_METRICS_COUNT || '10', 10);
 
 // --- Metrics: in-memory cache + JSON persistence ---
 let metricsEvents = [];
@@ -37,6 +40,9 @@ const loadMetrics = () => {
 
 const saveMetrics = () => {
   try {
+    if (metricsEvents.length > MAX_METRICS_EVENTS) {
+      metricsEvents = metricsEvents.slice(metricsEvents.length - MAX_METRICS_EVENTS);
+    }
     fs.mkdirSync(path.dirname(METRICS_FILE), { recursive: true });
     fs.writeFileSync(METRICS_FILE, JSON.stringify({ events: metricsEvents }));
   } catch (err) {
@@ -153,9 +159,8 @@ setInterval(cleanupOldFiles, 60 * 60 * 1000);
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, UPLOADS_DIR),
   filename: (req, file, cb) => {
-    const ts = Date.now();
-    const safe = file.originalname.replace(/[^a-zA-Z0-9._-]/g, '_');
-    cb(null, `${ts}_${safe}`);
+    const ext = path.extname(file.originalname).toLowerCase();
+    cb(null, `${crypto.randomBytes(16).toString('hex')}${ext}`);
   },
 });
 
@@ -188,6 +193,16 @@ app.use(cors({
 
 app.use(express.json({ limit: '10kb' }));
 
+app.use((err, req, res, next) => {
+  if (err?.type === 'entity.too.large') {
+    return res.status(413).json({ success: false, error: 'Request body too large' });
+  }
+  if (err instanceof SyntaxError && 'body' in err) {
+    return res.status(400).json({ success: false, error: 'Invalid JSON body' });
+  }
+  next(err);
+});
+
 // Security headers
 app.use((req, res, next) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
@@ -217,9 +232,6 @@ const generalLimiter = rateLimit({
 
 app.use('/api/', generalLimiter);
 
-// Serve uploads folder statically
-app.use('/uploads', express.static(UPLOADS_DIR));
-
 if (fs.existsSync(DIST_DIR)) {
   app.use(express.static(DIST_DIR));
 }
@@ -238,7 +250,6 @@ app.post('/api/upload', uploadLimiter, upload.array('files', MAX_FILES_PER_UPLOA
     id: f.filename,
     name: f.originalname,
     size: f.size,
-    url: `/uploads/${f.filename}`,
     expiresAt: new Date(Date.now() + MAX_AGE_MS).toISOString(),
   }));
   res.json({ files: saved });
@@ -343,11 +354,11 @@ app.post('/api/contact', contactLimiter, async (req, res) => {
 // POST /api/metrics/track — record tool usage event(s)
 app.post('/api/metrics/track', (req, res) => {
   const { tool, count = 1 } = req.body;
-  if (!tool || typeof tool !== 'string' || tool.length > 100) {
+  if (!tool || typeof tool !== 'string' || tool.length > 80 || !/^[a-zA-Z0-9 _.-]+$/.test(tool)) {
     return res.status(400).json({ error: 'Invalid tool name' });
   }
   
-  const num = Math.max(1, Math.min(1000, Number(count) || 1));
+  const num = Math.max(1, Math.min(MAX_METRICS_COUNT, Number(count) || 1));
   const now = Date.now();
   
   for (let i = 0; i < num; i++) {
@@ -395,7 +406,16 @@ app.use('/api/v1', v1Router);
 // Serve downloads folder (for ?output=url mode)
 const DOWNLOADS_DIR = path.resolve(__dirname, process.env.DOWNLOADS_DIR || 'downloads');
 fs.mkdirSync(DOWNLOADS_DIR, { recursive: true });
-app.use('/downloads', express.static(DOWNLOADS_DIR));
+app.use('/downloads', express.static(DOWNLOADS_DIR, {
+  dotfiles: 'deny',
+  etag: false,
+  maxAge: 0,
+  setHeaders: (res) => {
+    res.setHeader('Cache-Control', 'private, no-store');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('Content-Disposition', 'attachment');
+  },
+}));
 
 // Cleanup downloads on schedule
 cleanupDownloads();

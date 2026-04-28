@@ -26,7 +26,7 @@ if (args.includes('--install')) {
   uninstall();
 } else {
   // Try creating log dir silently (works if running as root or dir already exists)
-  try { mkdirSync(LOG_DIR, { recursive: true }); } catch {}
+  try { mkdirSync(LOG_DIR, { recursive: true }); } catch { /* optional when not root */ }
   await import(serverPath);
 }
 
@@ -49,11 +49,17 @@ After=network.target
 
 [Service]
 Type=simple
-User=root
+User=nobody
+Group=nogroup
 ExecStart=${nodeBin} ${serverPath}
-ExecStartPre=/bin/mkdir -p ${LOG_DIR}
 Restart=on-failure
 RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/var/lib/pixconvert ${LOG_DIR}
+StateDirectory=pixconvert
+LogsDirectory=pixconvert
 
 # Environment — edit as needed
 Environment=API_PORT=3000
@@ -61,6 +67,9 @@ Environment=FRONTEND_PORT=8080
 Environment=API_RATE_LIMIT=10
 Environment=FILE_SIZE_LIMIT_MB=50
 Environment=FILE_TTL_HOURS=1
+Environment=UPLOADS_DIR=/var/lib/pixconvert/uploads
+Environment=DOWNLOADS_DIR=/var/lib/pixconvert/downloads
+Environment=METRICS_FILE=/var/lib/pixconvert/data/metrics.json
 
 # Logging
 StandardOutput=append:${LOG_DIR}/pixconvert_access.log
@@ -100,8 +109,8 @@ function uninstall() {
 
   const SERVICE_PATH = '/etc/systemd/system/pixconvert.service';
 
-  try { execSync('systemctl stop pixconvert'); } catch {}
-  try { execSync('systemctl disable pixconvert'); } catch {}
+  try { execSync('systemctl stop pixconvert'); } catch { /* service may not be running */ }
+  try { execSync('systemctl disable pixconvert'); } catch { /* service may not be enabled */ }
 
   if (existsSync(SERVICE_PATH)) {
     unlinkSync(SERVICE_PATH);

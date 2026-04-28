@@ -11,6 +11,7 @@ logs/
 # AI Tooling & Internal metadata
 .claude/
 .gemini/
+.codex
 .codex/
 .cursor/
 .cursorrules

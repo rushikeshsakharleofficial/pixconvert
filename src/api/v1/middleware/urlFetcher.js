@@ -1,10 +1,10 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { pipeline } from 'stream/promises';
+import { assertPublicHttpUrl, MAX_REDIRECTS, resolveRedirectUrl } from '../utils/networkGuard.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const UPLOADS_DIR = path.resolve(__dirname, '../../../../uploads');
+const UPLOADS_DIR = path.resolve(__dirname, '../../../../', process.env.UPLOADS_DIR || 'uploads');
 const MAX_FILE_SIZE = parseInt(process.env.MAX_FILE_SIZE_MB || '50', 10) * 1024 * 1024;
 const FETCH_TIMEOUT = parseInt(process.env.URL_FETCH_TIMEOUT_MS || '30000', 10);
 
@@ -29,32 +29,49 @@ export async function fetchUrlFiles(req, res, next) {
     if (!req.files) req.files = [];
 
     for (const url of urls) {
-      if (typeof url !== 'string' || !url.startsWith('http')) {
-        return res.status(400).json({ success: false, error: `Invalid URL: ${url}` });
+      if (typeof url !== 'string') {
+        return res.status(400).json({ success: false, error: 'Invalid URL' });
       }
 
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT);
 
       try {
-        const response = await fetch(url, {
-          signal: controller.signal,
-          headers: { 'User-Agent': 'PixConvert-API/1.0' },
-        });
+        let currentUrl = url;
+        let response;
+
+        for (let redirectCount = 0; redirectCount <= MAX_REDIRECTS; redirectCount++) {
+          await assertPublicHttpUrl(currentUrl);
+          response = await fetch(currentUrl, {
+            signal: controller.signal,
+            redirect: 'manual',
+            headers: { 'User-Agent': 'PixConvert-API/1.0' },
+          });
+
+          if (![301, 302, 303, 307, 308].includes(response.status)) break;
+
+          const location = response.headers.get('location');
+          if (!location) break;
+          if (redirectCount === MAX_REDIRECTS) {
+            clearTimeout(timeout);
+            return res.status(400).json({ success: false, error: 'Too many redirects' });
+          }
+          currentUrl = resolveRedirectUrl(currentUrl, location);
+        }
         clearTimeout(timeout);
 
         if (!response.ok) {
-          return res.status(400).json({ success: false, error: `Failed to fetch URL: ${url} (${response.status})` });
+          return res.status(400).json({ success: false, error: `Failed to fetch URL (${response.status})` });
         }
 
         // Check content-length before downloading
         const contentLength = parseInt(response.headers.get('content-length') || '0', 10);
         if (contentLength > MAX_FILE_SIZE) {
-          return res.status(413).json({ success: false, error: `Remote file too large: ${url}` });
+          return res.status(413).json({ success: false, error: 'Remote file too large' });
         }
 
         // Extract filename from URL
-        const urlPath = new URL(url).pathname;
+        const urlPath = new URL(currentUrl).pathname;
         const originalname = path.basename(urlPath) || 'downloaded-file';
         const ts = Date.now();
         const safe = originalname.replace(/[^a-zA-Z0-9._-]/g, '_');
@@ -66,6 +83,10 @@ export async function fetchUrlFiles(req, res, next) {
         let downloaded = 0;
 
         const body = response.body;
+        if (!body) {
+          return res.status(400).json({ success: false, error: 'Remote URL returned no body' });
+        }
+
         const reader = body.getReader();
 
         while (true) {
@@ -75,7 +96,7 @@ export async function fetchUrlFiles(req, res, next) {
           if (downloaded > MAX_FILE_SIZE) {
             writeStream.destroy();
             fs.unlinkSync(filepath);
-            return res.status(413).json({ success: false, error: `Remote file too large: ${url}` });
+            return res.status(413).json({ success: false, error: 'Remote file too large' });
           }
           writeStream.write(value);
         }
@@ -116,9 +137,9 @@ export async function fetchUrlFiles(req, res, next) {
       } catch (err) {
         clearTimeout(timeout);
         if (err.name === 'AbortError') {
-          return res.status(408).json({ success: false, error: `URL fetch timed out: ${url}` });
+          return res.status(408).json({ success: false, error: 'URL fetch timed out' });
         }
-        return res.status(400).json({ success: false, error: `Failed to fetch URL: ${url} — ${err.message}` });
+        return res.status(err.statusCode || 400).json({ success: false, error: err.message || 'Failed to fetch URL' });
       }
     }
 

@@ -21,7 +21,10 @@ ENV PORT=4000
 COPY --from=prod-deps /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
 COPY server.js ./
+COPY src ./src
+COPY public ./public
 COPY .env.example ./.env.example
-RUN mkdir -p /app/uploads
+RUN mkdir -p /app/uploads /app/downloads /app/data && chown -R node:node /app
+USER node
 EXPOSE 4000
 CMD ["node", "server.js"]

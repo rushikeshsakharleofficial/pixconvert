@@ -1,11 +1,16 @@
 import { Router } from 'express';
-import fs from 'fs';
 import { upload, fileSizeError } from '../../middleware/fileGuard.js';
 import { fetchUrlFiles } from '../../middleware/urlFetcher.js';
 import { sendResult } from '../../middleware/outputHandler.js';
-import { requireFiles, cleanupUploads, tempPath, cleanup } from '../../utils/fileHelpers.js';
+import { cleanupUploads, tempPath, cleanup } from '../../utils/fileHelpers.js';
+import { assertPublicHttpUrl } from '../../utils/networkGuard.js';
 
 const router = Router();
+const PDF_FORMATS = new Set(['A4', 'Letter', 'Legal', 'Tabloid']);
+
+function safeClientError(res, status, error) {
+  return res.status(status).json({ success: false, error });
+}
 
 router.post('/', upload.array('files', 1), fileSizeError, fetchUrlFiles, async (req, res) => {
   let browser = null;
@@ -18,21 +23,36 @@ router.post('/', upload.array('files', 1), fileSizeError, fetchUrlFiles, async (
     if (req.files?.length > 0) {
       contentUrl = `file://${req.files[0].path}`;
     } else if (htmlUrl) {
+      await assertPublicHttpUrl(htmlUrl);
       contentUrl = htmlUrl;
     } else {
       return res.status(400).json({ success: false, error: 'Provide an HTML file or htmlUrl parameter' });
     }
 
-    const puppeteer = await import('puppeteer');
-    browser = await puppeteer.default.launch({
+    const { chromium } = await import('playwright');
+    browser = await chromium.launch({
       headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
 
     const page = await browser.newPage();
-    await page.goto(contentUrl, { waitUntil: 'networkidle0', timeout: 30000 });
+    await page.route('**/*', async (route) => {
+      const requestUrl = route.request().url();
+      if (requestUrl.startsWith('file://')) {
+        return contentUrl.startsWith('file://') ? route.continue() : route.abort();
+      }
 
-    const format = req.query.format || req.body?.format || 'A4';
+      try {
+        await assertPublicHttpUrl(requestUrl);
+        return route.continue();
+      } catch {
+        return route.abort();
+      }
+    });
+
+    await page.goto(contentUrl, { waitUntil: 'networkidle', timeout: 30000 });
+
+    const requestedFormat = req.query.format || req.body?.format || 'A4';
+    const format = PDF_FORMATS.has(requestedFormat) ? requestedFormat : 'A4';
     const landscape = req.query.landscape === 'true' || req.body?.landscape === true;
 
     await page.pdf({
@@ -53,7 +73,8 @@ router.post('/', upload.array('files', 1), fileSizeError, fetchUrlFiles, async (
     if (browser) await browser.close().catch(() => {});
     cleanupUploads(req);
     cleanup(outPath);
-    res.status(502).json({ success: false, error: err.message });
+    console.error('[html-to-pdf] conversion failed:', err.message);
+    safeClientError(res, err.statusCode || 502, err.statusCode ? err.message : 'HTML to PDF conversion failed');
   }
 });
 
