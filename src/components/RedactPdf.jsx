@@ -315,7 +315,7 @@ const RedactPdf = () => {
       />
 
       {file && (
-        <div className="tool-info-bar fade-in" style={{ marginTop: '1.25rem', gap: '1.25rem' }}>
+        <div className="tool-info-bar fade-in" style={{ gap: '1.25rem' }}>
           <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', alignItems: 'center' }}>
             <div className="tool-file-info" style={{ margin: 0 }}>
               <span className="file-icon">PDF</span>
@@ -346,7 +346,7 @@ const RedactPdf = () => {
           
           {searchFeedback && <p style={{ fontSize: '0.85rem', color: 'var(--success)', fontWeight: 600, margin: 0 }}>{searchFeedback}</p>}
 
-          <div style={{ display: 'grid', gap: '1.5rem', gridTemplateColumns: 'minmax(280px, 320px) minmax(320px, 1fr)' }}>
+          <div style={{ display: 'grid', gap: '1.5rem', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
             <div style={{ display: 'grid', gap: '1.25rem', alignContent: 'start' }}>
               <div className="form-group" style={{ marginBottom: 0 }}>
                 <label>Navigation</label>

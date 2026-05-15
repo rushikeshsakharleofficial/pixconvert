@@ -110,7 +110,7 @@ const DonutChart = React.forwardRef(
                     },
                   }}
                   className={cn(
-                    "origin-center transition-transform duration-200",
+                    "origin-center",
                     highlightOnHover && "cursor-pointer"
                   )}
                   style={{

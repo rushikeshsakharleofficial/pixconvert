@@ -193,8 +193,7 @@ const Navbar = () => {
               >
                 Tools {mobileToolsOpen ? '▴' : '▾'}
               </button>
-              {mobileToolsOpen && (
-                <div className="mobile-tools-list">
+              <div className={`mobile-tools-list${mobileToolsOpen ? ' open' : ''}`}>
                   <div className="mobile-tools-popular">
                     {[
                       { icon: '🔄', name: 'Converter', path: '/tools/converter' },
@@ -229,8 +228,7 @@ const Navbar = () => {
                   <Link to="/tools" onClick={closeMenu} className="mobile-browse-all">
                     Browse all tools →
                   </Link>
-                </div>
-              )}
+              </div>
             </li>
 
             <li className="mobile-only">

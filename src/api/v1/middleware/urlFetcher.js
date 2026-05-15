@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { assertPublicHttpUrl, MAX_REDIRECTS, resolveRedirectUrl } from '../utils/networkGuard.js';
+import { assertPublicHttpUrl, pinnedFetch, MAX_REDIRECTS, resolveRedirectUrl } from '../utils/networkGuard.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const UPLOADS_DIR = path.resolve(__dirname, '../../../../', process.env.UPLOADS_DIR || 'uploads');
@@ -41,16 +41,17 @@ export async function fetchUrlFiles(req, res, next) {
         let response;
 
         for (let redirectCount = 0; redirectCount <= MAX_REDIRECTS; redirectCount++) {
-          await assertPublicHttpUrl(currentUrl);
-          response = await fetch(currentUrl, {
+          // assertPublicHttpUrl resolves DNS and returns pinnedIp to prevent DNS rebinding
+          const { pinnedIp } = await assertPublicHttpUrl(currentUrl);
+          response = await pinnedFetch(currentUrl, pinnedIp, {
             signal: controller.signal,
-            redirect: 'manual',
             headers: { 'User-Agent': 'PixConvert-API/1.0' },
           });
 
-          if (![301, 302, 303, 307, 308].includes(response.status)) break;
+          const status = response.statusCode;
+          if (![301, 302, 303, 307, 308].includes(status)) break;
 
-          const location = response.headers.get('location');
+          const location = response.headers['location'];
           if (!location) break;
           if (redirectCount === MAX_REDIRECTS) {
             clearTimeout(timeout);
@@ -60,13 +61,17 @@ export async function fetchUrlFiles(req, res, next) {
         }
         clearTimeout(timeout);
 
-        if (!response.ok) {
-          return res.status(400).json({ success: false, error: `Failed to fetch URL (${response.status})` });
+        // response is Node.js http.IncomingMessage
+        const statusCode = response.statusCode;
+        if (statusCode < 200 || statusCode >= 300) {
+          response.resume(); // drain to free socket
+          return res.status(400).json({ success: false, error: `Failed to fetch URL (${statusCode})` });
         }
 
         // Check content-length before downloading
-        const contentLength = parseInt(response.headers.get('content-length') || '0', 10);
+        const contentLength = parseInt(response.headers['content-length'] || '0', 10);
         if (contentLength > MAX_FILE_SIZE) {
+          response.resume();
           return res.status(413).json({ success: false, error: 'Remote file too large' });
         }
 
@@ -82,28 +87,20 @@ export async function fetchUrlFiles(req, res, next) {
         const writeStream = fs.createWriteStream(filepath);
         let downloaded = 0;
 
-        const body = response.body;
-        if (!body) {
-          return res.status(400).json({ success: false, error: 'Remote URL returned no body' });
-        }
-
-        const reader = body.getReader();
-
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          downloaded += value.length;
-          if (downloaded > MAX_FILE_SIZE) {
-            writeStream.destroy();
-            fs.unlinkSync(filepath);
-            return res.status(413).json({ success: false, error: 'Remote file too large' });
-          }
-          writeStream.write(value);
-        }
-        writeStream.end();
-
-        // Wait for write to finish
         await new Promise((resolve, reject) => {
+          response.on('data', (chunk) => {
+            downloaded += chunk.length;
+            if (downloaded > MAX_FILE_SIZE) {
+              writeStream.destroy();
+              response.destroy();
+              try { fs.unlinkSync(filepath); } catch { /* ignore */ }
+              reject(Object.assign(new Error('Remote file too large'), { statusCode: 413 }));
+              return;
+            }
+            writeStream.write(chunk);
+          });
+          response.on('end', () => { writeStream.end(); });
+          response.on('error', reject);
           writeStream.on('finish', resolve);
           writeStream.on('error', reject);
         });

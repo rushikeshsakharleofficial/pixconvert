@@ -14,6 +14,7 @@ const router = Router();
 
 const IMAGE_FORMATS = ['jpg', 'jpeg', 'png', 'webp', 'bmp', 'gif', 'avif', 'tiff'];
 const OFFICE_FORMATS = ['pdf', 'docx', 'doc', 'xlsx', 'xls', 'pptx', 'ppt'];
+const ALLOWED_FORMATS = new Set([...IMAGE_FORMATS, ...OFFICE_FORMATS]);
 
 router.post('/', upload.array('files', 1), fileSizeError, fetchUrlFiles, async (req, res) => {
   try {
@@ -23,6 +24,11 @@ router.post('/', upload.array('files', 1), fileSizeError, fetchUrlFiles, async (
     if (!targetFormat) {
       cleanupUploads(req);
       return res.status(400).json({ success: false, error: 'Missing required parameter: to (target format)' });
+    }
+
+    if (!ALLOWED_FORMATS.has(targetFormat)) {
+      cleanupUploads(req);
+      return res.status(400).json({ success: false, error: `Unsupported target format: ${targetFormat}. Allowed: ${[...ALLOWED_FORMATS].join(', ')}` });
     }
 
     const file = req.files[0];

@@ -167,8 +167,8 @@ const GifMaker = () => {
                 title="Drag to reorder"
               >
                 <img className="frame-thumb" src={f.url} alt={`Frame ${i + 1}`} style={{ pointerEvents: 'none' }} />
-                <button onClick={() => removeFrame(i)} style={{
-                  position: 'absolute', top: -6, right: -6, width: 20, height: 20,
+                <button onClick={() => removeFrame(i)} className="btn-sm" style={{
+                  position: 'absolute', top: -6, right: -6,
                   borderRadius: '50%', background: '#ef4444', color: '#fff',
                   border: 'none', cursor: 'pointer', fontSize: '.7rem',
                   display: 'flex', alignItems: 'center', justifyContent: 'center'

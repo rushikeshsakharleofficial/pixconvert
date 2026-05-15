@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 const Privacy = () => (
   <section className="py-20">
-    <div className="container max-w-4xl">
+    <div className="container">
       {/* Header Section */}
       <div className="text-center mb-16">
         <div className="text-xs font-bold text-primary/50 uppercase tracking-[0.2em] mb-2">Version 2.0</div>

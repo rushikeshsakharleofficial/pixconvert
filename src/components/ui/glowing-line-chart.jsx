@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
 import { TrendingUp } from "lucide-react";
 
@@ -18,6 +19,12 @@ import {
 import { Badge } from "./badge.jsx";
 
 export function GlowingLineChart({ data, config, title, description, trending }) {
+  const [animate, setAnimate] = useState(true);
+  useEffect(() => {
+    const t = requestAnimationFrame(() => setAnimate(false));
+    return () => cancelAnimationFrame(t);
+  }, []);
+
   return (
     <Card className="glass border-none shadow-none">
       <CardHeader className="px-0">
@@ -68,6 +75,7 @@ export function GlowingLineChart({ data, config, title, description, trending })
                 strokeWidth={3}
                 connectNulls={true}
                 filter="url(#rainbow-line-glow)"
+                isAnimationActive={animate}
               />
             ))}
             <defs>

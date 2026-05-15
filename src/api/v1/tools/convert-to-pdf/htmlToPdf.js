@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import fs from 'node:fs';
 import { upload, fileSizeError } from '../../middleware/fileGuard.js';
 import { fetchUrlFiles } from '../../middleware/urlFetcher.js';
 import { sendResult } from '../../middleware/outputHandler.js';
@@ -16,29 +17,34 @@ router.post('/', upload.array('files', 1), fileSizeError, fetchUrlFiles, async (
   let browser = null;
   const outPath = tempPath('.pdf');
   try {
-    // Either a file upload or a URL in body
     const htmlUrl = req.body?.htmlUrl || req.body?.url;
-    let contentUrl;
+    let useSetContent = false;
+    let htmlContent = null;
+    let remoteUrl = null;
 
     if (req.files?.length > 0) {
-      contentUrl = `file://${req.files[0].path}`;
+      // Read uploaded HTML into memory — never load via file:// to prevent local file access
+      htmlContent = fs.readFileSync(req.files[0].path, 'utf-8');
+      useSetContent = true;
     } else if (htmlUrl) {
       await assertPublicHttpUrl(htmlUrl);
-      contentUrl = htmlUrl;
+      remoteUrl = htmlUrl;
     } else {
       return res.status(400).json({ success: false, error: 'Provide an HTML file or htmlUrl parameter' });
     }
 
     const { chromium } = await import('playwright');
-    browser = await chromium.launch({
-      headless: true,
-    });
+    browser = await chromium.launch({ headless: true });
 
     const page = await browser.newPage();
+
+    // Block all file:// and private-IP requests regardless of source
     await page.route('**/*', async (route) => {
       const requestUrl = route.request().url();
+
+      // Never allow file:// in any context — prevents local file reads from HTML content
       if (requestUrl.startsWith('file://')) {
-        return contentUrl.startsWith('file://') ? route.continue() : route.abort();
+        return route.abort();
       }
 
       try {
@@ -49,7 +55,13 @@ router.post('/', upload.array('files', 1), fileSizeError, fetchUrlFiles, async (
       }
     });
 
-    await page.goto(contentUrl, { waitUntil: 'networkidle', timeout: 30000 });
+    if (useSetContent) {
+      // Load HTML as a string with a safe non-filesystem base URL.
+      // Relative paths like ../etc/passwd resolve against https://localhost/ not the filesystem.
+      await page.setContent(htmlContent, { baseURL: 'https://localhost/', waitUntil: 'networkidle' });
+    } else {
+      await page.goto(remoteUrl, { waitUntil: 'networkidle', timeout: 30000 });
+    }
 
     const requestedFormat = req.query.format || req.body?.format || 'A4';
     const format = PDF_FORMATS.has(requestedFormat) ? requestedFormat : 'A4';

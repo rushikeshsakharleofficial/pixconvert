@@ -67,7 +67,7 @@ const PdfToPdfA = () => {
   };
 
   return (
-    <div className="tool-container">
+    <>
       <div className="tool-info-bar">
         <p className="tool-info-desc">
           Flatten forms, embed metadata, and prepare your PDF for long-term archiving. Produces a clean, self-contained PDF suitable for official record-keeping.
@@ -130,7 +130,7 @@ const PdfToPdfA = () => {
           )}
         </div>
       )}
-    </div>
+    </>
   );
 };
 

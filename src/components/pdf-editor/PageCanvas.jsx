@@ -160,6 +160,81 @@ export default function PageCanvas({
     setDragCurrent(null);
   }, [dragStart, dragCurrent, activeTool, activeColor, pageIndex, onAddAnnotation]);
 
+  const handlePointerDown = useCallback((e) => {
+    e.currentTarget.setPointerCapture(e.pointerId);
+    if (activeTool === 'select') return;
+    if (e.button !== 0) return;
+
+    const pos = getRelativePos(e);
+
+    if (activeTool === 'text') {
+      onAddAnnotation({
+        type: 'text',
+        pageIndex,
+        x: pos.x,
+        y: pos.y,
+        content: '',
+        color: activeColor,
+        fontSize,
+        width: 200,
+        height: 30,
+        editing: true,
+      });
+      return;
+    }
+
+    if (activeTool === 'sticky') {
+      onAddAnnotation({
+        type: 'sticky',
+        pageIndex,
+        x: pos.x,
+        y: pos.y,
+        content: '',
+        color: activeColor,
+        width: 180,
+        height: 120,
+        editing: true,
+      });
+      return;
+    }
+
+    setDragStart(pos);
+    setDragCurrent(pos);
+  }, [activeTool, activeColor, fontSize, pageIndex, onAddAnnotation, getRelativePos]);
+
+  const handlePointerMove = useCallback((e) => {
+    if (!dragStart) return;
+    setDragCurrent(getRelativePos(e));
+  }, [dragStart, getRelativePos]);
+
+  const handlePointerUp = useCallback(() => {
+    if (!dragStart || !dragCurrent) {
+      setDragStart(null);
+      setDragCurrent(null);
+      return;
+    }
+
+    const x = Math.min(dragStart.x, dragCurrent.x);
+    const y = Math.min(dragStart.y, dragCurrent.y);
+    const width = Math.abs(dragCurrent.x - dragStart.x);
+    const height = Math.abs(dragCurrent.y - dragStart.y);
+
+    if (width > 5 || height > 5) {
+      onAddAnnotation({
+        type: activeTool,
+        pageIndex,
+        x,
+        y,
+        width,
+        height: activeTool === 'highlight' ? Math.max(height, 20) : height,
+        color: activeColor,
+      });
+    }
+
+    setDragStart(null);
+    setDragCurrent(null);
+  }, [dragStart, dragCurrent, activeTool, activeColor, pageIndex, onAddAnnotation]);
+
   const pageAnnotations = annotations.filter((a) => a.pageIndex === pageIndex);
 
   // Preview rect while dragging
@@ -171,7 +246,7 @@ export default function PageCanvas({
   } : null;
 
   return (
-    <div ref={wrapperRef} className="page-canvas-wrapper" style={viewport ? { width: viewport.width, height: viewport.height } : { width: 595, height: 842 }}>
+    <div ref={wrapperRef} className="page-canvas-wrapper" style={viewport ? { width: viewport.width, height: viewport.height } : { width: typeof window !== 'undefined' ? Math.min(595, window.innerWidth - 32) : 595, height: Math.round((typeof window !== 'undefined' ? Math.min(595, window.innerWidth - 32) : 595) * 842 / 595) }}>
       {isVisible ? (
         <>
         <canvas ref={canvasRef} className="page-canvas" />
@@ -182,7 +257,10 @@ export default function PageCanvas({
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseUp}
-          style={viewport ? { width: viewport.width, height: viewport.height } : {}}
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          style={viewport ? { width: viewport.width, height: viewport.height, touchAction: 'none' } : { touchAction: 'none' }}
         >
         {pageAnnotations.map((ann) => (
           <AnnotationElement

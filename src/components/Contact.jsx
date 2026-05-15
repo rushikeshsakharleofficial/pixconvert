@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const faqs = [
   { q: 'Is PixConvert really free?', a: 'Yes, 100% free. There are no premium tiers, no hidden fees, no watermarks. Every feature is available to everyone.' },
@@ -91,8 +92,21 @@ const Contact = () => {
           </div>
         </div>
       </div>
-      {toast === 'success' && <div className="toast">✅ Message sent successfully!</div>}
-      {toast === 'error' && <div className="toast" style={{ background: '#dc2626' }}>❌ Failed to send message. Please try again later.</div>}
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            key="toast"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 16 }}
+            transition={{ duration: 0.2 }}
+            className="toast"
+            style={toast === 'error' ? { background: '#dc2626' } : undefined}
+          >
+            {toast === 'success' ? '✅ Message sent successfully!' : '❌ Failed to send message. Please try again later.'}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 };

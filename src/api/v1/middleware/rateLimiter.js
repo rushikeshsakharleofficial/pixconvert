@@ -7,6 +7,16 @@ const API_RATE_LIMIT = parseInt(process.env.API_RATE_LIMIT || '10', 10);
 const PROCESS_LIMIT = parseInt(process.env.PROCESS_LIMIT || '10', 10);
 const PROCESS_WINDOW_MS = 30 * 1000; // 30 seconds
 
+// Evict stale IPs that haven't sent a request in the last window — prevents unbounded growth
+setInterval(() => {
+  const cutoff = Date.now() - PROCESS_WINDOW_MS;
+  for (const [ip, timestamps] of processRequests) {
+    if (timestamps.length === 0 || Math.max(...timestamps) < cutoff) {
+      processRequests.delete(ip);
+    }
+  }
+}, PROCESS_WINDOW_MS);
+
 /**
  * Check if process limit is exceeded
  * Returns true if under limit, false if exceeded

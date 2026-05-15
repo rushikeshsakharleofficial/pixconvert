@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { useEffect, lazy, Suspense, useRef } from 'react';
+import { AnimatePresence, useReducedMotion, motion } from 'framer-motion';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -161,12 +162,19 @@ const LazyRoute = ({ children }) => (
   <ErrorBoundary>{children}</ErrorBoundary>
 );
 
-const App = () => (
-  <BrowserRouter>
-    <ScrollToTop />
-    <Navbar />
-    <main className="app-content">
-      <ErrorBoundary>
+const AppRoutes = () => {
+  const location = useLocation();
+  const reducedMotion = useReducedMotion();
+
+  return (
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={location.pathname}
+        initial={reducedMotion ? false : { opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={reducedMotion ? false : { opacity: 0 }}
+        transition={{ duration: 0.15 }}
+      >
         <Suspense fallback={<LoadingFallback />}>
           <Routes>
             <Route path="/" element={<Home />} />
@@ -237,6 +245,18 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
+      </motion.div>
+    </AnimatePresence>
+  );
+};
+
+const App = () => (
+  <BrowserRouter>
+    <ScrollToTop />
+    <Navbar />
+    <main className="app-content">
+      <ErrorBoundary>
+        <AppRoutes />
       </ErrorBoundary>
     </main>
     <Footer />

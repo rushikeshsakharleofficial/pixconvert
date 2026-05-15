@@ -1,5 +1,7 @@
 import dns from 'dns/promises';
 import net from 'net';
+import https from 'node:https';
+import http from 'node:http';
 
 const MAX_REDIRECTS = parseInt(process.env.URL_FETCH_MAX_REDIRECTS || '3', 10);
 const ALLOW_PRIVATE_URLS = process.env.ALLOW_PRIVATE_URLS === 'true';
@@ -52,6 +54,10 @@ export function isBlockedIp(address) {
   return true;
 }
 
+/**
+ * Validate and resolve a URL to a specific public IP.
+ * Returns { parsed, pinnedIp } — use pinnedIp with pinnedFetch() to prevent DNS rebinding.
+ */
 export async function assertPublicHttpUrl(rawUrl) {
   let parsed;
   try {
@@ -81,7 +87,7 @@ export async function assertPublicHttpUrl(rawUrl) {
       err.statusCode = 403;
       throw err;
     }
-    return parsed;
+    return { parsed, pinnedIp: hostname };
   }
 
   let records;
@@ -99,7 +105,51 @@ export async function assertPublicHttpUrl(rawUrl) {
     throw err;
   }
 
-  return parsed;
+  // Pin to the first validated public IP to prevent DNS rebinding (TOCTOU)
+  const pinnedIp = records[0].address;
+  return { parsed, pinnedIp };
+}
+
+/**
+ * Fetch a URL using a pinned IP to prevent DNS rebinding attacks.
+ * The TCP connection goes to pinnedIp; Host header and TLS SNI use the original hostname.
+ */
+export function pinnedFetch(urlString, pinnedIp, options = {}) {
+  return new Promise((resolve, reject) => {
+    let parsed;
+    try { parsed = new URL(urlString); } catch (e) { return reject(e); }
+
+    const isHttps = parsed.protocol === 'https:';
+    const port = parsed.port ? Number(parsed.port) : (isHttps ? 443 : 80);
+    const path = (parsed.pathname || '/') + (parsed.search || '');
+
+    const reqOptions = {
+      hostname: pinnedIp,       // connect to pinned IP — no DNS re-lookup
+      port,
+      path,
+      method: options.method || 'GET',
+      headers: {
+        ...(options.headers || {}),
+        'Host': parsed.hostname, // correct Host header for virtual hosting
+      },
+      servername: parsed.hostname, // TLS SNI — certificate validates against real hostname
+      rejectUnauthorized: true,
+      signal: options.signal,
+    };
+
+    const req = (isHttps ? https : http).request(reqOptions, resolve);
+    req.on('error', reject);
+
+    if (options.signal) {
+      options.signal.addEventListener('abort', () => {
+        const err = new Error('AbortError');
+        err.name = 'AbortError';
+        req.destroy(err);
+      });
+    }
+
+    req.end();
+  });
 }
 
 export function resolveRedirectUrl(currentUrl, location) {

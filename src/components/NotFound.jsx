@@ -102,7 +102,7 @@ const ghostVariants = {
 
 const NotFound = () => {
   return (
-    <div className="min-h-[80vh] flex flex-col items-center justify-center bg-transparent px-4">
+    <section><div className="container" style={{textAlign:'center'}}>
       <AnimatePresence mode="wait">
         <motion.div 
           className="text-center"
@@ -185,7 +185,7 @@ const NotFound = () => {
           </motion.div>
         </motion.div>
       </AnimatePresence>
-    </div>
+    </div></section>
   );
 };
 

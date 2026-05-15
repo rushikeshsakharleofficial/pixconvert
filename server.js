@@ -8,6 +8,7 @@ import path from 'path';
 import crypto from 'crypto';
 import { fileURLToPath } from 'url';
 import rateLimit from 'express-rate-limit';
+import helmet from 'helmet';
 import v1Router from './src/api/v1/index.js';
 import { cleanupDownloads } from './src/api/v1/middleware/outputHandler.js';
 
@@ -203,13 +204,31 @@ app.use((err, req, res, next) => {
   next(err);
 });
 
-// Security headers
-app.use((req, res, next) => {
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('X-Frame-Options', 'DENY');
-  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-  next();
-});
+// Security headers — helmet covers X-Content-Type-Options, X-Frame-Options, etc.
+const IS_PRODUCTION = process.env.NODE_ENV === 'production';
+
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"], // SPA requires inline scripts
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", 'data:', 'blob:'],
+      fontSrc: ["'self'", 'data:'],
+      connectSrc: ["'self'"],
+      mediaSrc: ["'self'", 'blob:'],
+      objectSrc: ["'none'"],
+      frameSrc: ["'none'"],
+      baseUri: ["'self'"],
+      formAction: ["'self'"],
+    },
+  },
+  hsts: IS_PRODUCTION
+    ? { maxAge: 31536000, includeSubDomains: true }
+    : false,
+  referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+  crossOriginEmbedderPolicy: false, // PDF.js workers need cross-origin resources
+}));
 
 // Rate limiting
 const uploadLimiter = rateLimit({
@@ -229,10 +248,17 @@ const generalLimiter = rateLimit({
   max: 60,
   message: { error: 'Too many requests. Please slow down.' },
   skip: (req) => {
-    // Skip rate limiting for documentation and metrics as they are frontend-support calls
+    // Skip rate limiting for documentation only; metrics is rate-limited by its own limiter
     const path = req.originalUrl.split('?')[0];
-    return path === '/api/docs' || path.startsWith('/api/metrics');
+    return path === '/api/docs';
   }
+});
+
+// Dedicated limiter for metric tracking — prevents spam inflation from single IPs
+const metricsTrackLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 60,             // max 60 events/min per IP (generous for legitimate use)
+  message: { error: 'Metrics rate limit exceeded. Please slow down.' },
 });
 
 // --- API docs page ---
@@ -362,7 +388,7 @@ app.post('/api/contact', contactLimiter, async (req, res) => {
 
 // --- Metrics API ---
 // POST /api/metrics/track — record tool usage event(s)
-app.post('/api/metrics/track', (req, res) => {
+app.post('/api/metrics/track', metricsTrackLimiter, (req, res) => {
   const { tool, count = 1 } = req.body;
   if (!tool || typeof tool !== 'string' || tool.length > 80 || !/^[a-zA-Z0-9 _.-]+$/.test(tool)) {
     return res.status(400).json({ error: 'Invalid tool name' });

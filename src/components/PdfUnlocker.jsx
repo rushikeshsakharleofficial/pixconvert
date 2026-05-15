@@ -78,7 +78,7 @@ const PdfUnlocker = () => {
       <DropZone onFiles={handleFiles} multiple={false} maxFiles={1} accept="application/pdf" label="Drop an encrypted PDF here — or click to browse" />
 
       {file && !unlockedUrl && (
-        <div className="tool-info-bar fade-in" style={{ marginTop: '1.25rem', gap: '1rem' }}>
+        <div className="tool-info-bar fade-in" style={{ gap: '1rem' }}>
           <div className="tool-file-info" style={{ margin: 0 }}>
             <span className="file-icon">🔒</span>
             <div>

@@ -14,7 +14,18 @@ router.post('/', upload.array('files', 1), fileSizeError, fetchUrlFiles, async (
     const password = req.query.password || req.body?.password || '';
     const bytes = readFileBuffer(req.files[0].path);
 
-    const doc = await PDFDocument.load(bytes, { ignoreEncryption: true });
+    let doc;
+    try {
+      doc = await PDFDocument.load(bytes, { password });
+    } catch (loadErr) {
+      cleanupUploads(req);
+      const msg = loadErr.message || '';
+      if (msg.includes('password') || msg.includes('encrypted') || msg.includes('decrypt')) {
+        return res.status(403).json({ success: false, error: 'Incorrect or missing password' });
+      }
+      return res.status(422).json({ success: false, error: 'Failed to read PDF' });
+    }
+
     const result = await doc.save();
 
     cleanupUploads(req);

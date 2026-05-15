@@ -304,7 +304,7 @@ const SignPdf = () => {
       />
 
       {file && (
-        <div className="tool-info-bar fade-in" style={{ marginTop: '1.25rem', gap: '1.25rem' }}>
+        <div className="tool-info-bar fade-in" style={{ gap: '1.25rem' }}>
           <div className="tool-file-info" style={{ margin: 0 }}>
             <span className="file-icon">PDF</span>
             <div>
@@ -313,7 +313,7 @@ const SignPdf = () => {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gap: '1.5rem', gridTemplateColumns: 'minmax(280px, 420px) minmax(320px, 1fr)' }}>
+          <div style={{ display: 'grid', gap: '1.5rem', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
             <div style={{ display: 'grid', gap: '1rem', alignContent: 'start' }}>
               <div className="form-group" style={{ marginBottom: 0 }}>
                 <label>Signature source</label>

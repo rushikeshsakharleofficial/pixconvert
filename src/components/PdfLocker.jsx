@@ -77,7 +77,7 @@ const PdfLocker = () => {
       <DropZone onFiles={handleFiles} multiple={false} maxFiles={1} accept="application/pdf" label="Drop a PDF here to protect — or click to browse" />
 
       {file && !lockedUrl && (
-        <div className="tool-info-bar fade-in" style={{ marginTop: '1.25rem', gap: '1rem' }}>
+        <div className="tool-info-bar fade-in" style={{ gap: '1rem' }}>
           <div className="tool-file-info" style={{ margin: 0 }}>
             <span className="file-icon">📄</span>
             <div>

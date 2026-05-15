@@ -48,6 +48,30 @@ import gifMaker from './tools/media/gifMaker.js';
 
 const router = Router();
 
+// Optional API key auth — enabled when API_KEY_REQUIRED=true env var is set.
+// Accepts key via Authorization: Bearer <key> or x-api-key header.
+// Valid keys: comma-separated list in API_KEYS env var.
+if (process.env.API_KEY_REQUIRED === 'true') {
+  const validKeys = new Set(
+    (process.env.API_KEYS || '').split(',').map(k => k.trim()).filter(Boolean)
+  );
+
+  router.use((req, res, next) => {
+    // Skip auth for health check and tools list
+    if (req.path === '/health' || req.path === '/tools') return next();
+
+    const authHeader = req.headers['authorization'] || '';
+    const bearer = authHeader.startsWith('Bearer ') ? authHeader.slice(7).trim() : null;
+    const apiKeyHeader = req.headers['x-api-key'] || null;
+    const key = bearer || apiKeyHeader;
+
+    if (!key || !validKeys.has(key)) {
+      return res.status(401).json({ success: false, error: 'Invalid or missing API key' });
+    }
+    next();
+  });
+}
+
 // Apply rate limiter to all v1 routes
 router.use(apiRateLimiter);
 

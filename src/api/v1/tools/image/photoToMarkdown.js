@@ -8,12 +8,25 @@ import { runTesseract } from '../../utils/binaryRunner.js';
 
 const router = Router();
 
+const ALLOWED_LANGS = new Set([
+  'eng', 'deu', 'fra', 'spa', 'ita', 'por', 'nld', 'rus', 'pol', 'tur',
+  'chi_sim', 'chi_tra', 'jpn', 'kor', 'ara', 'hin', 'ben', 'vie', 'tha',
+  'swe', 'nor', 'dan', 'fin', 'ces', 'slk', 'hun', 'ron', 'bul', 'hrv',
+  'ukr', 'cat', 'heb', 'ind', 'msa', 'srp', 'lit', 'lav', 'est', 'slv',
+  'ell', 'afr', 'isl',
+]);
+
 router.post('/', upload.array('files', 1), fileSizeError, fetchUrlFiles, async (req, res) => {
   const outBase = tempPath('').replace(/\.[^.]+$/, '');
   try {
     if (!requireFiles(req, res, 1)) return;
 
-    const lang = req.query.lang || req.body?.lang || 'eng';
+    const rawLang = req.query.lang || req.body?.lang || 'eng';
+    const lang = String(rawLang).toLowerCase().trim();
+    if (!ALLOWED_LANGS.has(lang)) {
+      cleanupUploads(req);
+      return res.status(400).json({ success: false, error: `Unsupported language: ${lang}` });
+    }
 
     await runTesseract(req.files[0].path, outBase, lang, 'txt');
 

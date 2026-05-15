@@ -97,7 +97,7 @@ const PdfToPowerpoint = () => {
   };
 
   return (
-    <div className="tool-container">
+    <>
       <div className="tool-info-bar">
         <p className="tool-info-desc">
           Convert PDF pages into PowerPoint slides. Each PDF page becomes a slide image in a .pptx file ready to edit in PowerPoint or Google Slides.
@@ -156,7 +156,7 @@ const PdfToPowerpoint = () => {
           )}
         </div>
       )}
-    </div>
+    </>
   );
 };
 

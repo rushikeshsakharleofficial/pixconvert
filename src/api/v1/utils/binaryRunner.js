@@ -1,5 +1,6 @@
 import { execFile } from 'child_process';
 import { promisify } from 'util';
+import { enqueue } from './jobQueue.js';
 
 const execFileAsync = promisify(execFile);
 
@@ -14,13 +15,15 @@ const EXEC_TIMEOUT = 120_000; // 2 minutes
  * Run Ghostscript command.
  */
 export async function runGhostscript(args) {
-  try {
-    const { stdout, stderr } = await execFileAsync(GS_PATH, args, { timeout: EXEC_TIMEOUT });
-    return { stdout, stderr };
-  } catch (err) {
-    console.error('[ghostscript] failed:', err.stderr || err.message);
-    throw new Error('Ghostscript processing failed');
-  }
+  return enqueue(async () => {
+    try {
+      const { stdout, stderr } = await execFileAsync(GS_PATH, args, { timeout: EXEC_TIMEOUT });
+      return { stdout, stderr };
+    } catch (err) {
+      console.error('[ghostscript] failed:', err.stderr || err.message);
+      throw new Error('Ghostscript processing failed');
+    }
+  });
 }
 
 /**
@@ -30,18 +33,20 @@ export async function runGhostscript(args) {
  * @param {string} format - Target format (pdf, docx, pptx, xlsx, etc.)
  */
 export async function runLibreOffice(inputPath, outputDir, format = 'pdf') {
-  try {
-    const { stdout, stderr } = await execFileAsync(SOFFICE_PATH, [
-      '--headless',
-      '--convert-to', format,
-      '--outdir', outputDir,
-      inputPath,
-    ], { timeout: EXEC_TIMEOUT });
-    return { stdout, stderr };
-  } catch (err) {
-    console.error('[libreoffice] failed:', err.stderr || err.message);
-    throw new Error('LibreOffice processing failed');
-  }
+  return enqueue(async () => {
+    try {
+      const { stdout, stderr } = await execFileAsync(SOFFICE_PATH, [
+        '--headless',
+        '--convert-to', format,
+        '--outdir', outputDir,
+        inputPath,
+      ], { timeout: EXEC_TIMEOUT });
+      return { stdout, stderr };
+    } catch (err) {
+      console.error('[libreoffice] failed:', err.stderr || err.message);
+      throw new Error('LibreOffice processing failed');
+    }
+  });
 }
 
 /**
@@ -52,28 +57,32 @@ export async function runLibreOffice(inputPath, outputDir, format = 'pdf') {
  * @param {string} outputFormat - pdf, txt, hocr
  */
 export async function runTesseract(inputPath, outputBase, lang = 'eng', outputFormat = 'pdf') {
-  try {
-    const { stdout, stderr } = await execFileAsync(TESSERACT_PATH, [
-      inputPath, outputBase, '-l', lang, outputFormat,
-    ], { timeout: EXEC_TIMEOUT });
-    return { stdout, stderr };
-  } catch (err) {
-    console.error('[tesseract] failed:', err.stderr || err.message);
-    throw new Error('OCR processing failed');
-  }
+  return enqueue(async () => {
+    try {
+      const { stdout, stderr } = await execFileAsync(TESSERACT_PATH, [
+        inputPath, outputBase, '-l', lang, outputFormat,
+      ], { timeout: EXEC_TIMEOUT });
+      return { stdout, stderr };
+    } catch (err) {
+      console.error('[tesseract] failed:', err.stderr || err.message);
+      throw new Error('OCR processing failed');
+    }
+  });
 }
 
 /**
  * Run ImageMagick convert.
  */
 export async function runImageMagick(args) {
-  try {
-    const { stdout, stderr } = await execFileAsync(CONVERT_PATH, args, { timeout: EXEC_TIMEOUT });
-    return { stdout, stderr };
-  } catch (err) {
-    console.error('[imagemagick] failed:', err.stderr || err.message);
-    throw new Error('Image processing failed');
-  }
+  return enqueue(async () => {
+    try {
+      const { stdout, stderr } = await execFileAsync(CONVERT_PATH, args, { timeout: EXEC_TIMEOUT });
+      return { stdout, stderr };
+    } catch (err) {
+      console.error('[imagemagick] failed:', err.stderr || err.message);
+      throw new Error('Image processing failed');
+    }
+  });
 }
 
 /**

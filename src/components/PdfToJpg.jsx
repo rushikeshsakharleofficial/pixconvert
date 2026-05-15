@@ -87,7 +87,7 @@ const PdfToJpg = () => {
   };
 
   return (
-    <div className="tool-container">
+    <>
       <div className="tool-info-bar">
         <p className="tool-info-desc">
           Convert every page of a PDF into high-quality JPG images. All pages are packaged in a ZIP file, ready to download instantly.
@@ -103,7 +103,7 @@ const PdfToJpg = () => {
       {!file ? (
         <DropZone onFiles={handleFiles} multiple={false} accept=".pdf" label="Drop PDF here to convert to JPG" />
       ) : (
-        <div className="processing-box text-center">
+        <div className="tool-info-bar fade-in">
           {processing ? (
             <div className="processing-icon mb-3">⚙️</div>
           ) : (
@@ -146,7 +146,7 @@ const PdfToJpg = () => {
           )}
         </div>
       )}
-    </div>
+    </>
   );
 };
 

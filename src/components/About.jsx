@@ -2,7 +2,7 @@ import React from 'react';
 
 const About = () => (
   <section className="py-20">
-    <div className="container max-w-4xl">
+    <div className="container">
       {/* Header Section */}
       <div className="text-center mb-16">
         <div className="text-xs font-bold text-primary/50 uppercase tracking-[0.2em] mb-2">Version 2.0</div>
@@ -15,7 +15,7 @@ const About = () => (
       {/* Mission Section */}
       <div className="space-y-12">
         <div className="fade-in delay-2">
-          <h3 className="text-2xl font-heading font-bold mb-4 flex items-center gap-3">
+          <h3 className="category-heading">
             ⚡ Our Mission
           </h3>
           <p className="text-lg text-muted-foreground leading-relaxed">

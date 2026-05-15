@@ -263,11 +263,11 @@ const Analytics = () => {
 
   return (
     <section>
-      <div className="container" style={{ maxWidth: '1000px' }}>
+      <div className="container">
         
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '1rem', marginBottom: '2.5rem' }}>
           <div>
-            <h2 className="section-title fade-in visible" style={{ textAlign: 'left', marginBottom: '0.2rem', marginLeft: 0 }}>Analytics</h2>
+            <h2 className="section-title fade-in visible">Analytics</h2>
             <p className="section-subtitle fade-in visible" style={{ textAlign: 'left', margin: 0 }}>Real-time file processing metrics</p>
           </div>
           <div className="analytics-live-badge">

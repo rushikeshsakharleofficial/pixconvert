@@ -135,7 +135,6 @@ const PdfToExcel = () => {
   };
 
   return (
-    <div className="tool-container">
       <div className="tool-info-bar">
         <p className="tool-info-desc">
           Extract tables and text from PDFs into an Excel spreadsheet (.xlsx). Each PDF page becomes a worksheet with the extracted data.
@@ -197,7 +196,6 @@ const PdfToExcel = () => {
           )}
         </div>
       )}
-    </div>
   );
 };
 

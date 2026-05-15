@@ -121,7 +121,7 @@ const OcrTool = ({ type = 'image' }) => {
   const acceptTypes = type === 'pdf' ? '.pdf' : 'image/*';
 
   return (
-    <div className="tool-container">
+    <>
       {!file ? (
         <DropZone onFiles={handleFiles} multiple={false} accept={acceptTypes} label={`Drop ${type === 'pdf' ? 'PDF' : 'Image'} here to extract text to Markdown`} />
       ) : (
@@ -178,7 +178,7 @@ const OcrTool = ({ type = 'image' }) => {
           {error && <p className="text-danger mt-3">{error}</p>}
         </div>
       )}
-    </div>
+    </>
   );
 };
 

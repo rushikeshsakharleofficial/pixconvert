@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useRef, useState, useCallback, useEffect } from 'react';
+import { useReducedMotion } from 'framer-motion';
 
 import BoxLoader from './ui/box-loader';
 import ToolMarquee from './ui/tool-marquee';
@@ -132,11 +133,13 @@ function HowItWorksTimeline() {
   );
 }
 
-const Home = () => (
+const Home = () => {
+  const reducedMotion = useReducedMotion();
+  return (
   <section className="hero" style={{ position: 'relative', overflow: 'hidden' }}>
     <div className="hero-orb hero-orb-1" aria-hidden="true" />
-    <div className="hero-orb hero-orb-2" aria-hidden="true" />
-    <div className="hero-orb hero-orb-3" aria-hidden="true" />
+    {!reducedMotion && <div className="hero-orb hero-orb-2" aria-hidden="true" />}
+    {!reducedMotion && <div className="hero-orb hero-orb-3" aria-hidden="true" />}
 
     <div className="container fade-in">
       <div className="hero-3d-scene hero-loader-scene" aria-hidden="true">
@@ -192,6 +195,7 @@ const Home = () => (
       <div className="section-divider" />
     </div>
   </section>
-);
+  );
+};
 
 export default Home;

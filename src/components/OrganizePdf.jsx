@@ -116,7 +116,7 @@ const OrganizePdf = () => {
       />
 
       {file && (
-        <div className="tool-info-bar fade-in" style={{ marginTop: '1.25rem' }}>
+        <div className="tool-info-bar fade-in">
           <div className="tool-file-info" style={{ margin: 0 }}>
             <span className="file-icon">📄</span>
             <div>

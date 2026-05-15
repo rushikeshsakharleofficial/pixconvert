@@ -115,7 +115,6 @@ const PdfToWord = () => {
   };
 
   return (
-    <div className="tool-container">
       <div className="tool-info-bar">
         <p className="tool-info-desc">
           Extract text from any PDF and convert it into an editable Word (.docx) document. Text layout is preserved page by page.
@@ -177,7 +176,6 @@ const PdfToWord = () => {
           )}
         </div>
       )}
-    </div>
   );
 };
 

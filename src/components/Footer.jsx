@@ -11,8 +11,8 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="mt-20 mb-8 px-4 max-w-6xl mx-auto font-sans -rotate-1">
-      <div className="relative bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-white/5 shadow-xl mx-auto px-6 md:px-12 py-12 flex flex-col gap-12 text-slate-900 dark:text-slate-100">
+    <footer className="mt-20 mb-8 px-4 max-w-[1100px] mx-auto font-sans -rotate-1">
+      <div className="relative bg-white rounded-[2.5rem] border border-slate-200 shadow-xl mx-auto px-6 md:px-12 py-12 flex flex-col gap-12 text-slate-900">
         {/* Tapes */}
         <div className="hidden md:block absolute -top-4 -left-8 w-[80px] h-[36px] scale-75 opacity-90">
           {tape}
@@ -24,7 +24,7 @@ const Footer = () => {
         <div className="flex flex-col lg:flex-row justify-between gap-12 relative z-10">
           {/* Brand & Mission */}
           <div className="flex flex-col items-start gap-4 max-w-sm">
-            <Link to="/" className="flex items-center gap-2 text-2xl font-display font-black text-slate-900 dark:text-white group">
+            <Link to="/" className="flex items-center gap-2 text-2xl font-display font-black text-slate-900 group">
               <svg viewBox="0 0 28 28" fill="none" style={{ width: 28, height: 28, flexShrink: 0 }}>
                 <rect x="2" y="2" width="24" height="24" rx="6" stroke="#FF4F00" strokeWidth="2.5"/>
                 <path d="M8 20l4-6 3 4 2-3 3 5" stroke="#FF4F00" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -32,7 +32,7 @@ const Footer = () => {
               </svg>
               Pix<span className="text-primary">Convert</span>
             </Link>
-            <p className="text-slate-500 dark:text-slate-400 font-medium text-base leading-relaxed">
+            <p className="text-slate-500 font-medium text-base leading-relaxed">
               Privacy-first file conversion. Everything runs in your browser. Zero uploads. Zero tracking.
             </p>
           </div>
@@ -43,11 +43,11 @@ const Footer = () => {
             <div className="flex flex-col gap-4">
               <h4 className="uppercase font-display text-xs tracking-widest text-primary font-bold">PDF Tools</h4>
               <nav className="flex flex-col gap-2.5">
-                <Link className="text-slate-500 dark:text-slate-400 hover:text-primary transition-colors text-sm font-semibold" to="/tools/pdf">Unlock PDF</Link>
-                <Link className="text-slate-500 dark:text-slate-400 hover:text-primary transition-colors text-sm font-semibold" to="/tools/pdf-lock">Protect PDF</Link>
-                <Link className="text-slate-500 dark:text-slate-400 hover:text-primary transition-colors text-sm font-semibold" to="/tools/pdf-to-jpg">PDF to JPG</Link>
-                <Link className="text-slate-500 dark:text-slate-400 hover:text-primary transition-colors text-sm font-semibold" to="/tools/pdf-to-word">PDF to Word</Link>
-                <Link className="text-slate-500 dark:text-slate-400 hover:text-primary transition-colors text-sm font-semibold" to="/tools/merge-pdf">Merge PDF</Link>
+                <Link className="text-slate-500 hover:text-primary transition-colors text-sm font-semibold" to="/tools/pdf">Unlock PDF</Link>
+                <Link className="text-slate-500 hover:text-primary transition-colors text-sm font-semibold" to="/tools/pdf-lock">Protect PDF</Link>
+                <Link className="text-slate-500 hover:text-primary transition-colors text-sm font-semibold" to="/tools/pdf-to-jpg">PDF to JPG</Link>
+                <Link className="text-slate-500 hover:text-primary transition-colors text-sm font-semibold" to="/tools/pdf-to-word">PDF to Word</Link>
+                <Link className="text-slate-500 hover:text-primary transition-colors text-sm font-semibold" to="/tools/merge-pdf">Merge PDF</Link>
               </nav>
             </div>
 
@@ -55,11 +55,11 @@ const Footer = () => {
             <div className="flex flex-col gap-4">
               <h4 className="uppercase font-display text-xs tracking-widest text-primary font-bold">Image Tools</h4>
               <nav className="flex flex-col gap-2.5">
-                <Link className="text-slate-500 dark:text-slate-400 hover:text-primary transition-colors text-sm font-semibold" to="/tools/converter">Universal Converter</Link>
-                <Link className="text-slate-500 dark:text-slate-400 hover:text-primary transition-colors text-sm font-semibold" to="/tools/gif">GIF Maker</Link>
-                <Link className="text-slate-500 dark:text-slate-400 hover:text-primary transition-colors text-sm font-semibold" to="/tools/jpg-to-png">JPG to PNG</Link>
-                <Link className="text-slate-500 dark:text-slate-400 hover:text-primary transition-colors text-sm font-semibold" to="/tools/heic-to-jpg">HEIC to JPG</Link>
-                <Link className="text-slate-500 dark:text-slate-400 hover:text-primary transition-colors text-sm font-semibold" to="/tools/photo-to-markdown">OCR Tool</Link>
+                <Link className="text-slate-500 hover:text-primary transition-colors text-sm font-semibold" to="/tools/converter">Universal Converter</Link>
+                <Link className="text-slate-500 hover:text-primary transition-colors text-sm font-semibold" to="/tools/gif">GIF Maker</Link>
+                <Link className="text-slate-500 hover:text-primary transition-colors text-sm font-semibold" to="/tools/jpg-to-png">JPG to PNG</Link>
+                <Link className="text-slate-500 hover:text-primary transition-colors text-sm font-semibold" to="/tools/heic-to-jpg">HEIC to JPG</Link>
+                <Link className="text-slate-500 hover:text-primary transition-colors text-sm font-semibold" to="/tools/photo-to-markdown">OCR Tool</Link>
               </nav>
             </div>
 
@@ -67,17 +67,17 @@ const Footer = () => {
             <div className="flex flex-col gap-4">
               <h4 className="uppercase font-display text-xs tracking-widest text-primary font-bold">Company</h4>
               <nav className="flex flex-col gap-2.5">
-                <Link className="text-slate-500 dark:text-slate-400 hover:text-primary transition-colors text-sm font-semibold" to="/about">About Us</Link>
-                <Link className="text-slate-500 dark:text-slate-400 hover:text-primary transition-colors text-sm font-semibold" to="/privacy">Privacy Policy</Link>
-                <Link className="text-slate-500 dark:text-slate-400 hover:text-primary transition-colors text-sm font-semibold" to="/contact">Contact</Link>
-                <Link className="text-slate-500 dark:text-slate-400 hover:text-primary transition-colors text-sm font-semibold" to="/tools">All Tools</Link>
+                <Link className="text-slate-500 hover:text-primary transition-colors text-sm font-semibold" to="/about">About Us</Link>
+                <Link className="text-slate-500 hover:text-primary transition-colors text-sm font-semibold" to="/privacy">Privacy Policy</Link>
+                <Link className="text-slate-500 hover:text-primary transition-colors text-sm font-semibold" to="/contact">Contact</Link>
+                <Link className="text-slate-500 hover:text-primary transition-colors text-sm font-semibold" to="/tools">All Tools</Link>
               </nav>
             </div>
           </div>
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-8 border-t border-slate-100 dark:border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 text-sm text-slate-400 font-medium">
+        <div className="pt-8 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6 text-sm text-slate-400 font-medium">
           <p>© {currentYear} PixConvert. Created with ❤️ for privacy.</p>
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-2">
