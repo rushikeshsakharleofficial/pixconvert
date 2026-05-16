@@ -44,16 +44,19 @@ const DonutChart = React.forwardRef(
       <div
         ref={ref}
         className={cn("relative flex items-center justify-center", className)}
-        style={{ width: size, height: size }}
+        style={{ width: '100%', maxWidth: size, height: size }}
         onMouseLeave={handleMouseLeave}
         {...props}
       >
         <svg
-          width={size}
+          width="100%"
           height={size}
           viewBox={`0 0 ${size} ${size}`}
           className="overflow-visible -rotate-90"
+          role="img"
+          aria-label="Donut chart showing tool usage breakdown"
         >
+          <title>Tool usage breakdown</title>
           <circle
             cx={size / 2}
             cy={size / 2}

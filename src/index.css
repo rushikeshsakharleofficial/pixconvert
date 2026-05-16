@@ -2092,8 +2092,8 @@ section { padding: 5rem 2rem 4rem; }
 
 .analytics-periods {
   display: flex; gap: 0.5rem; margin-bottom: 1.5rem;
-  background: var(--bg2); padding: 0.35rem; width: max-content;
-  border-radius: 8px; border: 1px solid var(--border);
+  background: var(--bg2); padding: 0.35rem; width: max-content; max-width: 100%;
+  border-radius: 8px; border: 1px solid var(--border); flex-wrap: wrap;
 }
 .period-btn {
   background: none; border: none; padding: 0.5rem 1rem;
@@ -2118,7 +2118,7 @@ section { padding: 5rem 2rem 4rem; }
   background: rgba(255,255,255,0.06); border-radius: 4px; color: var(--text2);
 }
 
-.analytics-chart-svg { width: 100%; height: auto; max-height: 260px; overflow: visible; font-family: inherit; }
+.analytics-chart-svg { width: 100%; height: auto; max-height: 260px; max-width: 100%; overflow: hidden; font-family: inherit; }
 .chart-axis-text { font-size: 10px; fill: var(--text2); font-weight: 500; font-family: inherit; }
 .chart-tooltip-text { font-size: 11px; fill: var(--text); font-weight: 700; }
 
@@ -2142,9 +2142,12 @@ section { padding: 5rem 2rem 4rem; }
 
 @media (max-width: 600px) {
   .analytics-header { flex-direction: column; align-items: flex-start; }
-  .analytics-periods { width: 100%; justify-content: center; }
+  .analytics-periods { width: 100%; justify-content: center; flex-wrap: wrap; }
   .top-tool-name { width: 100px; }
 }
+
+/* Chart container responsiveness */
+[data-slot="chart"] { max-width: 100%; overflow: hidden; }
 
 /* Ghost 404 Theme Styles */
 
@@ -2850,6 +2853,9 @@ section { padding: 5rem 2rem 4rem; }
   font-weight: 600;
   font-size: 0.85rem;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .api-desc-short {

@@ -65,7 +65,11 @@ function CodeBlock({ code }) {
   };
   return (
     <div className="api-code-block">
-      <button className="api-code-copy" onClick={handleCopy}>
+      <button
+        className="api-code-copy"
+        onClick={handleCopy}
+        aria-label="Copy code"
+      >
         {copied ? '✓ Copied' : 'Copy'}
       </button>
       <pre><code>{code}</code></pre>

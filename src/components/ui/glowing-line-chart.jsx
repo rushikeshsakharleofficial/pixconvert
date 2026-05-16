@@ -43,7 +43,7 @@ export function GlowingLineChart({ data, config, title, description, trending })
         <CardDescription>{description || "Usage trends"}</CardDescription>
       </CardHeader>
       <CardContent className="px-0">
-        <ChartContainer config={config} className="h-[300px] w-full min-h-[300px]">
+        <ChartContainer config={config} className="h-[300px] w-full min-h-[300px]" role="img" aria-label={`${title || 'Files Processed'} line chart`}>
           <LineChart
             data={data}
             margin={{
