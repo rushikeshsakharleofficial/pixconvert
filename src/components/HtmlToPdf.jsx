@@ -66,14 +66,15 @@ const HtmlToPdf = () => {
       </div>
 
       <div className="form-group">
-        <label>HTML content</label>
+        <label htmlFor="html-content">HTML content</label>
         <textarea
+          id="html-content"
           rows={12}
           value={htmlInput}
           onChange={(e) => setHtmlInput(e.target.value)}
           placeholder="<h1>Hello</h1><p>Your HTML here…</p>"
           disabled={isProcessing}
-          style={{ width: '100%', fontFamily: 'ui-monospace, monospace', fontSize: '0.85rem' }}
+          style={{ width: '100%', fontFamily: 'ui-monospace, monospace', fontSize: '0.85rem', minHeight: '44px' }}
         />
       </div>
 

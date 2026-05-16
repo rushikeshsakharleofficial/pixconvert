@@ -185,14 +185,16 @@ const JpgToPdf = () => {
       {files.length > 0 && (
         <div className="tool-info-bar fade-in" style={{ marginTop: '1rem' }}>
           <div className="form-group" style={{ marginBottom: '0.75rem' }}>
-            <label>Margin around each image (points)</label>
+            <label htmlFor="jpg-margin">Margin around each image (points)</label>
             <input
+              id="jpg-margin"
               type="number"
               min={0}
               max={120}
               value={marginPt}
               onChange={(e) => setMarginPt(Number(e.target.value) || 0)}
               disabled={isProcessing}
+              style={{ minHeight: '44px' }}
             />
           </div>
           <p className="tool-info-desc" style={{ marginBottom: '0.5rem' }}>{files.length} image(s)</p>
