@@ -126,7 +126,7 @@ function HowItWorksTimeline() {
 
       {/* Description panel */}
       <div className="hiw-panel" key={activeStep}>
-        <span className="hiw-panel-icon">{STEPS[activeStep].icon}</span>
+        <span className="hiw-panel-icon" aria-hidden="true">{STEPS[activeStep].icon}</span>
         <p className="hiw-panel-text">{STEPS[activeStep].desc}</p>
       </div>
     </div>
@@ -146,7 +146,7 @@ const Home = () => {
         <BoxLoader />
       </div>
 
-      <div className="hero-eyebrow">✦ 100% free &amp; private - no account needed</div>
+      <div className="hero-eyebrow"><span aria-hidden="true">✦ </span>100% free &amp; private - no account needed</div>
 
       <h1>
         Every tool you need for
@@ -160,8 +160,8 @@ const Home = () => {
       </p>
 
       <div className="hero-cta">
-        <Link to="/tools" className="btn btn-primary">Explore All Tools →</Link>
-        <Link to="/about" className="btn btn-outline">How it works</Link>
+        <Link to="/tools" className="btn btn-primary" aria-label="Explore all PDF and image tools">Explore All Tools <span aria-hidden="true">→</span></Link>
+        <Link to="/about" className="btn btn-outline" aria-label="Learn how PixConvert works">How it works</Link>
       </div>
 
       <div className="hero-stats fade-in delay-2">
@@ -173,14 +173,16 @@ const Home = () => {
         ))}
       </div>
 
-      <ToolMarquee />
+      <div aria-hidden="true">
+        <ToolMarquee />
+      </div>
 
       <div className="section-divider" />
 
       <div className="trust-strip fade-in delay-4">
         {TRUST.map((t, i) => (
           <div className="trust-item" key={i}>
-            <span className="dot" />
+            <span className="dot" aria-hidden="true" />
             {t}
           </div>
         ))}
