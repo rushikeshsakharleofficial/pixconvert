@@ -87,24 +87,26 @@ const PdfLocker = () => {
           </div>
 
           <div className="form-group" style={{ marginBottom: '0.5rem' }}>
-            <label>Set Password</label>
+            <label htmlFor="pdf-lock-password">Set Password</label>
             <input
+              id="pdf-lock-password"
               type="password"
               value={password}
               onChange={e => setPassword(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && password && handleLock()}
               placeholder="Choose a strong password…"
               disabled={isProcessing}
+              aria-required="true"
             />
           </div>
 
           {error && <p className="text-danger" style={{ fontWeight: 600, fontSize: '0.875rem' }}>{error}</p>}
 
           <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-            <button className="btn btn-primary" onClick={handleLock} disabled={isProcessing || !password}>
+            <button type="button" className="btn btn-primary" onClick={handleLock} disabled={isProcessing || !password}>
               {isProcessing ? 'Encrypting…' : '🔐 Protect PDF'}
             </button>
-            <button className="btn btn-outline" onClick={() => { setFile(null); setPassword(''); setError(null); }}>
+            <button type="button" className="btn btn-outline" onClick={() => { setFile(null); setPassword(''); setError(null); }}>
               Remove
             </button>
           </div>
@@ -118,8 +120,8 @@ const PdfLocker = () => {
           <div className="tool-result-title">PDF Protected Successfully</div>
           <p className="tool-result-meta">Your PDF is now password-encrypted and ready to share safely.</p>
           <div className="tool-result-actions">
-            <button className="btn btn-primary" onClick={downloadFile}>⬇ Download Protected PDF</button>
-            <button className="btn btn-outline" onClick={() => { setFile(null); setPassword(''); setLockedUrl(null); }}>Protect Another</button>
+            <button type="button" className="btn btn-primary" onClick={downloadFile}>⬇ Download Protected PDF</button>
+            <button type="button" className="btn btn-outline" onClick={() => { setFile(null); setPassword(''); setLockedUrl(null); }}>Protect Another</button>
           </div>
         </div>
       )}

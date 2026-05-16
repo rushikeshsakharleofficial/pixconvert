@@ -88,24 +88,26 @@ const PdfUnlocker = () => {
           </div>
 
           <div className="form-group" style={{ marginBottom: '0.5rem' }}>
-            <label>PDF Password</label>
+            <label htmlFor="pdf-unlock-password">PDF Password</label>
             <input
+              id="pdf-unlock-password"
               type="password"
               value={password}
               onChange={e => setPassword(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && password && handleUnlock()}
               placeholder="Enter the document password…"
               disabled={isProcessing}
+              aria-required="true"
             />
           </div>
 
           {error && <p className="text-danger" style={{ fontWeight: 600, fontSize: '0.875rem' }}>{error}</p>}
 
           <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-            <button className="btn btn-primary" onClick={handleUnlock} disabled={isProcessing || !password}>
+            <button type="button" className="btn btn-primary" onClick={handleUnlock} disabled={isProcessing || !password}>
               {isProcessing ? 'Unlocking…' : '🔓 Unlock PDF'}
             </button>
-            <button className="btn btn-outline" onClick={() => { setFile(null); setPassword(''); setError(null); }}>
+            <button type="button" className="btn btn-outline" onClick={() => { setFile(null); setPassword(''); setError(null); }}>
               Remove
             </button>
           </div>
@@ -119,8 +121,8 @@ const PdfUnlocker = () => {
           <div className="tool-result-title">PDF Unlocked Successfully</div>
           <p className="tool-result-meta">Unlocked file size: <strong style={{ color: 'var(--success)' }}>{formatSize(unlockedSize)}</strong></p>
           <div className="tool-result-actions">
-            <button className="btn btn-primary" onClick={downloadFile}>⬇ Download Unlocked PDF</button>
-            <button className="btn btn-outline" onClick={() => { setFile(null); setPassword(''); setUnlockedUrl(null); }}>Unlock Another</button>
+            <button type="button" className="btn btn-primary" onClick={downloadFile}>⬇ Download Unlocked PDF</button>
+            <button type="button" className="btn btn-outline" onClick={() => { setFile(null); setPassword(''); setUnlockedUrl(null); }}>Unlock Another</button>
           </div>
         </div>
       )}
