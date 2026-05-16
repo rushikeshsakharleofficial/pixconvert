@@ -160,8 +160,8 @@ const Home = () => {
       </p>
 
       <div className="hero-cta">
-        <Link to="/tools" className="btn btn-primary" aria-label="Explore all PDF and image tools">Explore All Tools <span aria-hidden="true">→</span></Link>
-        <Link to="/about" className="btn btn-outline" aria-label="Learn how PixConvert works">How it works</Link>
+        <Link to="/tools" className="btn btn-primary">Explore All Tools <span aria-hidden="true">→</span></Link>
+        <Link to="/about" className="btn btn-outline">How it works</Link>
       </div>
 
       <div className="hero-stats fade-in delay-2">
@@ -173,7 +173,7 @@ const Home = () => {
         ))}
       </div>
 
-      <div aria-hidden="true">
+      <div aria-hidden="true" inert="">
         <ToolMarquee />
       </div>
 

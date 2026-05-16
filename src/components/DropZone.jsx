@@ -30,7 +30,6 @@ const DropZone = ({ onFiles, multiple = true, accept = 'image/*', maxFiles = 999
       className={`drop-zone${dragOver ? ' drag-over' : ''}`}
       role="button"
       tabIndex={0}
-      aria-label="Drop files here or click to browse"
       onClick={() => inputRef.current?.click()}
       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); inputRef.current?.click(); } }}
       onDragOver={(e) => {
@@ -57,7 +56,7 @@ const DropZone = ({ onFiles, multiple = true, accept = 'image/*', maxFiles = 999
         </div>
 
         <div className="drop-zone-copy">
-          <h3>{label || 'Drop your file here'}</h3>
+          <p className="drop-zone-heading">{label || 'Drop your file here'}</p>
           <p className="drop-zone-subtitle">or click to browse from your computer</p>
         </div>
 
