@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import DropZone from './DropZone';
 import ToolProgressBar from './ToolProgressBar';
 import * as pdfjsLib from 'pdfjs-dist';
@@ -6,6 +6,22 @@ import pdfWorker from 'pdfjs-dist/build/pdf.worker.mjs?url';
 import { createWorker } from 'tesseract.js';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
+
+const LANGUAGE_OPTIONS = [
+  { value: 'eng', label: 'English' },
+  { value: 'fra', label: 'French' },
+  { value: 'deu', label: 'German' },
+  { value: 'spa', label: 'Spanish' },
+  { value: 'por', label: 'Portuguese' },
+  { value: 'ita', label: 'Italian' },
+  { value: 'chi_sim', label: 'Chinese (Simplified)' },
+  { value: 'chi_tra', label: 'Chinese (Traditional)' },
+  { value: 'jpn', label: 'Japanese' },
+  { value: 'kor', label: 'Korean' },
+  { value: 'ara', label: 'Arabic' },
+  { value: 'hin', label: 'Hindi' },
+  { value: 'rus', label: 'Russian' },
+];
 
 const OcrTool = ({ type = 'image' }) => {
   const [file, setFile] = useState(null);
@@ -16,6 +32,7 @@ const OcrTool = ({ type = 'image' }) => {
   const [error, setError] = useState(null);
   const [needsPassword, setNeedsPassword] = useState(false);
   const [password, setPassword] = useState('');
+  const [language, setLanguage] = useState('eng');
 
   const [copying, setCopying] = useState(false);
 
@@ -48,7 +65,7 @@ const OcrTool = ({ type = 'image' }) => {
       let fullText = '';
       const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
 
-      const worker = await createWorker('eng', 1, {
+      const worker = await createWorker(language, 1, {
         logger: m => {
           if (m.status === 'recognizing text' && !isPdf) {
             setProgress(Math.round(m.progress * 100));
@@ -123,7 +140,22 @@ const OcrTool = ({ type = 'image' }) => {
   return (
     <>
       {!file ? (
-        <DropZone onFiles={handleFiles} multiple={false} accept={acceptTypes} label={`Drop ${type === 'pdf' ? 'PDF' : 'Image'} here to extract text to Markdown`} />
+        <>
+          <div className="mb-3" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+            <label htmlFor="ocr-lang" style={{ fontWeight: 500, fontSize: '0.95rem' }}>Language</label>
+            <select
+              id="ocr-lang"
+              value={language}
+              onChange={(e) => setLanguage(e.target.value)}
+              style={{ padding: '0.4rem 0.75rem', borderRadius: '6px', border: '1px solid var(--border)', background: 'var(--bg)', color: 'var(--text)', fontSize: '0.9rem', cursor: 'pointer' }}
+            >
+              {LANGUAGE_OPTIONS.map(opt => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+          </div>
+          <DropZone onFiles={handleFiles} multiple={false} accept={acceptTypes} label={`Drop ${type === 'pdf' ? 'PDF' : 'Image'} here to extract text to Markdown`} />
+        </>
       ) : (
         <div className="processing-box text-center">
           {processing ? (
@@ -132,19 +164,21 @@ const OcrTool = ({ type = 'image' }) => {
             <h3 className="mb-3">{type === 'pdf' ? '📄' : '🖼️'}</h3>
           )}
           <h4 className="mb-3">{file.name}</h4>
-          
+
           {needsPassword ? (
             <div className="mt-4">
               <p className="text-danger mb-3">🔒 This PDF is password protected.</p>
-              <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
-                <input 
-                  type="password" 
-                  placeholder="Enter password" 
+              <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+                <label htmlFor="ocr-pdf-password" className="visually-hidden">PDF Password</label>
+                <input
+                  id="ocr-pdf-password"
+                  type="password"
+                  placeholder="Enter password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   style={{ padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--border)', outline: 'none' }}
                 />
-                <button className="btn btn-primary" onClick={() => processFile(password)}>
+                <button type="button" className="btn btn-primary" onClick={() => processFile(password)}>
                   Unlock & Extract
                 </button>
               </div>
@@ -154,24 +188,39 @@ const OcrTool = ({ type = 'image' }) => {
               <ToolProgressBar active label="Recognizing text…" value={progress} />
             </div>
           ) : !result ? (
-            <button className="btn btn-primary mt-3" onClick={() => processFile()}>Extract Text (OCR)</button>
+            <button type="button" className="btn btn-primary mt-3" onClick={() => processFile()}>Extract Text (OCR)</button>
           ) : (
             <div className="mt-4">
               <p className="text-success mb-3">✅ Text extracted successfully!</p>
-              <div className="result-preview glass p-3 mb-3 text-left" style={{ maxHeight: '250px', overflowY: 'auto', textAlign: 'left', fontSize: '0.9rem', whiteSpace: 'pre-wrap', position: 'relative' }}>
-                {result}
-                <button 
+              <div style={{ position: 'relative' }}>
+                <label htmlFor="ocr-output" className="visually-hidden">Extracted text</label>
+                <textarea
+                  id="ocr-output"
+                  readOnly
+                  aria-readonly="true"
+                  value={result}
+                  className="glass p-3 mb-3"
+                  style={{ display: 'block', width: '100%', minHeight: '120px', maxHeight: '40vh', overflowY: 'auto', textAlign: 'left', fontSize: '0.9rem', whiteSpace: 'pre-wrap', resize: 'none', border: '1px solid var(--border)', borderRadius: '8px', background: 'transparent', color: 'var(--text)', boxSizing: 'border-box' }}
+                />
+                <button
+                  type="button"
+                  aria-label="Copy extracted text"
                   onClick={copyToClipboard}
-                  style={{ position: 'absolute', top: '10px', right: '10px', padding: '4px 8px', fontSize: '0.75rem', borderRadius: '4px', background: 'var(--primary)', color: 'white', border: 'none', cursor: 'pointer' }}
+                  style={{ position: 'absolute', top: '10px', right: '10px', padding: '4px 8px', fontSize: '0.75rem', borderRadius: '4px', background: 'var(--primary)', color: 'white', border: 'none', cursor: 'pointer', minHeight: '28px' }}
                 >
                   {copying ? 'Copied!' : 'Copy'}
                 </button>
               </div>
               <div className="cs-actions">
-                <a href={downloadUrl} download={`${file.name.replace(/\.[^.]+$/, '')}.md`} className="btn btn-primary">
+                <a
+                  href={downloadUrl}
+                  download={`${file.name.replace(/\.[^.]+$/, '')}.md`}
+                  className="btn btn-primary"
+                  aria-label="Download as text file"
+                >
                   ⬇ Download Markdown (.md)
                 </a>
-                <button className="btn btn-outline" onClick={reset}>Try Another</button>
+                <button type="button" className="btn btn-outline" onClick={reset}>Try Another</button>
               </div>
             </div>
           )}
