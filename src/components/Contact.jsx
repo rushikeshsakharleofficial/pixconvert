@@ -42,14 +42,14 @@ const Contact = () => {
   return (
     <section>
       <div className="container">
-        <h2 className="section-title fade-in visible">Contact Us</h2>
+        <h1 className="section-title fade-in visible">Contact Us</h1>
         <p className="section-subtitle fade-in visible">Questions? Feedback? We'd love to hear from you</p>
         <div className="contact-grid fade-in visible">
           <div className="glass">
-            <h3 style={{ fontFamily: 'var(--heading)', color: 'var(--white)', marginBottom: '1.25rem' }}>
+            <h2 style={{ fontFamily: 'var(--heading)', color: 'var(--white)', marginBottom: '1.25rem' }}>
               Send a Message
-            </h3>
-            <form onSubmit={handleSubmit}>
+            </h2>
+            <form className="contact-form" onSubmit={handleSubmit}>
               {[
                 { id: 'name',    label: 'Name',    type: 'text',  placeholder: 'Your name' },
                 { id: 'email',   label: 'Email',   type: 'email', placeholder: 'you@example.com' },
@@ -74,9 +74,9 @@ const Contact = () => {
           </div>
           <div>
             <div className="glass">
-              <h3 style={{ fontFamily: 'var(--heading)', color: 'var(--white)', marginBottom: '1rem' }}>
+              <h2 style={{ fontFamily: 'var(--heading)', color: 'var(--white)', marginBottom: '1rem' }}>
                 Frequently Asked Questions
-              </h3>
+              </h2>
               <div className="faq-list">
                 {faqs.map((faq, i) => (
                   <div className="faq-item" key={i}>
