@@ -881,6 +881,7 @@ section { padding: 5rem 2rem 4rem; }
   backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--border); border-radius: var(--radius); padding: 2rem;
   transition: border-color 0.2s;
+  overflow: hidden; max-width: 100%;
 }
 .glass:hover { border-color: var(--border-active); }
 
@@ -1658,7 +1659,11 @@ section { padding: 5rem 2rem 4rem; }
 [data-theme="light"] .step-num { background: var(--bg3); border-color: rgba(0,0,0,0.09); }
 
 /* ===== Tool Container ===== */
-.tool-container { padding: 0.25rem; }
+.tool-container { padding: 0.25rem; max-width: 100%; }
+
+/* ===== File List (semantic ul/li for tool file queues) ===== */
+.file-list { list-style: none; padding: 0; margin: 0; }
+.file-item { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
 
 /* ===== Tool Info Bar ===== */
 .tool-info-bar {
@@ -1845,6 +1850,8 @@ section { padding: 5rem 2rem 4rem; }
   .hero-3d-scene::after { animation: none; }
   .hero-orb { animation: none; }
   .step-num-inner { transition: none; }
+  /* Suppress fade/slide animations on tool card wrapper */
+  .glass { animation: none; opacity: 1; }
 }
 
 /* ===== Shared Processing Loader ===== */

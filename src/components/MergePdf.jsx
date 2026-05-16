@@ -81,6 +81,7 @@ const MergePdf = () => {
 
   return (
     <div>
+      <h1 className="visually-hidden">Merge PDF</h1>
       <div className="tool-info-bar">
         <p className="tool-info-desc">Combine multiple PDFs in your preferred order. Processing stays in your browser.</p>
         <div className="tool-feats">
@@ -98,22 +99,39 @@ const MergePdf = () => {
           <p className="tool-info-desc" style={{ marginBottom: '0.7rem' }}>
             Arrange file order before merge.
           </p>
-          <div style={{ display: 'grid', gap: '0.5rem', marginBottom: '0.9rem' }}>
+          <ul className="file-list" aria-label="PDF files to merge" style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: '0.5rem', marginBottom: '0.9rem' }}>
             {files.map((file, i) => (
-              <div key={`${file.name}-${i}`} style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5rem', alignItems: 'center', border: '1px solid var(--border)', borderRadius: '10px', padding: '0.55rem 0.7rem', background: 'var(--bg2)' }}>
-                <div style={{ fontSize: '0.92rem' }}>
+              <li key={`${file.name}-${i}`} className="file-item" style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5rem', alignItems: 'center', border: '1px solid var(--border)', borderRadius: '10px', padding: '0.55rem 0.7rem', background: 'var(--bg2)' }}>
+                <span style={{ fontSize: '0.92rem' }}>
                   {i + 1}. {file.name} <span style={{ color: 'var(--text3)' }}>({formatSize(file.size)})</span>
-                </div>
+                </span>
                 <div style={{ display: 'flex', gap: '0.35rem' }}>
-                  <button className="btn btn-outline btn-sm" onClick={() => moveFile(i, -1)} disabled={i === 0}>↑</button>
-                  <button className="btn btn-outline btn-sm" onClick={() => moveFile(i, 1)} disabled={i === files.length - 1}>↓</button>
-                  <button className="btn btn-outline btn-sm" onClick={() => removeFile(i)}>Remove</button>
+                  <button
+                    type="button"
+                    className="btn btn-outline btn-sm"
+                    onClick={() => moveFile(i, -1)}
+                    disabled={i === 0}
+                    aria-label={`Move ${file.name} up`}
+                  >↑</button>
+                  <button
+                    type="button"
+                    className="btn btn-outline btn-sm"
+                    onClick={() => moveFile(i, 1)}
+                    disabled={i === files.length - 1}
+                    aria-label={`Move ${file.name} down`}
+                  >↓</button>
+                  <button
+                    type="button"
+                    className="btn btn-outline btn-sm"
+                    onClick={() => removeFile(i)}
+                    aria-label={`Remove ${file.name}`}
+                  >Remove</button>
                 </div>
-              </div>
+              </li>
             ))}
-          </div>
+          </ul>
           <div style={{ display: 'flex', gap: '0.7rem', flexWrap: 'wrap' }}>
-            <button className="btn btn-primary" onClick={mergeFiles} disabled={files.length < 2 || isProcessing}>
+            <button type="button" className="btn btn-primary" onClick={mergeFiles} disabled={files.length < 2 || isProcessing}>
               {isProcessing ? 'Merging…' : 'Merge PDFs'}
             </button>
           </div>
