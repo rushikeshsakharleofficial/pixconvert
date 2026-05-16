@@ -103,7 +103,7 @@ const PdfToPdfA = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   style={{ padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--border)', outline: 'none' }}
                 />
-                <button className="btn btn-primary" onClick={() => processPdf(password)}>
+                <button type="button" className="btn btn-primary" onClick={() => processPdf(password)}>
                   Unlock & Archive
                 </button>
               </div>
@@ -115,7 +115,7 @@ const PdfToPdfA = () => {
           ) : !downloadUrl ? (
             <div className="mt-3">
               <p className="text-muted text-sm mb-3">Note: This tool flattens forms and optimizes metadata for long-term preservation. It does not produce a fully ISO 19005-compliant PDF/A — for strict compliance, use a dedicated PDF/A validator.</p>
-              <button className="btn btn-primary" onClick={() => processPdf()}>Flatten &amp; Archive PDF</button>
+              <button type="button" className="btn btn-primary" onClick={() => processPdf()}>Flatten &amp; Archive PDF</button>
             </div>
           ) : (
             <div className="mt-4">
@@ -124,7 +124,7 @@ const PdfToPdfA = () => {
                 <a href={downloadUrl} download={`${file.name.replace('.pdf', '')}_PDFA.pdf`} className="btn btn-primary">
                   ⬇ Download Archive PDF
                 </a>
-                <button className="btn btn-outline" onClick={reset}>Convert Another</button>
+                <button type="button" className="btn btn-outline" onClick={reset}>Convert Another</button>
               </div>
             </div>
           )}

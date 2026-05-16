@@ -170,7 +170,7 @@ const PdfToExcel = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   style={{ padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--border)', outline: 'none' }}
                 />
-                <button className="btn btn-primary" onClick={() => processPdf(password)}>
+                <button type="button" className="btn btn-primary" onClick={() => processPdf(password)}>
                   Unlock & Extract
                 </button>
               </div>
@@ -182,7 +182,7 @@ const PdfToExcel = () => {
           ) : !downloadUrl ? (
             <div className="mt-3">
               <p className="text-muted text-sm mb-3">Note: We attempt to automatically detect columns and rows based on text spacing.</p>
-              <button className="btn btn-primary" onClick={() => processPdf()}>Extract to Excel</button>
+              <button type="button" className="btn btn-primary" onClick={() => processPdf()}>Extract to Excel</button>
             </div>
           ) : (
             <div className="mt-4">
@@ -191,7 +191,7 @@ const PdfToExcel = () => {
                 <a href={downloadUrl} download={`${file.name.replace('.pdf', '')}.xlsx`} className="btn btn-primary">
                   ⬇ Download XLSX
                 </a>
-                <button className="btn btn-outline" onClick={reset}>Extract Another</button>
+                <button type="button" className="btn btn-outline" onClick={reset}>Extract Another</button>
               </div>
             </div>
           )}

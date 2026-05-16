@@ -132,7 +132,7 @@ const PdfToPowerpoint = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   style={{ padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--border)', outline: 'none' }}
                 />
-                <button className="btn btn-primary" onClick={() => processPdf(password)}>
+                <button type="button" className="btn btn-primary" onClick={() => processPdf(password)}>
                   Unlock & Convert
                 </button>
               </div>
@@ -142,7 +142,7 @@ const PdfToPowerpoint = () => {
               <ToolProgressBar active label="Converting to PowerPoint…" value={progress} />
             </div>
           ) : !downloadUrl ? (
-            <button className="btn btn-primary mt-3" onClick={() => processPdf()}>Convert to POWERPOINT</button>
+            <button type="button" className="btn btn-primary mt-3" onClick={() => processPdf()}>Convert to POWERPOINT</button>
           ) : (
             <div className="mt-4">
               <p className="text-success mb-3">✅ Conversion complete!</p>
@@ -150,7 +150,7 @@ const PdfToPowerpoint = () => {
                 <a href={downloadUrl} download={`${file.name.replace('.pdf', '')}.pptx`} className="btn btn-primary">
                   ⬇ Download PowerPoint
                 </a>
-                <button className="btn btn-outline" onClick={reset}>Convert Another</button>
+                <button type="button" className="btn btn-outline" onClick={reset}>Convert Another</button>
               </div>
             </div>
           )}

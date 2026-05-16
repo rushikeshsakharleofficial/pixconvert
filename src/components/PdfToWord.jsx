@@ -150,7 +150,7 @@ const PdfToWord = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   style={{ padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--border)', outline: 'none' }}
                 />
-                <button className="btn btn-primary" onClick={() => processPdf(password)}>
+                <button type="button" className="btn btn-primary" onClick={() => processPdf(password)}>
                   Unlock & Extract
                 </button>
               </div>
@@ -162,7 +162,7 @@ const PdfToWord = () => {
           ) : !downloadUrl ? (
             <div className="mt-3">
               <p className="text-muted text-sm mb-3">Note: Text extraction translates readable text. Complex layouts and images might not be perfectly preserved.</p>
-              <button className="btn btn-primary" onClick={() => processPdf()}>Extract to Word</button>
+              <button type="button" className="btn btn-primary" onClick={() => processPdf()}>Extract to Word</button>
             </div>
           ) : (
             <div className="mt-4">
@@ -171,7 +171,7 @@ const PdfToWord = () => {
                 <a href={downloadUrl} download={`${file.name.replace('.pdf', '')}.docx`} className="btn btn-primary">
                   ⬇ Download DOCX
                 </a>
-                <button className="btn btn-outline" onClick={reset}>Extract Another</button>
+                <button type="button" className="btn btn-outline" onClick={reset}>Extract Another</button>
               </div>
             </div>
           )}
