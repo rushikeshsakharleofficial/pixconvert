@@ -9,12 +9,12 @@ const Tools = () => {
     return (
       <section>
         <div className="container">
-          <h2 className="section-title fade-in">All PDF &amp; Image Tools</h2>
+          <h1 className="section-title fade-in">All PDF &amp; Image Tools</h1>
           <p className="section-subtitle fade-in delay-1">Every tool you need, running entirely in your browser</p>
 
           {toolsData.map((cat, idx) => (
             <div key={idx} className={`tools-category-section fade-in delay-${Math.min(idx + 1, 9)}`}>
-              <h3 className="category-heading">{cat.category}</h3>
+              <h2 className="category-heading">{cat.category}</h2>
               <div className="tool-cards-grid">
                 {cat.items.map((item, i) => (
                   <Link
@@ -23,7 +23,7 @@ const Tools = () => {
                     className={`tool-card ${item.comingSoon ? 'coming-soon' : ''}`}
                     style={{ "--card-color": item.color || "var(--primary)" }}
                   >
-                    <div className="tool-card-icon">{item.icon}</div>
+                    <div className="tool-card-icon" aria-hidden="true">{item.icon}</div>
                     <h3>
                       {item.name}
                       {item.isNew && <span className="badge badge-new">New</span>}
@@ -60,7 +60,7 @@ const Tools = () => {
   return (
     <section>
       <div className="container">
-        <h2 className="section-title fade-in">{title}</h2>
+        <h1 className="section-title fade-in">{title}</h1>
         <p className="section-subtitle fade-in delay-1">{subtitle}</p>
         <div className="glass fade-in delay-2" style={{ marginTop: '1rem' }}>
           <Outlet />
