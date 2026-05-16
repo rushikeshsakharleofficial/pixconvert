@@ -91,19 +91,19 @@ const RotatePdf = () => {
             <div>
               <strong>{file.name}</strong> <span style={{ color: 'var(--text3)' }}>({formatSize(file.size)})</span>
             </div>
-            <button className="btn btn-outline btn-sm" onClick={() => setFile(null)}>Remove</button>
+            <button type="button" className="btn btn-outline btn-sm" aria-label="Remove selected file" onClick={() => setFile(null)}>Remove</button>
           </div>
           
           <div style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>Rotation Angle:</label>
-            <select value={rotation} onChange={(e) => setRotation(Number(e.target.value))} className="form-select" style={{ padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--border)', background: 'var(--bg1)', color: 'var(--text1)', width: '100%', maxWidth: '200px' }}>
+            <label htmlFor="rotation-angle" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>Rotation Angle:</label>
+            <select id="rotation-angle" value={rotation} onChange={(e) => setRotation(Number(e.target.value))} className="form-select" style={{ padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--border)', background: 'var(--bg1)', color: 'var(--text1)', width: '100%', maxWidth: '200px' }}>
               <option value={90}>Right 90°</option>
               <option value={-90}>Left 90°</option>
               <option value={180}>180°</option>
             </select>
           </div>
 
-          <button className="btn btn-primary" onClick={processPdf} disabled={isProcessing}>
+          <button type="button" className="btn btn-primary" onClick={processPdf} disabled={isProcessing}>
             {isProcessing ? 'Processing…' : 'Rotate PDF'}
           </button>
           
@@ -119,8 +119,8 @@ const RotatePdf = () => {
           <div className="tool-result-title">Rotated PDF Ready</div>
           <p className="tool-result-meta">Output size: <strong style={{ color: 'var(--success)' }}>{formatSize(resultSize)}</strong></p>
           <div className="tool-result-actions">
-            <button className="btn btn-primary" onClick={download}>⬇ Download PDF</button>
-            <button className="btn btn-outline" onClick={() => { setFile(null); setResultUrl(null); }}>Rotate Another</button>
+            <button type="button" className="btn btn-primary" onClick={download}>⬇ Download PDF</button>
+            <button type="button" className="btn btn-outline" onClick={() => { setFile(null); setResultUrl(null); }}>Rotate Another</button>
           </div>
         </div>
       )}

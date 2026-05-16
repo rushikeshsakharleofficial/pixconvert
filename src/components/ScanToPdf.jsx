@@ -161,16 +161,20 @@ const ScanToPdf = () => {
           <p className="tool-info-desc" style={{ marginBottom: '0.8rem', color: 'var(--text3)' }}>
             Drag and drop cards with mouse to reorder pages.
           </p>
-          <div
+          <ul
+            className="file-list"
+            aria-label="Images to convert"
             style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: '0.75rem', marginBottom: '0.9rem' }}
             onDragOver={onGridDragOver}
             onDrop={onGridDrop}
           >
             {files.map((item, i) => (
-              <div
+              <li
                 key={item.id}
+                className="file-item"
                 data-scan-card-index={i}
                 draggable
+                aria-label={`Page ${i + 1}: ${item.file.name}`}
                 onDragStart={(e) => onDragStart(e, i)}
                 onDragEnd={onDragEnd}
                 style={{
@@ -183,7 +187,7 @@ const ScanToPdf = () => {
                 }}
               >
                 <div style={{ width: '100%', aspectRatio: '1 / 1.3', overflow: 'hidden', borderRadius: '8px', background: 'var(--bg3)', marginBottom: '0.45rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <img src={item.previewUrl} alt={`Page preview ${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <img src={item.previewUrl} alt={`Page ${i + 1} preview`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
                 <div style={{ fontSize: '0.86rem', marginBottom: '0.45rem', minHeight: '2.4rem', lineHeight: 1.35 }}>
                   <span style={{ color: 'var(--text3)', marginRight: '0.35rem' }}>{i + 1}.</span>
@@ -191,6 +195,8 @@ const ScanToPdf = () => {
                 </div>
                 <div style={{ display: 'flex', gap: '0.35rem', alignItems: 'center' }}>
                   <button
+                    type="button"
+                    aria-label={`Move ${item.file.name} up`}
                     className="btn btn-outline btn-sm"
                     style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1, minWidth: '2.2rem' }}
                     onClick={() => move(i, -1)}
@@ -199,6 +205,8 @@ const ScanToPdf = () => {
                     ↑
                   </button>
                   <button
+                    type="button"
+                    aria-label={`Move ${item.file.name} down`}
                     className="btn btn-outline btn-sm"
                     style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1, minWidth: '2.2rem' }}
                     onClick={() => move(i, 1)}
@@ -207,6 +215,8 @@ const ScanToPdf = () => {
                     ↓
                   </button>
                   <button
+                    type="button"
+                    aria-label={`Remove ${item.file.name}`}
                     className="btn btn-outline btn-sm"
                     style={{
                       display: 'inline-flex',
@@ -223,10 +233,10 @@ const ScanToPdf = () => {
                     Remove
                   </button>
                 </div>
-              </div>
+              </li>
             ))}
-          </div>
-          <button className="btn btn-primary" onClick={convert} disabled={isProcessing}>
+          </ul>
+          <button type="button" className="btn btn-primary" onClick={convert} disabled={isProcessing}>
             {isProcessing ? 'Creating PDF…' : 'Create PDF'}
           </button>
           <ToolProgressBar active={isProcessing} label="Creating PDF…" value={progress} />

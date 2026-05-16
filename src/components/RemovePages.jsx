@@ -151,7 +151,7 @@ const RemovePages = () => {
               </label>
             ))}
           </div>
-          <button className="btn btn-primary" onClick={applyRemoval} disabled={isProcessing}>
+          <button type="button" className="btn btn-primary" onClick={applyRemoval} disabled={isProcessing}>
             {isProcessing ? 'Processing…' : 'Remove Selected Pages'}
           </button>
           <ToolProgressBar active={isProcessing} label="Building PDF…" />
@@ -166,7 +166,7 @@ const RemovePages = () => {
           <div className="tool-result-title">Updated PDF Ready</div>
           <p className="tool-result-meta">Output size: <strong style={{ color: 'var(--success)' }}>{formatSize(resultSize)}</strong></p>
           <div className="tool-result-actions">
-            <button className="btn btn-primary" onClick={download}>⬇ Download PDF</button>
+            <button type="button" className="btn btn-primary" onClick={download}>⬇ Download PDF</button>
           </div>
         </div>
       )}

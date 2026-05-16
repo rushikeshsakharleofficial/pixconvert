@@ -128,10 +128,10 @@ const OrganizePdf = () => {
           </div>
 
           <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-            <button className="btn btn-primary" onClick={downloadOrganizedPdf} disabled={isProcessing || pages.length === 0}>
+            <button type="button" className="btn btn-primary" onClick={downloadOrganizedPdf} disabled={isProcessing || pages.length === 0}>
               {isProcessing ? 'Processing…' : 'Generate Organized PDF'}
             </button>
-            <button className="btn btn-outline" onClick={resetOrder} disabled={isProcessing}>
+            <button type="button" className="btn btn-outline" onClick={resetOrder} disabled={isProcessing}>
               Reset
             </button>
           </div>
@@ -144,10 +144,11 @@ const OrganizePdf = () => {
           <p className="tool-info-desc" style={{ marginBottom: '0.85rem' }}>
             Arrange pages in final order. Use arrows to move pages and remove to drop them.
           </p>
-          <div style={{ display: 'grid', gap: '0.5rem', maxHeight: '420px', overflowY: 'auto' }}>
+          <ul className="file-list" aria-label="Page order" style={{ display: 'grid', gap: '0.5rem', maxHeight: '420px', overflowY: 'auto' }}>
             {pages.map((pageIndex, i) => (
-              <div
+              <li
                 key={`${pageIndex}-${i}`}
+                className="file-item"
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -163,19 +164,19 @@ const OrganizePdf = () => {
                   Position {i + 1}: Original page {pageIndex + 1}
                 </div>
                 <div style={{ display: 'flex', gap: '0.4rem' }}>
-                  <button className="btn btn-outline btn-sm" onClick={() => movePage(i, -1)} disabled={i === 0}>
+                  <button type="button" aria-label={`Move page ${pageIndex + 1} up`} className="btn btn-outline btn-sm" onClick={() => movePage(i, -1)} disabled={i === 0}>
                     ↑
                   </button>
-                  <button className="btn btn-outline btn-sm" onClick={() => movePage(i, 1)} disabled={i === pages.length - 1}>
+                  <button type="button" aria-label={`Move page ${pageIndex + 1} down`} className="btn btn-outline btn-sm" onClick={() => movePage(i, 1)} disabled={i === pages.length - 1}>
                     ↓
                   </button>
-                  <button className="btn btn-outline btn-sm" onClick={() => removePage(i)}>
+                  <button type="button" aria-label={`Remove page ${pageIndex + 1}`} className="btn btn-outline btn-sm" onClick={() => removePage(i)}>
                     Remove
                   </button>
                 </div>
-              </div>
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
       )}
 
@@ -189,7 +190,7 @@ const OrganizePdf = () => {
             Output size: <strong style={{ color: 'var(--success)' }}>{formatSize(resultSize)}</strong>
           </p>
           <div className="tool-result-actions">
-            <button className="btn btn-primary" onClick={downloadFile}>⬇ Download Organized PDF</button>
+            <button type="button" className="btn btn-primary" onClick={downloadFile}>⬇ Download Organized PDF</button>
           </div>
         </div>
       )}

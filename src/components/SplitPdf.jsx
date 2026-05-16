@@ -80,7 +80,7 @@ const SplitPdf = () => {
       {file && (
         <div className="tool-info-bar fade-in" style={{ marginTop: '1rem' }}>
           <p className="tool-info-desc">{file.name} - {pageCount} pages</p>
-          <button className="btn btn-primary" onClick={splitAndDownload} disabled={isProcessing}>
+          <button type="button" className="btn btn-primary" onClick={splitAndDownload} disabled={isProcessing}>
             {isProcessing ? 'Splitting…' : 'Split PDF to ZIP'}
           </button>
           <ToolProgressBar active={isProcessing} label="Splitting PDF…" value={progress} />

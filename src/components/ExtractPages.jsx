@@ -132,8 +132,8 @@ const ExtractPages = () => {
             value={previewProgress}
           />
           <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap', marginBottom: '0.8rem' }}>
-            <button className="btn btn-outline btn-sm" onClick={selectAll} disabled={isProcessing || !pageCount}>Select All</button>
-            <button className="btn btn-outline btn-sm" onClick={clearSelection} disabled={isProcessing || !pageCount}>Clear</button>
+            <button type="button" className="btn btn-outline btn-sm" onClick={selectAll} disabled={isProcessing || !pageCount}>Select All</button>
+            <button type="button" className="btn btn-outline btn-sm" onClick={clearSelection} disabled={isProcessing || !pageCount}>Clear</button>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '0.75rem', marginBottom: '0.85rem' }}>
             {extractFlags.map((extractPage, i) => (
@@ -152,7 +152,7 @@ const ExtractPages = () => {
               </label>
             ))}
           </div>
-          <button className="btn btn-primary" onClick={extract} disabled={isProcessing}>
+          <button type="button" className="btn btn-primary" onClick={extract} disabled={isProcessing}>
             {isProcessing ? 'Extracting…' : 'Extract Pages'}
           </button>
           <ToolProgressBar active={isProcessing} label="Building PDF…" />
@@ -167,7 +167,7 @@ const ExtractPages = () => {
           <div className="tool-result-title">Extracted PDF Ready</div>
           <p className="tool-result-meta">Output size: <strong style={{ color: 'var(--success)' }}>{formatSize(resultSize)}</strong></p>
           <div className="tool-result-actions">
-            <button className="btn btn-primary" onClick={download}>⬇ Download Extracted PDF</button>
+            <button type="button" className="btn btn-primary" onClick={download}>⬇ Download Extracted PDF</button>
           </div>
         </div>
       )}
