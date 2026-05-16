@@ -111,11 +111,12 @@ const NotFound = () => {
           animate="visible"
           exit="hidden"
         >
-          <div className="flex items-center justify-center gap-4 md:gap-6 mb-8 md:mb-12">
-            <motion.span 
+          <div className="flex items-center justify-center gap-4 md:gap-6 mb-8 md:mb-12" aria-hidden="true">
+            <motion.span
               className="text-[80px] md:text-[120px] font-bold text-foreground opacity-90 font-signika select-none"
               variants={numberVariants}
               custom={-1}
+              aria-hidden="true"
             >
               4
             </motion.span>
@@ -126,17 +127,19 @@ const NotFound = () => {
             >
               <img
                 src="https://xubohuah.github.io/xubohua.top/Group.png"
-                alt="Ghost"
+                alt=""
+                aria-hidden="true"
                 width={120}
                 height={120}
                 className="w-[80px] h-[80px] md:w-[120px] md:h-[120px] object-contain select-none"
                 draggable="false"
               />
             </motion.div>
-            <motion.span 
+            <motion.span
               className="text-[80px] md:text-[120px] font-bold text-foreground opacity-90 font-signika select-none"
               variants={numberVariants}
               custom={1}
+              aria-hidden="true"
             >
               4
             </motion.span>
@@ -172,13 +175,13 @@ const NotFound = () => {
             </Link>
           </motion.div>
 
-          <motion.div 
+          <motion.div
             className="mt-12"
             variants={itemVariants}
           >
             <Link
               to="/about"
-              className="text-foreground opacity-70 hover:opacity-90 transition-opacity underline select-none"
+              className="inline-flex items-center justify-center min-h-[44px] px-3 text-foreground opacity-70 hover:opacity-90 transition-opacity underline select-none"
             >
               What means 404?
             </Link>
