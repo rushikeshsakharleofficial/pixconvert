@@ -246,13 +246,21 @@ export default function PageCanvas({
   } : null;
 
   return (
-    <div ref={wrapperRef} className="page-canvas-wrapper" style={viewport ? { width: viewport.width, height: viewport.height } : { width: typeof window !== 'undefined' ? Math.min(595, window.innerWidth - 32) : 595, height: Math.round((typeof window !== 'undefined' ? Math.min(595, window.innerWidth - 32) : 595) * 842 / 595) }}>
+    <div ref={wrapperRef} className="page-canvas-wrapper" style={viewport ? { width: viewport.width, height: viewport.height, maxWidth: '100%' } : { width: typeof window !== 'undefined' ? Math.min(595, window.innerWidth - 32) : 595, height: Math.round((typeof window !== 'undefined' ? Math.min(595, window.innerWidth - 32) : 595) * 842 / 595), maxWidth: '100%' }}>
       {isVisible ? (
         <>
-        <canvas ref={canvasRef} className="page-canvas" />
+        <canvas
+          ref={canvasRef}
+          className="page-canvas"
+          role="img"
+          aria-label={`PDF page ${pageIndex + 1} editor canvas`}
+          style={{ maxWidth: '100%' }}
+        />
         <div
           ref={overlayRef}
           className="page-overlay"
+          role="application"
+          aria-label={`Annotation overlay for page ${pageIndex + 1}`}
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
@@ -260,7 +268,7 @@ export default function PageCanvas({
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
-          style={viewport ? { width: viewport.width, height: viewport.height, touchAction: 'none' } : { touchAction: 'none' }}
+          style={viewport ? { width: viewport.width, height: viewport.height, touchAction: 'none', maxWidth: '100%' } : { touchAction: 'none' }}
         >
         {pageAnnotations.map((ann) => (
           <AnnotationElement

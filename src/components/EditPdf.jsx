@@ -6,6 +6,7 @@ import EditorToolbar from './pdf-editor/EditorToolbar';
 import ThumbnailSidebar from './pdf-editor/ThumbnailSidebar';
 import PageCanvas from './pdf-editor/PageCanvas';
 
+
 let nextId = 1;
 
 const EditPdf = () => {
@@ -20,6 +21,7 @@ const EditPdf = () => {
   const [saving, setSaving] = useState(false);
   const [resultUrl, setResultUrl] = useState(null);
   const [error, setError] = useState(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const mainRef = useRef(null);
 
   const { pdfDoc, numPages, loading, error: loadError } = usePdfDocument(file);
@@ -320,6 +322,8 @@ const EditPdf = () => {
         onDownload={handleDownload}
         saving={saving}
         canUndo={history.length > 0}
+        sidebarOpen={sidebarOpen}
+        onToggleSidebar={() => setSidebarOpen((v) => !v)}
       />
 
       {error && <p className="text-danger" style={{ padding: '0.5rem 1rem', fontWeight: 600 }}>{error}</p>}
@@ -327,9 +331,9 @@ const EditPdf = () => {
       {resultUrl && (
         <div className="pdf-editor-saved-bar">
           <span>PDF saved successfully!</span>
-          <button className="btn btn-primary btn-sm" onClick={downloadPdf}>⬇ Download</button>
-          <button className="btn btn-outline btn-sm" onClick={() => setResultUrl(null)}>Continue Editing</button>
-          <button className="btn btn-outline btn-sm" onClick={reset}>Edit Another</button>
+          <button type="button" className="btn btn-primary btn-sm" onClick={downloadPdf}>⬇ Download</button>
+          <button type="button" className="btn btn-outline btn-sm" onClick={() => setResultUrl(null)}>Continue Editing</button>
+          <button type="button" className="btn btn-outline btn-sm" onClick={reset}>Edit Another</button>
         </div>
       )}
 
@@ -338,8 +342,10 @@ const EditPdf = () => {
           pdfDoc={pdfDoc}
           numPages={numPages}
           activePage={activePage}
+          sidebarOpen={sidebarOpen}
           onPageSelect={(i) => {
             setActivePage(i);
+            setSidebarOpen(false);
             // scroll to page in main area
             const pageEl = mainRef.current?.querySelector(`[data-page="${i}"]`);
             if (pageEl) pageEl.scrollIntoView({ behavior: 'smooth', block: 'start' });

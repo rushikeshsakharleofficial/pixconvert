@@ -2,9 +2,20 @@ import { useEffect, useRef, useState } from 'react';
 
 const THUMB_WIDTH = 120;
 
-export default function ThumbnailSidebar({ pdfDoc, numPages, activePage, onPageSelect }) {
+export default function ThumbnailSidebar({ pdfDoc, numPages, activePage, onPageSelect, sidebarOpen }) {
+  // sidebarOpen controls visibility on mobile. On desktop the sidebar is always shown
+  // (the existing CSS `@media (max-width: 480px) { .pdf-thumbnail-sidebar { display: none } }`
+  // is overridden here when the user opens the panel via the toolbar toggle).
+  // We use an inline style so it beats the media-query specificity.
+  const sidebarStyle = sidebarOpen ? { display: 'flex' } : {};
+
   return (
-    <div className="pdf-thumbnail-sidebar">
+    <div
+      className="pdf-thumbnail-sidebar"
+      style={sidebarStyle}
+      role="navigation"
+      aria-label="Page thumbnails"
+    >
       <div className="thumbnail-header">Pages</div>
       <div className="thumbnail-list">
         {Array.from({ length: numPages }, (_, i) => (
@@ -69,11 +80,14 @@ function Thumbnail({ pdfDoc, pageIndex, isActive, onClick }) {
   return (
     <button
       ref={wrapperRef}
+      type="button"
       className={`thumbnail-item${isActive ? ' active' : ''}`}
       onClick={onClick}
+      aria-label={`Page ${pageIndex + 1}`}
+      aria-current={isActive ? 'page' : undefined}
       title={`Page ${pageIndex + 1}`}
     >
-      <canvas ref={canvasRef} className="thumbnail-canvas" />
+      <canvas ref={canvasRef} className="thumbnail-canvas" aria-hidden="true" />
       <span className="thumbnail-num">{pageIndex + 1}</span>
     </button>
   );
