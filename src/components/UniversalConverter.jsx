@@ -31,7 +31,7 @@ const drawToCanvas = (img, fmt, resizeW, resizeH) => {
   return canvas;
 };
 
-const FilePreviewRow = ({ file, config, onChangeConfig }) => {
+const FilePreviewRow = ({ file, config, onChangeConfig, rowIndex = 0 }) => {
   const [preview, setPreview] = useState(null);
   const [isRendering, setIsRendering] = useState(false);
   const imgCache = useRef(null);
@@ -39,6 +39,10 @@ const FilePreviewRow = ({ file, config, onChangeConfig }) => {
 
   const { outputFormat, quality, resizeEnabled, resizeW, resizeH } = config;
   const showsQuality = !noQualityFormats.includes(outputFormat);
+  const fmtId = `output-format-${rowIndex}`;
+  const qualId = `quality-slider-${rowIndex}`;
+  const widthId = `resize-width-${rowIndex}`;
+  const heightId = `resize-height-${rowIndex}`;
 
   const renderPreview = useCallback(async () => {
     setIsRendering(true);
@@ -89,15 +93,21 @@ const FilePreviewRow = ({ file, config, onChangeConfig }) => {
         <h4 style={{ margin: 0, textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', maxWidth: '30%', minWidth: '150px' }} title={file.name}>{file.name}</h4>
         
         <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center', fontSize: '0.85rem' }}>
-          <select value={outputFormat} onChange={e => onChangeConfig({ outputFormat: e.target.value })} style={{ padding: '0.25rem 0.5rem', borderRadius: '4px', border: '1px solid var(--border)', background: 'var(--bg)', color: 'var(--text)' }}>
-            {formats.map(f => <option key={f.value} value={f.value}>{f.label}</option>)}
-          </select>
+          <label htmlFor={fmtId} style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+            Convert to
+            <select id={fmtId} value={outputFormat} onChange={e => onChangeConfig({ outputFormat: e.target.value })} style={{ padding: '0.25rem 0.5rem', borderRadius: '4px', border: '1px solid var(--border)', background: 'var(--bg)', color: 'var(--text)' }}>
+              {formats.map(f => <option key={f.value} value={f.value}>{f.label}</option>)}
+            </select>
+          </label>
           {showsQuality && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <input type="range" min="1" max="100" value={quality}
-                onChange={e => onChangeConfig({ quality: +e.target.value })}
-                style={{ width: '80px', accentColor: 'var(--teal)' }} title="Quality" />
-              <span style={{ minWidth: '32px' }}>{quality}%</span>
+              <label htmlFor={qualId} style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                Quality: {quality}%
+                <input id={qualId} type="range" min="1" max="100" value={quality}
+                  onChange={e => onChangeConfig({ quality: +e.target.value })}
+                  aria-valuenow={quality} aria-valuemin={1} aria-valuemax={100}
+                  style={{ width: '80px', accentColor: 'var(--teal)' }} />
+              </label>
             </div>
           )}
           <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
@@ -106,9 +116,11 @@ const FilePreviewRow = ({ file, config, onChangeConfig }) => {
           </label>
           {resizeEnabled && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-              <input type="number" min="1" max="8000" value={resizeW} onChange={e => onChangeConfig({ resizeW: +e.target.value })} style={{ width: '60px', padding: '0.25rem', borderRadius: '4px', border: '1px solid var(--border)', background: 'var(--bg)', color: 'var(--text)' }} title="Width" />
-              <span>×</span>
-              <input type="number" min="1" max="8000" value={resizeH} onChange={e => onChangeConfig({ resizeH: +e.target.value })} style={{ width: '60px', padding: '0.25rem', borderRadius: '4px', border: '1px solid var(--border)', background: 'var(--bg)', color: 'var(--text)' }} title="Height" />
+              <label htmlFor={widthId} className="sr-only">Width (px)</label>
+              <input id={widthId} type="number" min="1" max="8000" value={resizeW} onChange={e => onChangeConfig({ resizeW: +e.target.value })} style={{ width: '60px', padding: '0.25rem', borderRadius: '4px', border: '1px solid var(--border)', background: 'var(--bg)', color: 'var(--text)' }} title="Width (px)" aria-label="Width in pixels" />
+              <span aria-hidden="true">×</span>
+              <label htmlFor={heightId} className="sr-only">Height (px)</label>
+              <input id={heightId} type="number" min="1" max="8000" value={resizeH} onChange={e => onChangeConfig({ resizeH: +e.target.value })} style={{ width: '60px', padding: '0.25rem', borderRadius: '4px', border: '1px solid var(--border)', background: 'var(--bg)', color: 'var(--text)' }} title="Height (px)" aria-label="Height in pixels" />
             </div>
           )}
         </div>
@@ -298,13 +310,13 @@ const UniversalConverter = ({ defaultOutputFormat = null }) => {
       {!defaultOutputFormat && (
         <div className="device-conversions">
           <span className="device-conversions-label">Popular device &amp; use-case conversions</span>
-          <div className="device-grid">
-            <div className="device-card"><span className="dc-emoji">📱</span><span className="dc-from">iPhone / Apple</span><span className="dc-arr">→</span><span className="dc-to">Samsung / Android</span></div>
-            <div className="device-card"><span className="dc-emoji">📸</span><span className="dc-from">Apple HEIC</span><span className="dc-arr">→</span><span className="dc-to">WhatsApp JPEG</span></div>
-            <div className="device-card"><span className="dc-emoji">🎨</span><span className="dc-from">PNG (transparent)</span><span className="dc-arr">→</span><span className="dc-to">WebP (web)</span></div>
-            <div className="device-card"><span className="dc-emoji">🖼️</span><span className="dc-from">JPEG / PNG</span><span className="dc-arr">→</span><span className="dc-to">AVIF (streaming)</span></div>
-            <div className="device-card"><span className="dc-emoji">💾</span><span className="dc-from">BMP (Windows)</span><span className="dc-arr">→</span><span className="dc-to">PNG / WebP</span></div>
-            <div className="device-card"><span className="dc-emoji">🔷</span><span className="dc-from">PNG (logo)</span><span className="dc-arr">→</span><span className="dc-to">ICO (favicon)</span></div>
+          <div className="device-grid" role="list">
+            <div className="device-card" role="listitem" aria-label="Convert iPhone / Apple photos (HEIC) to Samsung / Android compatible format"><span className="dc-emoji" aria-hidden="true">📱</span><span className="dc-from">iPhone / Apple</span><span className="dc-arr" aria-hidden="true">→</span><span className="dc-to">Samsung / Android</span></div>
+            <div className="device-card" role="listitem" aria-label="Convert Apple HEIC photos to WhatsApp-compatible JPEG"><span className="dc-emoji" aria-hidden="true">📸</span><span className="dc-from">Apple HEIC</span><span className="dc-arr" aria-hidden="true">→</span><span className="dc-to">WhatsApp JPEG</span></div>
+            <div className="device-card" role="listitem" aria-label="Convert transparent PNG images to WebP for web use"><span className="dc-emoji" aria-hidden="true">🎨</span><span className="dc-from">PNG (transparent)</span><span className="dc-arr" aria-hidden="true">→</span><span className="dc-to">WebP (web)</span></div>
+            <div className="device-card" role="listitem" aria-label="Convert JPEG or PNG images to AVIF for streaming and modern browsers"><span className="dc-emoji" aria-hidden="true">🖼️</span><span className="dc-from">JPEG / PNG</span><span className="dc-arr" aria-hidden="true">→</span><span className="dc-to">AVIF (streaming)</span></div>
+            <div className="device-card" role="listitem" aria-label="Convert Windows BMP images to PNG or WebP"><span className="dc-emoji" aria-hidden="true">💾</span><span className="dc-from">BMP (Windows)</span><span className="dc-arr" aria-hidden="true">→</span><span className="dc-to">PNG / WebP</span></div>
+            <div className="device-card" role="listitem" aria-label="Convert PNG logo to ICO favicon format"><span className="dc-emoji" aria-hidden="true">🔷</span><span className="dc-from">PNG (logo)</span><span className="dc-arr" aria-hidden="true">→</span><span className="dc-to">ICO (favicon)</span></div>
           </div>
         </div>
       )}
@@ -319,53 +331,62 @@ const UniversalConverter = ({ defaultOutputFormat = null }) => {
             <div style={{ fontWeight: 600, color: 'var(--text)' }}>Global Settings:</div>
             
             {!defaultOutputFormat && (
-              <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+              <label htmlFor="global-output-format" style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
                 Format:
-                <select value={outputFormat} onChange={e => { setOutputFormat(e.target.value); setResults([]); }} style={{ padding: '0.25rem' }}>
+                <select id="global-output-format" value={outputFormat} onChange={e => { setOutputFormat(e.target.value); setResults([]); }} style={{ padding: '0.25rem' }}>
                   {formats.map(f => <option key={f.value} value={f.value}>{f.label}</option>)}
                 </select>
               </label>
             )}
-            
+
             {showsQuality && (
-              <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                Quality:
-                <div className="quality-control" style={{ margin: 0 }}>
-                  <input
-                    type="range" min="1" max="100" value={quality}
-                    onChange={e => setQuality(+e.target.value)}
-                    style={{ background: `linear-gradient(to right, var(--teal) 0%, var(--teal) ${quality}%, var(--border) ${quality}%, var(--border) 100%)`, width: '100px', accentColor: 'var(--teal)' }}
-                  />
-                  <input
-                    type="number" min="1" max="100" value={quality}
-                    onChange={e => setQuality(Math.max(1, Math.min(100, +e.target.value)))}
-                    style={{ width: '50px', marginLeft: '0.5rem', padding: '0.25rem' }}
-                  />
-                  <span style={{ fontSize: '.85rem', color: 'var(--text2)' }}>%</span>
-                </div>
-              </label>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                <label htmlFor="global-quality-slider" style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                  Quality:
+                  <div className="quality-control" style={{ margin: 0 }}>
+                    <input
+                      id="global-quality-slider"
+                      type="range" min="1" max="100" value={quality}
+                      onChange={e => setQuality(+e.target.value)}
+                      aria-valuenow={quality} aria-valuemin={1} aria-valuemax={100}
+                      aria-label={`Quality: ${quality}%`}
+                      style={{ background: `linear-gradient(to right, var(--teal) 0%, var(--teal) ${quality}%, var(--border) ${quality}%, var(--border) 100%)`, width: '100px', accentColor: 'var(--teal)' }}
+                    />
+                    <input
+                      id="global-quality-number"
+                      type="number" min="1" max="100" value={quality}
+                      onChange={e => setQuality(Math.max(1, Math.min(100, +e.target.value)))}
+                      aria-label="Quality percentage"
+                      style={{ width: '50px', marginLeft: '0.5rem', padding: '0.25rem' }}
+                    />
+                    <span style={{ fontSize: '.85rem', color: 'var(--text2)' }}>%</span>
+                  </div>
+                </label>
+              </div>
             )}
-            
+
             <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
               <input type="checkbox" checked={resizeEnabled} onChange={e => setResizeEnabled(e.target.checked)} style={{ accentColor: 'var(--teal)' }} />
               Resize
             </label>
-            
+
             {resizeEnabled && (
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                <input type="number" min="1" max="8000" placeholder="W" value={resizeW} onChange={e => setResizeW(Math.max(1, Math.min(8000, +e.target.value)))} style={{ width: '60px', padding: '0.25rem' }} title="Width (px)" />
-                <span style={{ fontSize: '.9rem', color: 'var(--text2)', fontWeight: 600 }}>×</span>
-                <input type="number" min="1" max="8000" placeholder="H" value={resizeH} onChange={e => setResizeH(Math.max(1, Math.min(8000, +e.target.value)))} style={{ width: '60px', padding: '0.25rem' }} title="Height (px)" />
+                <label htmlFor="global-resize-width" className="sr-only">Width (px)</label>
+                <input id="global-resize-width" type="number" min="1" max="8000" placeholder="W" value={resizeW} onChange={e => setResizeW(Math.max(1, Math.min(8000, +e.target.value)))} style={{ width: '60px', padding: '0.25rem' }} title="Width (px)" aria-label="Width in pixels" />
+                <span style={{ fontSize: '.9rem', color: 'var(--text2)', fontWeight: 600 }} aria-hidden="true">×</span>
+                <label htmlFor="global-resize-height" className="sr-only">Height (px)</label>
+                <input id="global-resize-height" type="number" min="1" max="8000" placeholder="H" value={resizeH} onChange={e => setResizeH(Math.max(1, Math.min(8000, +e.target.value)))} style={{ width: '60px', padding: '0.25rem' }} title="Height (px)" aria-label="Height in pixels" />
                 <span style={{ fontSize: '.8rem', color: 'var(--text2)' }}>px</span>
               </div>
             )}
-            
-            <div style={{ borderLeft: '1px solid var(--border)', height: '24px', margin: '0 0.5rem' }}></div>
-            
-            <button className="btn btn-outline btn-sm" onClick={applyToAll} style={{ padding: '0.5rem 1rem' }} title="Apply these settings to all listed images">
+
+            <div style={{ borderLeft: '1px solid var(--border)', height: '24px', margin: '0 0.5rem' }} aria-hidden="true"></div>
+
+            <button type="button" className="btn btn-outline btn-sm" onClick={applyToAll} style={{ padding: '0.5rem 1rem' }} title="Apply these settings to all listed images">
               🔄 Apply to All
             </button>
-            <button className="btn btn-primary btn-sm" onClick={convertAll} disabled={processing} style={{ marginLeft: 'auto', padding: '0.5rem 1rem' }}>
+            <button type="button" className="btn btn-primary btn-sm" onClick={convertAll} disabled={processing} style={{ marginLeft: 'auto', padding: '0.5rem 1rem' }}>
               {processing ? 'Converting…' : `Convert ${files.length} file${files.length > 1 ? 's' : ''}`}
             </button>
           </div>
@@ -383,9 +404,10 @@ const UniversalConverter = ({ defaultOutputFormat = null }) => {
           {results.length === 0 && (
             <div style={{ marginTop: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0' }}>
               {files.map((file, i) => (
-                <FilePreviewRow 
+                <FilePreviewRow
                   key={`${file.name}-${i}`}
                   file={file}
+                  rowIndex={i}
                   config={fileConfigs[i] || { outputFormat, quality, resizeEnabled, resizeW, resizeH }}
                   onChangeConfig={(newCfg) => {
                     const next = [...fileConfigs];
@@ -402,7 +424,7 @@ const UniversalConverter = ({ defaultOutputFormat = null }) => {
       {results.length > 0 && (
         <>
           <div style={{ display: 'flex', justifyContent: 'flex-end', margin: '1rem 0 0' }}>
-            <button className="btn btn-outline btn-sm" onClick={downloadAll} disabled={zipping}>
+            <button type="button" className="btn btn-outline btn-sm" onClick={downloadAll} disabled={zipping}>
               {zipping ? '⏳ Zipping...' : '⬇ Download All as ZIP'}
             </button>
           </div>
@@ -421,8 +443,8 @@ const UniversalConverter = ({ defaultOutputFormat = null }) => {
                       </div>
                     </div>
                     <div className="preview-actions">
-                      <button className="btn btn-primary btn-sm" style={{ flex: 1 }}
-                        onClick={() => downloadFile(r.url, r.name)}>⬇ Download</button>
+                      <button type="button" className="btn btn-primary btn-sm" style={{ flex: 1 }}
+                        onClick={() => downloadFile(r.url, r.name)} aria-label={`Download ${r.name}`}>⬇ Download</button>
                     </div>
                   </>
                 ) : (
