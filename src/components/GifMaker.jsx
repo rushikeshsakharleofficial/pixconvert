@@ -11,7 +11,9 @@ const GIF_WORKER_URL = new URL('gif.js/dist/gif.worker.js', import.meta.url).hre
 
 const GifMaker = () => {
   const [frames, setFrames] = useState([]);
-  const [delay, setDelay] = useState(200);
+  const [fps, setFps] = useState(10);
+  const [loops, setLoops] = useState(0);
+  const [quality, setQuality] = useState(10);
   const [gifUrl, setGifUrl] = useState(null);
   const [gifSize, setGifSize] = useState(0);
   const [processing, setProcessing] = useState(false);
@@ -95,7 +97,8 @@ const GifMaker = () => {
       const height = Math.max(...images.map(i => i.naturalHeight));
 
       const workerCount = Math.min(navigator.hardwareConcurrency || 2, 4);
-      const gif = new GIF({ workers: workerCount, quality: 10, width, height, workerScript: GIF_WORKER_URL });
+      const frameDelay = Math.round(1000 / fps);
+      const gif = new GIF({ workers: workerCount, quality, width, height, workerScript: GIF_WORKER_URL, repeat: loops });
 
       images.forEach(img => {
         const canvas = document.createElement('canvas');
@@ -106,7 +109,7 @@ const GifMaker = () => {
         const dx = (width - img.naturalWidth) / 2;
         const dy = (height - img.naturalHeight) / 2;
         ctx.drawImage(img, dx, dy);
-        gif.addFrame(canvas, { delay, copy: true });
+        gif.addFrame(canvas, { delay: frameDelay, copy: true });
       });
 
       gif.on('progress', p => setProgress(Math.round(p * 100)));
@@ -167,39 +170,94 @@ const GifMaker = () => {
                 title="Drag to reorder"
               >
                 <img className="frame-thumb" src={f.url} alt={`Frame ${i + 1}`} style={{ pointerEvents: 'none' }} />
-                <button onClick={() => removeFrame(i)} className="btn-sm" style={{
-                  position: 'absolute', top: -6, right: -6,
-                  borderRadius: '50%', background: '#ef4444', color: '#fff',
-                  border: 'none', cursor: 'pointer', fontSize: '.7rem',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center'
-                }}>✕</button>
+                <button
+                  type="button"
+                  onClick={() => removeFrame(i)}
+                  className="btn-sm"
+                  aria-label={`Remove frame ${i + 1}`}
+                  style={{
+                    position: 'absolute', top: -6, right: -6,
+                    borderRadius: '50%', background: '#ef4444', color: '#fff',
+                    border: 'none', cursor: 'pointer', fontSize: '.7rem',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    minWidth: 44, minHeight: 44
+                  }}
+                >✕</button>
               </div>
             ))}
           </div>
           <div className="controls-row">
-            <label>Frame delay: {delay}ms</label>
-            <input type="range" min="50" max="2000" step="50" value={delay}
-              onChange={e => setDelay(+e.target.value)} />
-            <button className="btn btn-primary btn-sm" onClick={generateGif}
-              disabled={processing || frames.length < 2}>
+            <label htmlFor="gif-fps">FPS (frames per second): {fps}</label>
+            <input
+              id="gif-fps"
+              type="range"
+              min="1"
+              max="30"
+              step="1"
+              value={fps}
+              aria-label="FPS (frames per second)"
+              onChange={e => setFps(+e.target.value)}
+            />
+            <label htmlFor="gif-loops">Loop count (0 = infinite)</label>
+            <input
+              id="gif-loops"
+              type="number"
+              min="0"
+              max="100"
+              value={loops}
+              aria-label="Loop count (0 = infinite)"
+              onChange={e => setLoops(+e.target.value)}
+              style={{ width: '5rem' }}
+            />
+            <label htmlFor="gif-quality">Quality</label>
+            <select
+              id="gif-quality"
+              value={quality}
+              aria-label="Quality"
+              onChange={e => setQuality(+e.target.value)}
+            >
+              <option value={1}>Best (slowest)</option>
+              <option value={5}>High</option>
+              <option value={10}>Medium</option>
+              <option value={20}>Low (fastest)</option>
+            </select>
+            <button
+              type="button"
+              className="btn btn-primary btn-sm"
+              onClick={generateGif}
+              disabled={processing || frames.length < 2}
+            >
               {processing ? `Generating… ${progress}%` : '🎞️ Generate GIF'}
             </button>
           </div>
           <ToolProgressBar active={processing} label="Generating GIF…" value={progress} />
           {error && <p style={{ color: '#f87171', marginTop: '.5rem' }}>Error: {error}</p>}
           <p style={{ color: 'var(--text2)', fontSize: '.85rem' }}>
-            {frames.length} frame{frames.length !== 1 ? 's' : ''} • {delay}ms delay
+            {frames.length} frame{frames.length !== 1 ? 's' : ''} • {fps} fps • {Math.round(1000 / fps)}ms per frame
             {frames.length < 2 && <span style={{ color: '#f87171' }}> — Need at least 2 frames</span>}
           </p>
         </>
       )}
       {gifUrl && (
         <div className="gif-preview-area fade-in visible">
-          <img src={gifUrl} alt="Generated GIF" />
+          <div style={{ maxWidth: '100%', overflow: 'hidden' }}>
+            <img
+              src={gifUrl}
+              alt="Generated GIF preview"
+              role="img"
+              aria-label="GIF preview"
+              style={{ maxWidth: '100%', height: 'auto', display: 'block' }}
+            />
+          </div>
           <p style={{ marginTop: '.75rem', color: 'var(--text2)' }}>
             GIF size: <strong style={{ color: 'var(--teal)' }}>{formatSize(gifSize)}</strong>
           </p>
-          <button className="btn btn-primary" style={{ marginTop: '.75rem' }} onClick={downloadGif}>
+          <button
+            type="button"
+            className="btn btn-primary"
+            style={{ marginTop: '.75rem' }}
+            onClick={downloadGif}
+          >
             ⬇ Download GIF
           </button>
         </div>
