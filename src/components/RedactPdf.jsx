@@ -334,9 +334,11 @@ const RedactPdf = () => {
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 style={{ flex: 1, padding: '0.45rem 0.75rem', borderRadius: '8px', border: '1px solid var(--border)' }}
               />
-              <button 
-                className="btn btn-primary btn-sm" 
-                onClick={handleSearch} 
+              <button
+                type="button"
+                aria-label="Search and redact all occurrences"
+                className="btn btn-primary btn-sm"
+                onClick={handleSearch}
                 disabled={!searchTerm || isSearching}
               >
                 {isSearching ? '...' : 'Redact All'}
@@ -351,26 +353,26 @@ const RedactPdf = () => {
               <div className="form-group" style={{ marginBottom: 0 }}>
                 <label>Navigation</label>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                  <button className="btn btn-outline btn-sm" onClick={() => setSelectedPage(p => Math.max(1, p - 1))} disabled={selectedPage <= 1}>Prev</button>
+                  <button type="button" aria-label="Previous page" className="btn btn-outline btn-sm" onClick={() => setSelectedPage(p => Math.max(1, p - 1))} disabled={selectedPage <= 1}>Prev</button>
                   <span style={{ fontWeight: 600, fontSize: '0.9rem', minWidth: '60px', textAlign: 'center' }}>{selectedPage} / {pageCount}</span>
-                  <button className="btn btn-outline btn-sm" onClick={() => setSelectedPage(p => Math.min(pageCount, p + 1))} disabled={selectedPage >= pageCount}>Next</button>
+                  <button type="button" aria-label="Next page" className="btn btn-outline btn-sm" onClick={() => setSelectedPage(p => Math.min(pageCount, p + 1))} disabled={selectedPage >= pageCount}>Next</button>
                 </div>
               </div>
 
               <div className="form-group" style={{ marginBottom: 0 }}>
                 <label>Redaction Tools ({currentRects.length} on page)</label>
                 <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                  <button className="btn btn-outline btn-sm" onClick={undoLast} disabled={!currentRects.length}>Undo</button>
-                  <button className="btn btn-outline btn-sm" onClick={clearCurrentPage} disabled={!currentRects.length}>Clear Page</button>
-                  <button className="btn btn-outline btn-sm btn-danger" onClick={clearAll} disabled={!totalRects}>Clear All ({totalRects})</button>
+                  <button type="button" aria-label="Undo last redaction" className="btn btn-outline btn-sm" onClick={undoLast} disabled={!currentRects.length}>Undo</button>
+                  <button type="button" aria-label="Clear redactions on current page" className="btn btn-outline btn-sm" onClick={clearCurrentPage} disabled={!currentRects.length}>Clear Page</button>
+                  <button type="button" aria-label="Clear all redactions" className="btn btn-outline btn-sm btn-danger" onClick={clearAll} disabled={!totalRects}>Clear All ({totalRects})</button>
                 </div>
               </div>
 
               <div style={{ display: 'flex', gap: '0.85rem', flexWrap: 'wrap', marginTop: 'auto' }}>
-                <button className="btn btn-primary" onClick={exportRedactedPdf} disabled={isProcessing || !totalRects}>
+                <button type="button" aria-label="Apply redactions" className="btn btn-primary" onClick={exportRedactedPdf} disabled={isProcessing || !totalRects}>
                   {isProcessing ? 'Exporting...' : 'Export Redacted PDF'}
                 </button>
-                <button className="btn btn-outline" onClick={handleReset}>Reset</button>
+                <button type="button" aria-label="Reset and start over" className="btn btn-outline" onClick={handleReset}>Reset</button>
               </div>
             </div>
 
@@ -387,12 +389,15 @@ const RedactPdf = () => {
               >
                 <canvas
                   ref={overlayCanvasRef}
+                  role="application"
+                  aria-label="PDF page — drag to select areas to redact"
                   style={{
                     position: 'absolute',
                     inset: 0,
                     width: '100%',
                     height: '100%',
                     pointerEvents: 'none',
+                    touchAction: 'none',
                   }}
                 />
               </PdfInteractivePreview>
@@ -414,8 +419,8 @@ const RedactPdf = () => {
           <div className="tool-result-title">Redaction Complete</div>
           <p className="tool-result-meta">Output size: <strong style={{ color: 'var(--success)' }}>{formatSize(resultSize)}</strong></p>
           <div className="tool-result-actions">
-            <button className="btn btn-primary" onClick={downloadResult}>Download Redacted PDF</button>
-            <button className="btn btn-outline" onClick={handleReset}>Redact Another</button>
+            <button type="button" aria-label="Download redacted PDF" className="btn btn-primary" onClick={downloadResult}>Download Redacted PDF</button>
+            <button type="button" aria-label="Redact another PDF" className="btn btn-outline" onClick={handleReset}>Redact Another</button>
           </div>
         </div>
       )}

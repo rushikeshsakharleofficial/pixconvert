@@ -232,8 +232,12 @@ const ComparePdf = () => {
 
       <div style={{ display: 'grid', gap: '1rem' }}>
         <div style={{ display: 'grid', gap: '1.25rem', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
-          <DropZone onFiles={handleFilesA} multiple={false} accept=".pdf,application/pdf" label="Drop PDF A here or click to browse" />
-          <DropZone onFiles={handleFilesB} multiple={false} accept=".pdf,application/pdf" label="Drop PDF B here or click to browse" />
+          <div aria-label="Upload original PDF">
+            <DropZone onFiles={handleFilesA} multiple={false} accept=".pdf,application/pdf" label="Drop PDF A here or click to browse" />
+          </div>
+          <div aria-label="Upload PDF to compare">
+            <DropZone onFiles={handleFilesB} multiple={false} accept=".pdf,application/pdf" label="Drop PDF B here or click to browse" />
+          </div>
         </div>
 
         {(toolA.file || toolB.file) && (
@@ -291,10 +295,10 @@ const ComparePdf = () => {
             </div>
 
             <div style={{ display: 'flex', gap: '0.85rem', flexWrap: 'wrap', marginTop: '0.5rem' }}>
-              <button className="btn btn-primary" onClick={comparePages} disabled={!canCompare || isProcessing}>
+              <button type="button" aria-label="Compare selected pages" className="btn btn-primary" onClick={comparePages} disabled={!canCompare || isProcessing}>
                 {isProcessing ? 'Comparing...' : 'Compare pages'}
               </button>
-              <button className="btn btn-outline" onClick={resetAll}>
+              <button type="button" aria-label="Reset comparison" className="btn btn-outline" onClick={resetAll}>
                 Reset
               </button>
             </div>
@@ -333,16 +337,16 @@ const ComparePdf = () => {
               style={{
                 display: 'grid',
                 gap: '0.9rem',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(min(260px, 100%), 1fr))',
                 alignItems: 'start',
               }}
             >
               {[
-                { label: 'File A', url: result.leftUrl, accent: 'var(--primary)' },
-                { label: 'File B', url: result.rightUrl, accent: 'var(--success)' },
-                { label: 'Diff', url: result.diffUrl, accent: 'var(--danger)' },
+                { label: 'File A', url: result.leftUrl, accent: 'var(--primary)', ariaLabel: 'Original PDF' },
+                { label: 'File B', url: result.rightUrl, accent: 'var(--success)', ariaLabel: 'Compared PDF' },
+                { label: 'Diff', url: result.diffUrl, accent: 'var(--danger)', ariaLabel: 'Visual diff' },
               ].map((pane) => (
-                <div key={pane.label} className="glass" style={{ padding: '0.9rem', border: '1px solid var(--border)' }}>
+                <div key={pane.label} aria-label={pane.ariaLabel} className="glass" style={{ padding: '0.9rem', border: '1px solid var(--border)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem' }}>
                     <strong style={{ color: pane.accent }}>{pane.label}</strong>
                     <span style={{ fontSize: '0.8rem', color: 'var(--text3)' }}>{zoom}%</span>
