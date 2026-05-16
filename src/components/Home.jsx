@@ -135,6 +135,10 @@ function HowItWorksTimeline() {
 
 const Home = () => {
   const reducedMotion = useReducedMotion();
+  const marqueeRef = useRef(null);
+  useEffect(() => {
+    if (marqueeRef.current) marqueeRef.current.setAttribute('inert', '');
+  }, []);
   return (
   <section className="hero" style={{ position: 'relative', overflow: 'hidden' }}>
     <div className="hero-orb hero-orb-1" aria-hidden="true" />
@@ -173,7 +177,7 @@ const Home = () => {
         ))}
       </div>
 
-      <div aria-hidden="true" inert="">
+      <div ref={marqueeRef} aria-hidden="true">
         <ToolMarquee />
       </div>
 
