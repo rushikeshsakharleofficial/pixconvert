@@ -316,11 +316,32 @@ const SignPdf = () => {
           <div style={{ display: 'grid', gap: '1.5rem', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
             <div style={{ display: 'grid', gap: '1rem', alignContent: 'start' }}>
               <div className="form-group" style={{ marginBottom: 0 }}>
-                <label>Signature source</label>
-                <div style={{ display: 'flex', gap: '0.65rem', flexWrap: 'wrap' }}>
-                  <button className={`btn ${signatureMode === 'draw' ? 'btn-primary' : 'btn-outline'}`} onClick={() => setSignatureMode('draw')}>Draw</button>
-                  <button className={`btn ${signatureMode === 'type' ? 'btn-primary' : 'btn-outline'}`} onClick={() => setSignatureMode('type')}>Type</button>
-                  <button className={`btn ${signatureMode === 'upload' ? 'btn-primary' : 'btn-outline'}`} onClick={() => setSignatureMode('upload')}>Upload</button>
+                <label id="sig-source-label">Signature source</label>
+                <div role="tablist" aria-label="Signature method" aria-labelledby="sig-source-label" style={{ display: 'flex', gap: '0.65rem', flexWrap: 'wrap' }}>
+                  <button
+                    role="tab"
+                    aria-selected={signatureMode === 'draw'}
+                    type="button"
+                    className={`btn ${signatureMode === 'draw' ? 'btn-primary' : 'btn-outline'}`}
+                    onClick={() => setSignatureMode('draw')}
+                    style={{ minHeight: '44px' }}
+                  >Draw</button>
+                  <button
+                    role="tab"
+                    aria-selected={signatureMode === 'type'}
+                    type="button"
+                    className={`btn ${signatureMode === 'type' ? 'btn-primary' : 'btn-outline'}`}
+                    onClick={() => setSignatureMode('type')}
+                    style={{ minHeight: '44px' }}
+                  >Type</button>
+                  <button
+                    role="tab"
+                    aria-selected={signatureMode === 'upload'}
+                    type="button"
+                    className={`btn ${signatureMode === 'upload' ? 'btn-primary' : 'btn-outline'}`}
+                    onClick={() => setSignatureMode('upload')}
+                    style={{ minHeight: '44px' }}
+                  >Upload</button>
                 </div>
               </div>
 
@@ -330,6 +351,7 @@ const SignPdf = () => {
                     ref={drawRef}
                     width={DRAW_WIDTH}
                     height={DRAW_HEIGHT}
+                    aria-label="Signature drawing area"
                     onPointerDown={startDrawing}
                     onPointerMove={continueDrawing}
                     onPointerUp={stopDrawing}
@@ -345,15 +367,22 @@ const SignPdf = () => {
                     }}
                   />
                   <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                    <button className="btn btn-outline btn-sm" onClick={clearDrawnSignature}>Clear signature</button>
+                    <button
+                      type="button"
+                      aria-label="Clear signature"
+                      className="btn btn-outline btn-sm"
+                      onClick={clearDrawnSignature}
+                      style={{ minHeight: '44px' }}
+                    >Clear signature</button>
                   </div>
                 </div>
               )}
 
               {signatureMode === 'type' && (
                 <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label>Typed signature</label>
+                  <label htmlFor="typed-sig">Type your signature</label>
                   <input
+                    id="typed-sig"
                     type="text"
                     value={typedSignature}
                     onChange={(event) => setTypedSignature(event.target.value)}
@@ -456,12 +485,21 @@ const SignPdf = () => {
               </PdfInteractivePreview>
 
               <div style={{ display: 'flex', gap: '0.85rem', flexWrap: 'wrap', marginTop: '0.5rem' }}>
-                <button className="btn btn-primary" onClick={exportSignedPdf} disabled={isProcessing || !pdfBytes}>
+                <button
+                  type="button"
+                  aria-label="Apply signature to PDF"
+                  className="btn btn-primary"
+                  onClick={exportSignedPdf}
+                  disabled={isProcessing || !pdfBytes}
+                  style={{ minHeight: '44px' }}
+                >
                   {isProcessing ? 'Signing...' : 'Export signed PDF'}
                 </button>
                 <button
+                  type="button"
                   className="btn btn-outline"
                   onClick={handleReset}
+                  style={{ minHeight: '44px' }}
                 >
                   Reset
                 </button>
@@ -479,7 +517,7 @@ const SignPdf = () => {
           <div className="tool-result-title">Signed PDF ready</div>
           <p className="tool-result-meta">Output size: <strong style={{ color: 'var(--success)' }}>{formatSize(resultSize)}</strong></p>
           <div className="tool-result-actions">
-            <button className="btn btn-primary" onClick={downloadResult}>Download signed PDF</button>
+            <button type="button" className="btn btn-primary" onClick={downloadResult} style={{ minHeight: '44px' }}>Download signed PDF</button>
           </div>
         </div>
       )}
