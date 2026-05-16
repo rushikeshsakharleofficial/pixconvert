@@ -1,12 +1,12 @@
 import React from 'react';
 
 const About = () => (
-  <section className="py-20">
+  <section className="py-20" aria-labelledby="about-heading">
     <div className="container">
       {/* Header Section */}
       <div className="text-center mb-16">
-        <div className="text-xs font-bold text-primary/50 uppercase tracking-[0.2em] mb-2">Version 2.0</div>
-        <h2 className="section-title fade-in">About PixConvert</h2>
+        <div className="text-xs font-bold text-primary/50 uppercase tracking-[0.2em] mb-2" aria-hidden="true">Version 2.0</div>
+        <h1 id="about-heading" className="section-title fade-in">About PixConvert</h1>
         <p className="section-subtitle fade-in delay-1">
           The privacy-focused, 100% browser-based toolkit for all your file needs.
         </p>
@@ -15,56 +15,60 @@ const About = () => (
       {/* Mission Section */}
       <div className="space-y-12">
         <div className="fade-in delay-2">
-          <h3 className="category-heading">
-            ⚡ Our Mission
-          </h3>
+          <h2 className="text-lg font-bold uppercase tracking-widest text-muted-foreground mb-3">
+            <span aria-hidden="true">⚡ </span>Our Mission
+          </h2>
           <p className="text-lg text-muted-foreground leading-relaxed">
-            PixConvert was built with a single, uncompromising goal: to make file conversion and PDF manipulation 
-            <span className="text-foreground font-semibold"> free, instant, and completely private.</span> We believe 
+            PixConvert was built with a single, uncompromising goal: to make file conversion and PDF manipulation
+            <span className="text-foreground font-semibold"> free, instant, and completely private.</span> We believe
             you shouldn't have to sacrifice your data privacy just to resize an image or sign a document.
           </p>
         </div>
 
         {/* Core Pillars */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 py-8">
+        <ul className="grid grid-cols-1 md:grid-cols-2 gap-8 py-8 list-none pl-0">
           {[
             {
               icon: "🛡️",
+              iconLabel: "Shield",
               title: "Privacy First",
               desc: "Your files never leave your device. We use modern web technologies to process everything locally in your browser."
             },
             {
               icon: "💻",
+              iconLabel: "Computer",
               title: "Client-Side Power",
               desc: "By leveraging Canvas API, WebAssembly, and local processing, we eliminate the need for server-side uploads."
             },
             {
               icon: "🔐",
+              iconLabel: "Lock",
               title: "No Accounts",
               desc: "No sign-up, no email required, and no hidden subscriptions. Just open the tool and start working."
             },
             {
               icon: "📂",
+              iconLabel: "Folder",
               title: "Open Source",
               desc: "Built with transparency in mind. PixConvert is open-source friendly and relies on established, secure libraries."
             }
           ].map((item, i) => (
-            <div key={i} className="flex flex-col gap-4 p-6 rounded-2xl border border-border bg-card/50 hover:bg-card transition-colors fade-in" style={{ animationDelay: `${0.3 + i*0.1}s` }}>
-              <div className="text-3xl">{item.icon}</div>
-              <h4 className="text-xl font-bold">{item.title}</h4>
+            <li key={i} className="flex flex-col gap-4 p-6 rounded-2xl border border-border bg-card/50 hover:bg-card transition-colors fade-in" style={{ animationDelay: `${0.3 + i*0.1}s` }}>
+              <span className="text-3xl" aria-hidden="true">{item.icon}</span>
+              <h3 className="text-xl font-bold">{item.title}</h3>
               <p className="text-muted-foreground">{item.desc}</p>
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
 
         {/* Technology Section */}
         <div className="fade-in delay-7 pt-8">
-          <h3 className="text-2xl font-heading font-bold mb-6 flex items-center gap-3">
-            📄 What's Under the Hood?
-          </h3>
+          <h2 className="text-2xl font-heading font-bold mb-6 flex items-center gap-3">
+            <span aria-hidden="true">📄 </span>What's Under the Hood?
+          </h2>
           <div className="prose prose-slate dark:prose-invert max-w-none text-muted-foreground space-y-4">
             <p>
-              PixConvert isn't just another wrapper for a server-side API. It's a sophisticated Progressive Web App 
+              PixConvert isn't just another wrapper for a server-side API. It's a sophisticated Progressive Web App
               that utilizes the full potential of your computer's hardware through your browser:
             </p>
             <ul className="list-disc pl-6 space-y-2">
@@ -79,9 +83,9 @@ const About = () => (
         {/* Closing */}
         <div className="text-center pt-16 fade-in delay-9">
           <div className="inline-block p-1 rounded-full bg-primary/10 mb-4">
-            <div className="px-4 py-1 rounded-full bg-primary text-white text-sm font-bold">
+            <p className="px-4 py-3 rounded-full bg-primary text-white text-sm font-bold min-h-[44px] flex items-center justify-center">
               100% Free Forever
-            </div>
+            </p>
           </div>
           <p className="text-muted-foreground italic">
             "We didn't build PixConvert to collect data. We built it to solve a problem."
