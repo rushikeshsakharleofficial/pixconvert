@@ -76,7 +76,7 @@ const Navbar = () => {
         aria-hidden="true"
       />
 
-      <nav className="navbar">
+      <nav className="navbar" aria-label="Main navigation">
         <Link to="/" className="nav-logo" onClick={closeMenu}>
           <svg viewBox="0 0 28 28" fill="none" style={{ width: '28px', height: '28px', flexShrink: 0 }}>
             <rect x="2" y="2" width="24" height="24" rx="6" stroke="#FF4F00" strokeWidth="2.5"/>
@@ -87,7 +87,7 @@ const Navbar = () => {
         </Link>
 
         <div className="nav-center">
-          <ul className={`nav-links${menuOpen ? ' open' : ''}`}>
+          <ul className={`nav-links${menuOpen ? ' open' : ''}`} id="mobile-nav">
             <li className="desktop-only">
               <NavLink to="/" end onClick={closeMenu} className={({ isActive }) => (isActive ? 'active' : '')}>Home</NavLink>
             </li>
@@ -190,10 +190,12 @@ const Navbar = () => {
                 className="mobile-tools-toggle"
                 onClick={() => setMobileToolsOpen((open) => !open)}
                 aria-expanded={mobileToolsOpen}
+                aria-label={mobileToolsOpen ? 'Collapse tools menu' : 'Expand tools menu'}
+                aria-controls="mobile-tools-list"
               >
                 Tools {mobileToolsOpen ? '▴' : '▾'}
               </button>
-              <div className={`mobile-tools-list${mobileToolsOpen ? ' open' : ''}`}>
+              <div className={`mobile-tools-list${mobileToolsOpen ? ' open' : ''}`} id="mobile-tools-list">
                   <div className="mobile-tools-popular">
                     {[
                       { icon: '🔄', name: 'Converter', path: '/tools/converter' },
@@ -263,6 +265,7 @@ const Navbar = () => {
             onClick={() => setMenuOpen((open) => !open)}
             aria-label={menuOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={menuOpen}
+            aria-controls="mobile-nav"
           >
             <span /><span /><span />
           </button>

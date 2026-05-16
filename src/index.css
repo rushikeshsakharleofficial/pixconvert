@@ -1758,7 +1758,7 @@ section { padding: 5rem 2rem 4rem; }
 
   .desktop-only { display: none !important; }
   .mobile-only   { display: block; }
-  .hamburger     { display: flex; }
+  .hamburger     { display: flex; min-width: 44px; min-height: 44px; justify-content: center; align-items: center; }
   .nav-center { justify-content: flex-end; }
 
   .navbar { padding: 0 1.25rem; }
