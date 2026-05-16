@@ -1846,6 +1846,7 @@ section { padding: 5rem 2rem 4rem; }
   border: 1px solid var(--border);
   border-radius: 18px;
   background: color-mix(in srgb, var(--bg2) 88%, transparent);
+  overflow: hidden;
 }
 .tool-progress-loader {
   display: flex;
@@ -2026,8 +2027,12 @@ section { padding: 5rem 2rem 4rem; }
   .process-box div,
   .process-box-ground div,
   .process-box-loader:before,
-  .process-box-loader:after {
+  .process-box-loader:after,
+  .progress-fill.animated {
     animation: none;
+  }
+  .progress-fill.animated {
+    background: var(--primary);
   }
 }
 

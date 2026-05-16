@@ -22,6 +22,9 @@ const ToolProgressBar = ({ active, label = 'Processing...', value, count = 1, cl
 
   return (
     <div
+      role="status"
+      aria-live="polite"
+      aria-label={indeterminate ? label : `${label} ${pct}%`}
       className={`tool-progress-wrap fade-in ${className}`.trim()}
       style={{ marginTop: '0.85rem', ...wrapStyle }}
     >
@@ -48,6 +51,10 @@ const ToolProgressBar = ({ active, label = 'Processing...', value, count = 1, cl
         <div
           className={`progress-fill${indeterminate ? ' animated' : ''}`}
           style={{ width: indeterminate ? '100%' : `${pct}%` }}
+          role="progressbar"
+          aria-valuenow={indeterminate ? undefined : pct}
+          aria-valuemin={0}
+          aria-valuemax={100}
         />
       </div>
     </div>

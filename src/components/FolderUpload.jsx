@@ -22,7 +22,13 @@ const FolderUpload = ({ onFiles }) => {
 
   return (
     <div className="folder-upload-row">
-      <button className="btn btn-outline btn-sm" onClick={() => inputRef.current.click()}>
+      <button
+        type="button"
+        className="btn btn-outline btn-sm"
+        aria-label="Select folder to upload images"
+        style={{ minHeight: '44px' }}
+        onClick={() => inputRef.current.click()}
+      >
         📂 Select Folder
       </button>
       {folderName && (

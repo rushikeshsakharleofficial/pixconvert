@@ -1,5 +1,4 @@
 import { Component } from 'react';
-import { motion } from 'framer-motion';
 
 class ErrorBoundary extends Component {
   constructor(props) {
@@ -18,26 +17,36 @@ class ErrorBoundary extends Component {
   render() {
     if (this.state.hasError) {
       return (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
-          <div style={{
-            padding: '3rem 2rem',
+        <div
+          role="alert"
+          aria-live="assertive"
+          style={{
+            padding: '3rem 1.25rem',
             textAlign: 'center',
             maxWidth: '600px',
+            width: '100%',
             margin: '4rem auto',
-          }}>
-            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⚠️</div>
-            <h2 style={{ marginBottom: '1rem', color: 'var(--text)' }}>Something went wrong</h2>
-            <p style={{ color: 'var(--text2)', marginBottom: '1.5rem' }}>
-              An unexpected error occurred. This might be caused by a corrupted or unsupported file.
-            </p>
-            <button
-              className="btn btn-primary"
-              onClick={() => this.setState({ hasError: false, error: null })}
-            >
-              Try Again
-            </button>
-          </div>
-        </motion.div>
+            boxSizing: 'border-box',
+            overflow: 'hidden',
+          }}
+        >
+          <div style={{ fontSize: '3rem', marginBottom: '1rem' }} aria-hidden="true">⚠️</div>
+          <h2 style={{ marginBottom: '1rem', color: 'var(--text)', fontSize: 'clamp(1.1rem, 5vw, 1.5rem)' }}>
+            Something went wrong
+          </h2>
+          <p style={{ color: 'var(--text2)', marginBottom: '1.5rem', lineHeight: 1.6 }}>
+            An unexpected error occurred. This might be caused by a corrupted or unsupported file.
+          </p>
+          <button
+            type="button"
+            className="btn btn-primary"
+            aria-label="Try again — dismiss this error and retry"
+            style={{ minHeight: '44px', minWidth: '44px' }}
+            onClick={() => this.setState({ hasError: false, error: null })}
+          >
+            Try Again
+          </button>
+        </div>
       );
     }
 
