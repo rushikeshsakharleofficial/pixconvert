@@ -100,11 +100,25 @@ const PdfInteractivePreview = ({
 
   const busy = isBusy || internalBusy;
 
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      if (onPointSelect && previewUrl) {
+        // Trigger selection at center on keyboard activation
+        onPointSelect({ x: 0.5, y: 0.5 });
+      }
+    }
+  };
+
   return (
     <div
+      role={onPointSelect ? 'button' : undefined}
+      tabIndex={onPointSelect ? 0 : undefined}
+      aria-label={onPointSelect ? `Select page ${page}` : undefined}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
+      onKeyDown={onPointSelect ? handleKeyDown : undefined}
       style={{
         position: 'relative',
         border: '1px solid var(--border)',
@@ -121,10 +135,11 @@ const PdfInteractivePreview = ({
     >
       {previewUrl ? (
         <>
-          <img 
-            src={previewUrl} 
-            alt={`Preview of page ${page}`} 
-            style={{ width: '100%', display: 'block', pointerEvents: 'none' }} 
+          <img
+            src={previewUrl}
+            alt={`Page ${page}`}
+            aria-label={`Page ${page}`}
+            style={{ width: '100%', display: 'block', pointerEvents: 'none' }}
           />
           {children}
         </>
