@@ -77,7 +77,7 @@ const Footer = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-8 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-slate-400 font-medium">
+        <div className="pt-8 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-slate-600 font-medium">
           <p className="min-h-[44px] flex items-center">© {currentYear} PixConvert. Created with ❤️ for privacy.</p>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 min-h-[44px]">
