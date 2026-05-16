@@ -28,7 +28,11 @@ const DropZone = ({ onFiles, multiple = true, accept = 'image/*', maxFiles = 999
   return (
     <div
       className={`drop-zone${dragOver ? ' drag-over' : ''}`}
+      role="button"
+      tabIndex={0}
+      aria-label="Drop files here or click to browse"
       onClick={() => inputRef.current?.click()}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); inputRef.current?.click(); } }}
       onDragOver={(e) => {
         e.preventDefault();
         setDragOver(true);

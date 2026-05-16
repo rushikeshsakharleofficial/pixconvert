@@ -970,6 +970,7 @@ section { padding: 5rem 2rem 4rem; }
     var(--bg2);
   box-shadow: 0 22px 45px rgba(0,0,0,0.22);
   cursor: pointer;
+  touch-action: auto;
   transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
 }
 .drop-zone:hover, .drop-zone.drag-over {
@@ -1605,6 +1606,15 @@ section { padding: 5rem 2rem 4rem; }
 [data-theme="light"] .drop-zone-meta {
   background: rgba(255,255,255,0.8);
   border-color: rgba(15, 23, 42, 0.08);
+}
+[data-theme="light"] .drop-zone-orb {
+  background: rgba(234, 179, 8, 0.22);
+}
+[data-theme="light"] .drop-zone-orb-top {
+  background: rgba(234, 179, 8, 0.28);
+}
+[data-theme="light"] .drop-zone-orb-bottom {
+  background: rgba(234, 179, 8, 0.20);
 }
 
 [data-theme="light"] .live-preview-panel  { background: var(--bg2); }
