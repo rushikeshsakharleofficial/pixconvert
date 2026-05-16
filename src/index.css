@@ -710,6 +710,7 @@ section { padding: 5rem 2rem 4rem; }
 @media (hover: none) and (pointer: coarse) {
   .btn-sm { min-height: 44px; }
   .theme-toggle { min-width: 44px; min-height: 44px; }
+  .hamburger { min-width: 44px; min-height: 44px; }
   .pdf-editor-toolbar button { min-height: 44px; min-width: 44px; }
   .color-swatch { min-height: 44px; min-width: 44px; }
 }

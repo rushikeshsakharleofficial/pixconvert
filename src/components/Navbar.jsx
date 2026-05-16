@@ -253,6 +253,7 @@ const Navbar = () => {
 
         <div className="nav-actions">
           <button
+            type="button"
             className="theme-toggle"
             onClick={toggleTheme}
             aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
@@ -266,6 +267,7 @@ const Navbar = () => {
             aria-label={menuOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={menuOpen}
             aria-controls="mobile-nav"
+            type="button"
           >
             <span /><span /><span />
           </button>
