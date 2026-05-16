@@ -24,7 +24,7 @@ const Footer = () => {
         <div className="flex flex-col lg:flex-row justify-between gap-12 relative z-10">
           {/* Brand & Mission */}
           <div className="flex flex-col items-start gap-4 max-w-sm">
-            <Link to="/" className="flex items-center gap-2 text-2xl font-display font-black text-slate-900 group">
+            <Link to="/" aria-label="PixConvert home" className="flex items-center gap-2 text-2xl font-display font-black text-slate-900 group min-h-[44px]">
               <svg viewBox="0 0 28 28" fill="none" style={{ width: 28, height: 28, flexShrink: 0 }}>
                 <rect x="2" y="2" width="24" height="24" rx="6" stroke="#FF4F00" strokeWidth="2.5"/>
                 <path d="M8 20l4-6 3 4 2-3 3 5" stroke="#FF4F00" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -40,51 +40,51 @@ const Footer = () => {
           {/* Links Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-8 lg:gap-16 flex-1">
             {/* PDF Tools */}
-            <div className="flex flex-col gap-4">
-              <h4 className="uppercase font-display text-xs tracking-widest text-primary font-bold">PDF Tools</h4>
-              <nav className="flex flex-col gap-2.5">
-                <Link className="text-slate-500 hover:text-primary transition-colors text-sm font-semibold" to="/tools/pdf">Unlock PDF</Link>
-                <Link className="text-slate-500 hover:text-primary transition-colors text-sm font-semibold" to="/tools/pdf-lock">Protect PDF</Link>
-                <Link className="text-slate-500 hover:text-primary transition-colors text-sm font-semibold" to="/tools/pdf-to-jpg">PDF to JPG</Link>
-                <Link className="text-slate-500 hover:text-primary transition-colors text-sm font-semibold" to="/tools/pdf-to-word">PDF to Word</Link>
-                <Link className="text-slate-500 hover:text-primary transition-colors text-sm font-semibold" to="/tools/merge-pdf">Merge PDF</Link>
+            <div className="flex flex-col gap-2">
+              <h4 className="uppercase font-display text-xs tracking-widest text-primary font-bold min-h-[44px] flex items-center">PDF Tools</h4>
+              <nav className="flex flex-col">
+                <Link className="text-slate-500 hover:text-primary transition-colors text-sm font-semibold min-h-[44px] flex items-center" to="/tools/pdf">Unlock PDF</Link>
+                <Link className="text-slate-500 hover:text-primary transition-colors text-sm font-semibold min-h-[44px] flex items-center" to="/tools/pdf-lock">Protect PDF</Link>
+                <Link className="text-slate-500 hover:text-primary transition-colors text-sm font-semibold min-h-[44px] flex items-center" to="/tools/pdf-to-jpg">PDF to JPG</Link>
+                <Link className="text-slate-500 hover:text-primary transition-colors text-sm font-semibold min-h-[44px] flex items-center" to="/tools/pdf-to-word">PDF to Word</Link>
+                <Link className="text-slate-500 hover:text-primary transition-colors text-sm font-semibold min-h-[44px] flex items-center" to="/tools/merge-pdf">Merge PDF</Link>
               </nav>
             </div>
 
             {/* Image Tools */}
-            <div className="flex flex-col gap-4">
-              <h4 className="uppercase font-display text-xs tracking-widest text-primary font-bold">Image Tools</h4>
-              <nav className="flex flex-col gap-2.5">
-                <Link className="text-slate-500 hover:text-primary transition-colors text-sm font-semibold" to="/tools/converter">Universal Converter</Link>
-                <Link className="text-slate-500 hover:text-primary transition-colors text-sm font-semibold" to="/tools/gif">GIF Maker</Link>
-                <Link className="text-slate-500 hover:text-primary transition-colors text-sm font-semibold" to="/tools/jpg-to-png">JPG to PNG</Link>
-                <Link className="text-slate-500 hover:text-primary transition-colors text-sm font-semibold" to="/tools/heic-to-jpg">HEIC to JPG</Link>
-                <Link className="text-slate-500 hover:text-primary transition-colors text-sm font-semibold" to="/tools/photo-to-markdown">OCR Tool</Link>
+            <div className="flex flex-col gap-2">
+              <h4 className="uppercase font-display text-xs tracking-widest text-primary font-bold min-h-[44px] flex items-center">Image Tools</h4>
+              <nav className="flex flex-col">
+                <Link className="text-slate-500 hover:text-primary transition-colors text-sm font-semibold min-h-[44px] flex items-center" to="/tools/converter">Universal Converter</Link>
+                <Link className="text-slate-500 hover:text-primary transition-colors text-sm font-semibold min-h-[44px] flex items-center" to="/tools/gif">GIF Maker</Link>
+                <Link className="text-slate-500 hover:text-primary transition-colors text-sm font-semibold min-h-[44px] flex items-center" to="/tools/jpg-to-png">JPG to PNG</Link>
+                <Link className="text-slate-500 hover:text-primary transition-colors text-sm font-semibold min-h-[44px] flex items-center" to="/tools/heic-to-jpg">HEIC to JPG</Link>
+                <Link className="text-slate-500 hover:text-primary transition-colors text-sm font-semibold min-h-[44px] flex items-center" to="/tools/photo-to-markdown">OCR Tool</Link>
               </nav>
             </div>
 
             {/* Support */}
-            <div className="flex flex-col gap-4">
-              <h4 className="uppercase font-display text-xs tracking-widest text-primary font-bold">Company</h4>
-              <nav className="flex flex-col gap-2.5">
-                <Link className="text-slate-500 hover:text-primary transition-colors text-sm font-semibold" to="/about">About Us</Link>
-                <Link className="text-slate-500 hover:text-primary transition-colors text-sm font-semibold" to="/privacy">Privacy Policy</Link>
-                <Link className="text-slate-500 hover:text-primary transition-colors text-sm font-semibold" to="/contact">Contact</Link>
-                <Link className="text-slate-500 hover:text-primary transition-colors text-sm font-semibold" to="/tools">All Tools</Link>
+            <div className="flex flex-col gap-2">
+              <h4 className="uppercase font-display text-xs tracking-widest text-primary font-bold min-h-[44px] flex items-center">Company</h4>
+              <nav className="flex flex-col">
+                <Link className="text-slate-500 hover:text-primary transition-colors text-sm font-semibold min-h-[44px] flex items-center" to="/about">About Us</Link>
+                <Link className="text-slate-500 hover:text-primary transition-colors text-sm font-semibold min-h-[44px] flex items-center" to="/privacy">Privacy Policy</Link>
+                <Link className="text-slate-500 hover:text-primary transition-colors text-sm font-semibold min-h-[44px] flex items-center" to="/contact">Contact</Link>
+                <Link className="text-slate-500 hover:text-primary transition-colors text-sm font-semibold min-h-[44px] flex items-center" to="/tools">All Tools</Link>
               </nav>
             </div>
           </div>
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-8 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6 text-sm text-slate-400 font-medium">
-          <p>© {currentYear} PixConvert. Created with ❤️ for privacy.</p>
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-2">
+        <div className="pt-8 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-slate-400 font-medium">
+          <p className="min-h-[44px] flex items-center">© {currentYear} PixConvert. Created with ❤️ for privacy.</p>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 min-h-[44px]">
               <span className="size-2 rounded-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.4)]" />
               100% Client-Side Processing
             </div>
-            <Link to="/privacy" className="hover:text-primary transition-colors">Terms of Service</Link>
+            <Link to="/privacy" className="hover:text-primary transition-colors min-h-[44px] flex items-center px-2">Terms of Service</Link>
           </div>
         </div>
       </div>
