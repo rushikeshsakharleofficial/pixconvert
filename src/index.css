@@ -169,6 +169,7 @@ body::before {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   line-height: 1;
+  min-height: 44px;
 }
 .nav-logo .logo-mark {
   color: var(--primary);
@@ -364,6 +365,7 @@ body::before {
 .mobile-popular-pill {
   display: inline-flex; align-items: center; gap: 0.3rem;
   padding: 0.35rem 0.7rem; border-radius: var(--pill);
+  min-height: 44px;
   background: rgba(255,255,255,0.05); border: 1px solid var(--border);
   color: var(--text2); text-decoration: none;
   font-size: 0.8rem; font-weight: 500; white-space: nowrap;
@@ -416,7 +418,8 @@ body::before {
 }
 .mobile-tools-cat a:active { color: var(--primary); }
 .mobile-browse-all {
-  display: block; margin-top: 1rem; padding: 0.6rem 0;
+  display: flex; align-items: center; margin-top: 1rem; padding: 0.6rem 0;
+  min-height: 44px;
   color: var(--primary); font-size: 0.875rem; font-weight: 600;
   text-decoration: none; border-top: 1px solid var(--border);
 }
@@ -516,7 +519,7 @@ section { padding: 5rem 2rem 4rem; }
 }
 .hero-ed-desc {
   color: var(--text2); font-size: 1.05rem;
-  line-height: 1.75; max-width: 44ch;
+  line-height: 1.6; max-width: 44ch;
   margin: 1.5rem 0 2rem;
 }
 .hero-cta--left { justify-content: flex-start; }
@@ -865,7 +868,7 @@ section { padding: 5rem 2rem 4rem; }
   letter-spacing: -0.04em; line-height: 1;
 }
 .hero-stat .lbl {
-  font-size: 0.72rem; color: var(--text3); margin-top: 0.3rem;
+  font-size: 0.75rem; color: var(--text3); margin-top: 0.3rem;
   font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;
 }
 
@@ -905,6 +908,9 @@ section { padding: 5rem 2rem 4rem; }
 }
 .btn-outline:hover  { background: var(--cartoon-btn-outline-hover); transform: translateY(-4px); }
 .btn-outline:active { transform: translateY(0); }
+.btn-outline:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+[data-theme="light"] .btn-outline { background: var(--bg3); border-color: var(--border-active); }
+[data-theme="light"] .btn-outline:hover { background: var(--bg2); }
 .btn-sm  { padding: 0.45rem 1rem; font-size: 0.8rem; }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; box-shadow: none; }
 
@@ -931,7 +937,7 @@ section { padding: 5rem 2rem 4rem; }
   border-radius: var(--pill);
   background: var(--bg2);
   color: var(--text2);
-  font-size: 0.74rem; font-weight: 500;
+  font-size: 0.75rem; font-weight: 500;
   letter-spacing: 0.01em;
   transition: border-color 0.2s, color 0.2s, background 0.2s, transform 0.18s, box-shadow 0.2s;
   cursor: default;
@@ -954,6 +960,7 @@ section { padding: 5rem 2rem 4rem; }
 .how-it-works h2 {
   font-family: var(--heading); font-size: 2.2rem; font-weight: 800;
   color: var(--text); margin-bottom: 0.5rem; letter-spacing: -0.02em;
+  line-height: 1.15;
 }
 .how-it-works h2::after {
   content: '';
@@ -1090,7 +1097,7 @@ section { padding: 5rem 2rem 4rem; }
 
 /* ===== Section Divider ===== */
 .section-divider {
-  width: 100%; height: 1px; margin: 4rem 0;
+  width: 100%; height: 1px; margin: 2rem 0;
   background: linear-gradient(90deg, transparent, var(--border) 20%, var(--border) 80%, transparent);
 }
 
@@ -1666,7 +1673,7 @@ section { padding: 5rem 2rem 4rem; }
   to   { transform: scale(1)   rotate(0deg);    opacity: 1; }
 }
 .theme-toggle {
-  width: 34px; height: 34px; border-radius: 8px;
+  width: 40px; height: 40px; border-radius: 8px;
   background: rgba(255,255,255,0.06);
   border: 1px solid var(--border);
   color: var(--text2); cursor: pointer;
@@ -2387,6 +2394,7 @@ section { padding: 5rem 2rem 4rem; }
   transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease;
   min-width: 140px;
   max-width: 220px;
+  min-height: 44px;
   cursor: pointer;
 }
 .tool-chip:hover {
@@ -2739,11 +2747,11 @@ section { padding: 5rem 2rem 4rem; }
 
 .pipe-detail-step {
   font-family: var(--mono);
-  font-size: 0.6rem;
+  font-size: 0.72rem;
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #FF4F00;
+  color: var(--text2);
   margin-bottom: 0.22rem;
 }
 .pipe-detail-title {

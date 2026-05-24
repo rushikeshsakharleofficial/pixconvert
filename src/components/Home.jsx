@@ -228,7 +228,7 @@ const Home = () => {
             aria-hidden="true"
           >
             <div className="hero-ed-big-stat">
-              <span className="hero-ed-big-num">37<span className="hero-ed-big-plus">+</span></span>
+              <span className="hero-ed-big-num">40<span className="hero-ed-big-plus">+</span></span>
               <span className="hero-ed-big-lbl">tools available</span>
             </div>
 
