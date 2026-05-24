@@ -16,7 +16,7 @@ const ComingSoon = () => {
         <div className="cs-icon-ring" aria-hidden="true">
           <span className="cs-icon">{currentTool?.icon || '🛠️'}</span>
         </div>
-        <h1>{toolName} — Coming Soon</h1>
+        <h2>{toolName} — Coming Soon</h2>
         <p className="cs-desc">{currentTool?.desc || 'This tool is being developed.'}</p>
         <div className="cs-badge" aria-hidden="true">✨ Coming Soon</div>
         <p className="cs-sub">Some tools are coming soon. We're crafting this tool with care.</p>

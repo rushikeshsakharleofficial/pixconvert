@@ -185,6 +185,8 @@ body::before {
 }
 .nav-links a:hover  { color: var(--text); background: rgba(255,255,255,0.05); }
 .nav-links a.active { color: var(--text); background: rgba(255,255,255,0.07); }
+[data-theme="light"] .nav-links a:hover  { background: var(--bg3); }
+[data-theme="light"] .nav-links a.active { background: var(--bg3); }
 
 .hamburger {
   display: none; flex-direction: column; gap: 5px;
@@ -2325,7 +2327,7 @@ section { padding: 5rem 2rem 4rem; }
 }
 .analytics-card-badge {
   font-size: 0.8rem; font-weight: 600; padding: 0.2rem 0.6rem;
-  background: rgba(255,255,255,0.06); border-radius: 4px; color: var(--text2);
+  background: var(--bg3); border-radius: 4px; color: var(--text2);
 }
 
 .analytics-chart-svg { width: 100%; height: auto; max-height: 260px; max-width: 100%; overflow: hidden; font-family: inherit; }
@@ -3206,4 +3208,17 @@ section { padding: 5rem 2rem 4rem; }
   .api-desc-short { display: none; }
   .api-quickstart-grid { grid-template-columns: 1fr; }
   .api-integrations-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ===== Recharts theme adaptation ===== */
+/* Override Recharts default fill="#666" axis tick text so it adapts to theme */
+.recharts-cartesian-axis-tick text,
+.recharts-cartesian-axis-tick-value {
+  fill: var(--text2) !important;
+}
+
+/* ===== Footer tape decorations in dark mode ===== */
+/* Tape SVGs use fill="#222222" — invisible on dark background; fade them out */
+[data-theme="dark"] .tape-decoration {
+  opacity: 0.18;
 }

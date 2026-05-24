@@ -14,10 +14,10 @@ const Footer = () => {
     <footer className="mt-20 mb-8 px-4 max-w-[1100px] mx-auto font-sans -rotate-1">
       <div className="relative bg-white rounded-[2.5rem] border border-slate-200 shadow-xl mx-auto px-6 md:px-12 py-12 flex flex-col gap-12 text-slate-900">
         {/* Tapes */}
-        <div className="hidden md:block absolute -top-4 -left-8 w-[80px] h-[36px] scale-75 opacity-90">
+        <div className="tape-decoration hidden md:block absolute -top-4 -left-8 w-[80px] h-[36px] scale-75 opacity-90">
           {tape}
         </div>
-        <div className="hidden md:block absolute -top-4 -right-8 rotate-90 w-[80px] h-[36px] scale-75 opacity-90">
+        <div className="tape-decoration hidden md:block absolute -top-4 -right-8 rotate-90 w-[80px] h-[36px] scale-75 opacity-90">
           {tape}
         </div>
 

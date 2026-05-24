@@ -81,7 +81,7 @@ const MergePdf = () => {
 
   return (
     <div>
-      <h1 className="visually-hidden">Merge PDF</h1>
+      <h2 className="visually-hidden">Merge PDF</h2>
       <div className="tool-info-bar">
         <p className="tool-info-desc">Combine multiple PDFs in your preferred order. Processing stays in your browser.</p>
         <div className="tool-feats">
