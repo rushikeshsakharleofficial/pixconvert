@@ -405,9 +405,4 @@ Bug reports and feature requests: open a [GitHub issue](https://github.com/rushi
 
 ## License
 
-This project is declared as MIT in its package metadata. No `LICENSE` file is currently present in the repository.
-
-<!-- Maintainer TODOs:
-  - Add a LICENSE file at the repository root with the MIT license text (year: 2026, author: Rushikesh Sakharle).
-  - Add `"license": "MIT"` to package.json.
--->
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.

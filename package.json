@@ -2,6 +2,7 @@
   "name": "pixconvert",
   "private": false,
   "version": "1.4.2",
+  "license": "MIT",
   "type": "module",
   "repository": {
     "type": "git",
