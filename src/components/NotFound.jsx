@@ -1,5 +1,4 @@
-'use client';
-
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FlowButton } from "./ui/flow-button.jsx";
@@ -101,6 +100,19 @@ const ghostVariants = {
 };
 
 const NotFound = () => {
+  useEffect(() => {
+    let robotsMeta = document.querySelector('meta[name="robots"]');
+    if (!robotsMeta) {
+      robotsMeta = document.createElement('meta');
+      robotsMeta.setAttribute('name', 'robots');
+      document.head.appendChild(robotsMeta);
+    }
+    robotsMeta.setAttribute('content', 'noindex, follow');
+    return () => {
+      if (robotsMeta) robotsMeta.setAttribute('content', 'index, follow');
+    };
+  }, []);
+
   return (
     <section><div className="container" style={{textAlign:'center'}}>
       <AnimatePresence mode="wait">

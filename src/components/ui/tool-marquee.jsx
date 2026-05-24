@@ -1,15 +1,13 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import { toolsData } from "../../data/toolsData";
 
-/* ── Single tool chip ── */
-const ToolChip = ({ tool, isDuplicate = false }) => (
-  <Link
-    to={tool.comingSoon ? '#' : tool.path}
+/* ── Single tool chip ── decorative only; entire marquee section is aria-hidden + inert */
+const ToolChip = ({ tool }) => (
+  <span
     className="tool-chip"
     style={{ '--chip-color': tool.color || 'var(--primary)' }}
-    aria-hidden={isDuplicate ? 'true' : undefined}
-    tabIndex={isDuplicate ? -1 : undefined}
+    aria-hidden="true"
+    tabIndex={-1}
     title={tool.name}
   >
     <span className="tool-chip-icon-wrap" aria-hidden="true">
@@ -17,7 +15,7 @@ const ToolChip = ({ tool, isDuplicate = false }) => (
     </span>
     <span className="tool-chip-name">{tool.name}</span>
     {tool.comingSoon && <span className="tool-chip-soon" aria-hidden="true">Soon</span>}
-  </Link>
+  </span>
 );
 
 /* ── Single marquee row ── */
@@ -36,7 +34,6 @@ function MarqueeRow({ data, reverse = false, speed = 44 }) {
           <ToolChip
             key={`${tool.path}-${i}`}
             tool={tool}
-            isDuplicate={i >= data.length}
           />
         ))}
       </div>

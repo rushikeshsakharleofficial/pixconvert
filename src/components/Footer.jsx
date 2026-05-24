@@ -41,7 +41,7 @@ const Footer = () => {
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-8 lg:gap-16 flex-1">
             {/* PDF Tools */}
             <div className="flex flex-col gap-2">
-              <h2 className="uppercase font-display text-xs tracking-widest font-bold min-h-[44px] flex items-center" style={{color:'var(--footer-section-color)'}}>PDF Tools</h2>
+              <h3 className="uppercase font-display text-xs tracking-widest font-bold min-h-[44px] flex items-center" style={{color:'var(--footer-section-color)'}}>PDF Tools</h3>
               <nav className="flex flex-col">
                 <Link className="text-slate-500 hover:text-primary transition-colors text-sm font-semibold min-h-[44px] flex items-center" to="/tools/pdf">Unlock PDF</Link>
                 <Link className="text-slate-500 hover:text-primary transition-colors text-sm font-semibold min-h-[44px] flex items-center" to="/tools/pdf-lock">Protect PDF</Link>
@@ -53,7 +53,7 @@ const Footer = () => {
 
             {/* Image Tools */}
             <div className="flex flex-col gap-2">
-              <h2 className="uppercase font-display text-xs tracking-widest font-bold min-h-[44px] flex items-center" style={{color:'var(--footer-section-color)'}}>Image Tools</h2>
+              <h3 className="uppercase font-display text-xs tracking-widest font-bold min-h-[44px] flex items-center" style={{color:'var(--footer-section-color)'}}>Image Tools</h3>
               <nav className="flex flex-col">
                 <Link className="text-slate-500 hover:text-primary transition-colors text-sm font-semibold min-h-[44px] flex items-center" to="/tools/converter">Universal Converter</Link>
                 <Link className="text-slate-500 hover:text-primary transition-colors text-sm font-semibold min-h-[44px] flex items-center" to="/tools/gif">GIF Maker</Link>
@@ -65,7 +65,7 @@ const Footer = () => {
 
             {/* Support */}
             <div className="flex flex-col gap-2">
-              <h2 className="uppercase font-display text-xs tracking-widest font-bold min-h-[44px] flex items-center" style={{color:'var(--footer-section-color)'}}>Company</h2>
+              <h3 className="uppercase font-display text-xs tracking-widest font-bold min-h-[44px] flex items-center" style={{color:'var(--footer-section-color)'}}>Company</h3>
               <nav className="flex flex-col">
                 <Link className="text-slate-500 hover:text-primary transition-colors text-sm font-semibold min-h-[44px] flex items-center" to="/about">About Us</Link>
                 <Link className="text-slate-500 hover:text-primary transition-colors text-sm font-semibold min-h-[44px] flex items-center" to="/privacy">Privacy Policy</Link>

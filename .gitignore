@@ -29,6 +29,7 @@ data/*
 !data/.gitkeep
 extract_metadata.js
 *.mjs
+!scripts/*.mjs
 vectors.db
 config.json
 nohup.out

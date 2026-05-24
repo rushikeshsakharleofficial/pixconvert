@@ -180,7 +180,7 @@ npm run server   # Express API server
 **Production build:**
 
 ```bash
-npm run build
+npm run build   # vite build + SEO prerender → dist/
 npm run server
 ```
 
@@ -264,7 +264,7 @@ Copy `.env.example` to `.env` and set values before starting.
 
 ```bash
 npm run dev              # Vite dev server (hot reload)
-npm run build            # Production frontend build → dist/
+npm run build            # Production build: vite build + SEO prerender (dist/)
 npm run server           # Express API server
 npm run preview          # Preview production build locally
 npm run lint             # ESLint
@@ -272,6 +272,13 @@ npm run autoscale:docker # Docker auto-scaler daemon
 npm run sync-memory      # Sync analytics memory store
 npm run test:security    # DDoS / rate-limit smoke test
 ```
+
+`npm run build` runs two steps in sequence:
+
+1. `vite build` — compiles the React app into `dist/`.
+2. `node scripts/prerender-seo.mjs` — writes a route-specific `index.html` into every URL path (e.g. `dist/tools/merge-pdf/index.html`) with the correct `<title>`, meta description, canonical, Open Graph, and `BreadcrumbList` JSON-LD baked into `<head>`. Vercel serves these static files on first load; React hydrates and handles subsequent navigation.
+
+SEO metadata (titles, descriptions, noindex routes) is centralized in **`src/seo/page-meta.js`** — imported by both the React app (runtime updates) and the prerender script (build-time injection).
 
 ---
 

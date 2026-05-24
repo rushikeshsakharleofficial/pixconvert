@@ -1,5 +1,4 @@
-/* Google Fonts - IBM Plex Sans body, Barlow Condensed display, IBM Plex Mono technical */
-@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,700;0,900;1,700&family=IBM+Plex+Mono:wght@400&family=IBM+Plex+Sans:wght@400;700&display=swap');
+/* Google Fonts loaded via <link> in index.html for earlier fetch (avoids @import chain delay) */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

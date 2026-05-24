@@ -18,7 +18,7 @@
   "scripts": {
     "dev": "vite",
     "server": "node server.js",
-    "build": "vite build",
+    "build": "vite build && node scripts/prerender-seo.mjs",
     "lint": "eslint .",
     "test:security": "node scripts/security-ddos-test.js",
     "preview": "vite preview",
