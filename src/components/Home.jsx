@@ -233,7 +233,13 @@ const Home = () => {
             </div>
 
             <div className="hero-ed-loader-wrap">
-              {!reducedMotion && (
+              {reducedMotion ? (
+                <div className="hero-static-grid" aria-hidden="true">
+                  {['PDF', 'JPG', 'PNG', 'SVG', 'GIF', 'WEBP', 'MP4', 'ZIP'].map(fmt => (
+                    <span key={fmt} className="hero-static-fmt">{fmt}</span>
+                  ))}
+                </div>
+              ) : (
                 <div className="hero-3d-scene hero-loader-scene">
                   <BoxLoader />
                 </div>
