@@ -382,10 +382,14 @@ body::before {
 /* Mobile accordion */
 .mobile-tools-toggle {
   width: 100%; text-align: left; background: none; border: none;
-  color: var(--text2); font-weight: 600; font-size: 1rem; padding: 0;
+  color: var(--text2); font-weight: 600; font-size: 1rem;
+  padding: 0.6rem 0.75rem; border-radius: 8px; min-height: 44px;
   cursor: pointer; font-family: var(--body);
   display: flex; justify-content: space-between; align-items: center;
+  transition: background 0.15s;
 }
+.mobile-tools-toggle:hover { background: rgba(255,255,255,0.06); }
+[data-theme="light"] .mobile-tools-toggle:hover { background: var(--bg3); }
 .mobile-tools-list {
   width: 100%;
   padding-top: 1rem;
