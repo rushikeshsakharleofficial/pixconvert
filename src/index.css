@@ -893,10 +893,16 @@ section { padding: 5rem 2rem 4rem; }
 /* ===== How It Works ===== */
 .how-it-works { margin-top: 5rem; text-align: center; }
 .how-it-works h2 {
-  font-family: var(--heading); font-size: 1.7rem; font-weight: 800;
-  color: var(--text); margin-bottom: 0.4rem; letter-spacing: -0.03em;
+  font-family: var(--heading); font-size: 2.2rem; font-weight: 800;
+  color: var(--text); margin-bottom: 0.5rem; letter-spacing: -0.02em;
 }
-.how-it-works .subtitle { color: var(--text2); font-size: 0.9rem; margin-bottom: 2.5rem; }
+.how-it-works h2::after {
+  content: '';
+  display: block; width: 2.5rem; height: 3px;
+  background: #FF4F00; border-radius: 2px;
+  margin: 0.4rem auto 0;
+}
+.how-it-works .subtitle { color: var(--text2); font-size: 0.9rem; margin-bottom: 2.5rem; margin-top: 0.75rem; }
 
 /* ── Drag Timeline ── */
 .hiw-timeline { max-width: 520px; margin: 0 auto; }
@@ -1008,15 +1014,14 @@ section { padding: 5rem 2rem 4rem; }
 /* ===== Section Titles ===== */
 .section-title {
   font-family: var(--heading);
-  font-size: clamp(1.7rem, 3.8vw, 2.65rem);
+  font-size: clamp(2rem, 4.5vw, 3.2rem);
   font-weight: 900; color: var(--text);
   text-align: center; margin-bottom: 0.6rem;
-  letter-spacing: -0.045em; line-height: 1.08;
+  letter-spacing: -0.02em; line-height: 1.05;
   text-wrap: balance;
-  max-width: 18ch;
+  max-width: 22ch;
   margin-left: auto;
   margin-right: auto;
-  text-shadow: 0 8px 30px rgba(0,0,0,0.18);
 }
 .section-subtitle {
   text-align: center; color: var(--text2);
@@ -1089,8 +1094,9 @@ section { padding: 5rem 2rem 4rem; }
 }
 .tool-card:hover .tool-card-icon { transform: scale(1.06); }
 .tool-card h3 {
-  font-family: var(--heading); font-size: 0.85rem; font-weight: 700;
-  margin-bottom: 0.28rem; color: var(--text); line-height: 1.3; position: relative;
+  font-family: var(--heading); font-size: 1rem; font-weight: 700;
+  margin-bottom: 0.3rem; color: var(--text); line-height: 1.2; position: relative;
+  letter-spacing: 0.01em;
 }
 .tool-card p {
   font-size: 0.77rem; color: var(--text3); line-height: 1.5;
@@ -1103,9 +1109,15 @@ section { padding: 5rem 2rem 4rem; }
 /* ===== Tools Directory ===== */
 .tools-category-section { margin-bottom: 2.75rem; }
 .category-heading {
-  font-size: 0.72rem; font-weight: 700; color: var(--text3);
-  margin-bottom: 0.7rem; padding-left: 0.2rem;
-  text-transform: uppercase; letter-spacing: 0.09em;
+  font-family: var(--body); font-size: 0.68rem; font-weight: 600;
+  color: var(--text2); margin-bottom: 1rem; padding-left: 0.85rem;
+  text-transform: uppercase; letter-spacing: 0.14em;
+  position: relative;
+}
+.category-heading::before {
+  content: '';
+  position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+  width: 3px; height: 13px; background: #FF4F00; border-radius: 2px;
 }
 
 /* ===== Tabs ===== */
