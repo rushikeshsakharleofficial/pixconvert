@@ -2,6 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import multer from 'multer';
 import cors from 'cors';
+import compression from 'compression';
 import fs from 'fs';
 import nodemailer from 'nodemailer';
 import path from 'path';
@@ -9,6 +10,7 @@ import crypto from 'crypto';
 import { fileURLToPath } from 'url';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
+import { fileTypeFromBuffer } from 'file-type';
 import v1Router from './src/api/v1/index.js';
 import { cleanupDownloads } from './src/api/v1/middleware/outputHandler.js';
 
@@ -157,11 +159,20 @@ cleanupOldFiles();
 setInterval(cleanupOldFiles, 60 * 60 * 1000);
 
 // --- Multer config ---
+// Allowed image extensions and their canonical MIME types (magic-byte verified below)
+const UPLOAD_ALLOWED_EXTS = new Set(['.jpg', '.jpeg', '.png', '.gif', '.webp', '.avif', '.tiff', '.bmp']);
+const UPLOAD_ALLOWED_MIMES = new Set([
+  'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/avif', 'image/tiff', 'image/bmp',
+]);
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, UPLOADS_DIR),
   filename: (req, file, cb) => {
+    // Use only the extension if it's in the allowlist; fall back to .bin to prevent
+    // dangerous extensions (.php, .html, .svg, etc.) being stored on disk.
     const ext = path.extname(file.originalname).toLowerCase();
-    cb(null, `${crypto.randomBytes(16).toString('hex')}${ext}`);
+    const safeExt = UPLOAD_ALLOWED_EXTS.has(ext) ? ext : '.bin';
+    cb(null, `${crypto.randomBytes(16).toString('hex')}${safeExt}`);
   },
 });
 
@@ -171,6 +182,8 @@ const MAX_FILES_PER_UPLOAD = parseInt(process.env.MAX_FILES_PER_UPLOAD || '50', 
 const upload = multer({
   storage,
   limits: { fileSize: MAX_FILE_SIZE },
+  // First gate: reject client-declared non-image MIME types early.
+  // Second gate: magic byte check happens after multer saves (see POST /api/upload handler).
   fileFilter: (req, file, cb) => {
     if (file.mimetype.startsWith('image/')) cb(null, true);
     else cb(new Error('Only image files are allowed'));
@@ -178,16 +191,26 @@ const upload = multer({
 });
 
 const app = express();
+
+// SECURITY: trust proxy controls which X-Forwarded-For values are used for rate limiting.
+// - In production behind nginx/Caddy/Cloudflare: set TRUST_PROXY=1 (trusts first hop).
+// - If directly exposed to the internet (no proxy): set TRUST_PROXY=0 to use real TCP IP.
+// - Leaving TRUST_PROXY=1 with no reverse proxy allows any client to forge IPs and bypass
+//   all rate limiters by rotating X-Forwarded-For headers.
 app.set('trust proxy', process.env.TRUST_PROXY ? Number(process.env.TRUST_PROXY) : 1);
 
+// Gzip/deflate/brotli compression for all responses
+app.use(compression());
+
 // CORS — restrict to allowed origins
+// Returning false (not an Error) from the callback causes cors() to send 403, not 500.
 app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (server-to-server, curl, etc.)
     if (!origin || ALLOWED_ORIGINS.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      callback(null, false);
     }
   },
 }));
@@ -280,15 +303,51 @@ const safePath = (filename) => {
 };
 
 // POST /api/upload — accept one or more images
-app.post('/api/upload', uploadLimiter, upload.array('files', MAX_FILES_PER_UPLOAD), (req, res) => {
+// Magic byte validation: read first 4100 bytes of each saved file and verify actual MIME.
+// This closes the bypass where an attacker sends Content-Type: image/jpeg for a PHP file.
+app.post('/api/upload', uploadLimiter, upload.array('files', MAX_FILES_PER_UPLOAD), async (req, res) => {
   if (!req.files?.length) return res.status(400).json({ error: 'No files uploaded' });
-  const saved = req.files.map(f => ({
-    id: f.filename,
-    name: f.originalname,
-    size: f.size,
-    expiresAt: new Date(Date.now() + MAX_AGE_MS).toISOString(),
-  }));
-  res.json({ files: saved });
+
+  const rejected = [];
+  const saved = [];
+
+  for (const f of req.files) {
+    try {
+      // Read magic bytes and detect real MIME
+      const fd = fs.openSync(f.path, 'r');
+      const buf = Buffer.alloc(4100);
+      const bytesRead = fs.readSync(fd, buf, 0, 4100, 0);
+      fs.closeSync(fd);
+      const detected = await fileTypeFromBuffer(buf.slice(0, bytesRead));
+
+      if (!detected || !UPLOAD_ALLOWED_MIMES.has(detected.mime)) {
+        // Remove the file — it's not a real image
+        try { fs.unlinkSync(f.path); } catch {}
+        rejected.push(f.originalname);
+        continue;
+      }
+    } catch (err) {
+      try { fs.unlinkSync(f.path); } catch {}
+      rejected.push(f.originalname);
+      continue;
+    }
+
+    saved.push({
+      id: f.filename,
+      name: f.originalname,
+      size: f.size,
+      expiresAt: new Date(Date.now() + MAX_AGE_MS).toISOString(),
+    });
+  }
+
+  if (!saved.length) {
+    return res.status(400).json({
+      error: 'No valid image files uploaded',
+      rejected,
+    });
+  }
+
+  res.json({ files: saved, ...(rejected.length ? { rejected } : {}) });
 });
 
 // GET /api/files — list uploaded files (restricted to admin use only)
@@ -373,9 +432,9 @@ app.post('/api/contact', contactLimiter, async (req, res) => {
 
     await transporter.sendMail({
       from: `"PixConvert Contact" <${FROM_EMAIL}>`,
-      replyTo: `"${name.replace(/[<>"]/g, '')}" <${email}>`,
+      replyTo: `"${name.replace(/[\r\n<>"]/g, '')}" <${email}>`,
       to: ADMIN_EMAIL,
-      subject: `Contact Form: ${(subject || 'Feedback').replace(/[<>]/g, '')}`,
+      subject: `Contact Form: ${(subject || 'Feedback').replace(/[\r\n<>]/g, '')}`,
       text: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
     });
 
@@ -419,7 +478,12 @@ app.get('/api/metrics/stats', (req, res) => {
 });
 
 // GET /api/metrics/stream — SSE for live updates
+const MAX_SSE_CLIENTS = parseInt(process.env.MAX_SSE_CLIENTS || '200', 10);
+
 app.get('/api/metrics/stream', (req, res) => {
+  if (sseClients.size >= MAX_SSE_CLIENTS) {
+    return res.status(503).json({ error: 'Too many SSE clients. Try again later.' });
+  }
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache',
