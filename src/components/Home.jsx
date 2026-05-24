@@ -252,10 +252,6 @@ const Home = () => {
         </motion.div>
 
         {/* ── Tool marquee ── */}
-        <div ref={marqueeRef} aria-hidden="true">
-          <ToolMarquee />
-        </div>
-
         <div className="section-divider" />
 
         {/* ── Trust strip ── */}
@@ -273,6 +269,11 @@ const Home = () => {
               {t}
             </motion.div>
           ))}
+        </div>
+
+        {/* ── Tool marquee — just above pipeline ── */}
+        <div ref={marqueeRef} aria-hidden="true">
+          <ToolMarquee />
         </div>
 
         {/* ── How It Works ── */}
