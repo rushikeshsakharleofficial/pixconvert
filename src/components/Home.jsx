@@ -262,10 +262,7 @@ const Home = () => {
           </motion.div>
         </motion.div>
 
-        {/* ── Tool marquee ── */}
-        <div className="section-divider" />
-
-        {/* ── Trust strip ── */}
+        {/* ── Trust strip — just below hero stats ── */}
         <div className="trust-strip">
           {TRUST.map((t, i) => (
             <motion.div
@@ -282,7 +279,7 @@ const Home = () => {
           ))}
         </div>
 
-        {/* ── Tool marquee — just above pipeline ── */}
+        {/* ── Tool marquee — premium showcase strip ── */}
         <div ref={marqueeRef} aria-hidden="true">
           <ToolMarquee />
         </div>
