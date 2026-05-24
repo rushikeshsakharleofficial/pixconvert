@@ -70,7 +70,7 @@ function PipelineHIW() {
     if (reducedMotion) return;
     const t = setInterval(() => {
       setActiveStep(p => (p + 1) % STEPS.length);
-    }, 2600);
+    }, 2800);
     return () => clearInterval(t);
   }, [reducedMotion]);
 
@@ -89,7 +89,9 @@ function PipelineHIW() {
               onClick={() => setActiveStep(i)}
               aria-pressed={i === activeStep}
             >
-              <span className="pipe-step-num" aria-hidden="true">{step.n}</span>
+              <span className="pipe-step-num" aria-hidden="true">
+                {i < activeStep ? '✓' : step.n}
+              </span>
               <span className="pipe-step-icon" aria-hidden="true">{step.icon}</span>
               <span className="pipe-step-title">{step.title}</span>
             </button>
@@ -116,15 +118,23 @@ function PipelineHIW() {
       <motion.div
         key={activeStep}
         className="pipe-detail"
-        initial={reducedMotion ? false : { opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.28, ease: 'easeOut' }}
+        initial={reducedMotion ? false : { opacity: 0, x: 28, scale: 0.97 }}
+        animate={{ opacity: 1, x: 0, scale: 1 }}
+        transition={reducedMotion ? {} : { type: 'spring', stiffness: 440, damping: 28 }}
       >
         <span className="pipe-detail-icon" aria-hidden="true">{STEPS[activeStep].icon}</span>
-        <div>
+        <div className="pipe-detail-body">
           <div className="pipe-detail-step">Step {activeStep + 1} of {STEPS.length}</div>
           <div className="pipe-detail-title">{STEPS[activeStep].title}</div>
           <div className="pipe-detail-desc">{STEPS[activeStep].desc}</div>
+        </div>
+        <div className="pipe-detail-dots" aria-hidden="true">
+          {STEPS.map((_, i) => (
+            <span
+              key={i}
+              className={['pipe-progress-dot', i <= activeStep ? 'pipe-progress-dot--on' : ''].filter(Boolean).join(' ')}
+            />
+          ))}
         </div>
       </motion.div>
     </div>
@@ -168,7 +178,7 @@ const Home = () => {
           {/* LEFT: content */}
           <div className="hero-ed-content">
             <motion.div className="hero-eyebrow" variants={reducedMotion ? undefined : fadeUp}>
-              <span className="hero-eyebrow-diamond" aria-hidden="true">◆</span>
+              <span className="hero-eyebrow-diamond" aria-hidden="true" />
               100% free &amp; private — no account needed
             </motion.div>
 
@@ -205,6 +215,7 @@ const Home = () => {
                     }
                   </div>
                   <div className="lbl">{s.lbl}</div>
+                  <div className="hero-stat-gauge" aria-hidden="true" />
                 </div>
               ))}
             </motion.div>
@@ -284,6 +295,11 @@ const Home = () => {
           viewport={{ once: true, margin: '-60px' }}
           transition={{ duration: 0.55, ease: [0.2, 0.8, 0.2, 1] }}
         >
+          <div className="hiw-section-label" aria-hidden="true">
+            <span className="hiw-label-dash" />
+            <span>Process</span>
+            <span className="hiw-label-dash" />
+          </div>
           <h2>How It Works</h2>
           <p className="subtitle">Three steps. No account. Completely private.</p>
           <PipelineHIW />
