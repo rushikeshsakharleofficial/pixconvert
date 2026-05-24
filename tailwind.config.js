@@ -38,9 +38,10 @@ export default {
         'secondary-new': 'var(--color-secondary-new)',
       },
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
-        heading: ['Outfit', 'sans-serif'],
-        display: ['var(--font-display)'],
+        sans: ['IBM Plex Sans', 'sans-serif'],
+        heading: ['Barlow Condensed', 'sans-serif'],
+        display: ['Barlow Condensed', 'sans-serif'],
+        mono: ['IBM Plex Mono', 'monospace'],
         signika: ['Signika', 'sans-serif'],
       },
       borderRadius: {

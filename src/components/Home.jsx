@@ -140,42 +140,75 @@ const Home = () => {
     if (marqueeRef.current) marqueeRef.current.setAttribute('inert', '');
   }, []);
   return (
-  <section className="hero" style={{ position: 'relative', overflow: 'hidden' }}>
-    <div className="hero-orb hero-orb-1" aria-hidden="true" />
-    {!reducedMotion && <div className="hero-orb hero-orb-2" aria-hidden="true" />}
-    {!reducedMotion && <div className="hero-orb hero-orb-3" aria-hidden="true" />}
+  <section className="hero hero--editorial">
+    <div className="container">
+      <div className="hero-ed-grid fade-in">
 
-    <div className="container fade-in">
-      <div className="hero-3d-scene hero-loader-scene" aria-hidden="true">
-        <BoxLoader />
-      </div>
-
-      <div className="hero-eyebrow"><span aria-hidden="true">✦ </span>100% free &amp; private - no account needed</div>
-
-      <h1>
-        Every tool you need for
-        <br />
-        <span className="accent">PDFs &amp; Images</span>
-      </h1>
-
-      <p className="hero-desc">
-        Convert, compress, merge, protect and unlock files right in your browser.
-        Nothing is uploaded to any server - ever.
-      </p>
-
-      <div className="hero-cta">
-        <Link to="/tools" className="btn btn-primary">Explore All Tools <span aria-hidden="true">→</span></Link>
-        <Link to="/about" className="btn btn-outline">How it works</Link>
-      </div>
-
-      <div className="hero-stats fade-in delay-2">
-        {STATS.map((s, i) => (
-          <div className="hero-stat" key={i}>
-            <div className="num">{s.num}</div>
-            <div className="lbl">{s.lbl}</div>
+        {/* ── Left: content ── */}
+        <div className="hero-ed-content">
+          <div className="hero-eyebrow">
+            <span className="hero-eyebrow-diamond" aria-hidden="true">◆</span>
+            100% free &amp; private — no account needed
           </div>
-        ))}
-      </div>
+
+          <h1 className="hero-ed-headline">
+            Every tool<br />
+            you need for<br />
+            <em className="hero-ed-em">PDFs &amp; Images</em>
+          </h1>
+
+          <p className="hero-ed-desc">
+            Convert, compress, merge, protect and unlock files right in your browser.
+            Nothing is uploaded to any server — ever.
+          </p>
+
+          <div className="hero-cta hero-cta--left">
+            <Link to="/tools" className="btn btn-primary">Explore All Tools <span aria-hidden="true">→</span></Link>
+            <Link to="/about" className="btn btn-outline">How it works</Link>
+          </div>
+
+          <div className="hero-stats hero-stats--left fade-in delay-2">
+            {STATS.map((s, i) => (
+              <div className="hero-stat hero-stat--left" key={i}>
+                <div className="num">{s.num}</div>
+                <div className="lbl">{s.lbl}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ── Right: visual panel ── */}
+        <div className="hero-ed-visual" aria-hidden="true">
+          <div className="hero-ed-big-stat">
+            <span className="hero-ed-big-num">37<span className="hero-ed-big-plus">+</span></span>
+            <span className="hero-ed-big-lbl">tools available</span>
+          </div>
+
+          <div className="hero-ed-loader-wrap">
+            {!reducedMotion && (
+              <div className="hero-3d-scene hero-loader-scene">
+                <BoxLoader />
+              </div>
+            )}
+          </div>
+
+          <div className="hero-ed-badges">
+            {[
+              { icon: '🔄', name: 'Converter' },
+              { icon: '📁', name: 'Merge PDF' },
+              { icon: '✂️', name: 'Split PDF' },
+              { icon: '✏️', name: 'Edit PDF' },
+              { icon: '🔓', name: 'Unlock PDF' },
+              { icon: '🖼️', name: 'PDF → JPG' },
+            ].map((t) => (
+              <span key={t.name} className="hero-ed-badge">
+                <span>{t.icon}</span> {t.name}
+              </span>
+            ))}
+          </div>
+        </div>
+
+      </div>{/* /hero-ed-grid */}
 
       <div ref={marqueeRef} aria-hidden="true">
         <ToolMarquee />
