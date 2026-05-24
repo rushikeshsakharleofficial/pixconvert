@@ -79,16 +79,22 @@ function CodeBlock({ code }) {
 
 function EndpointCard({ item }) {
   const [open, setOpen] = useState(false);
+  const panelId = `endpoint-body-${item.path.replace(/\//g, '-')}`;
   return (
     <div className={`api-endpoint-card${open ? ' open' : ''}`}>
-      <button className="api-endpoint-header" onClick={() => setOpen(!open)}>
+      <button
+        className="api-endpoint-header"
+        onClick={() => setOpen(!open)}
+        aria-expanded={open}
+        aria-controls={panelId}
+      >
         <span className="api-method">POST</span>
         <span className="api-path">/api/v1{item.path}</span>
         <span className="api-desc-short">{item.desc}</span>
-        <span className="api-toggle">{open ? '−' : '+'}</span>
+        <span className="api-toggle" aria-hidden="true">{open ? '−' : '+'}</span>
       </button>
       {open && (
-        <div className="api-endpoint-body">
+        <div id={panelId} className="api-endpoint-body">
           <div className="api-endpoint-meta">
             <span>Input: <strong>{item.input}</strong></span>
           </div>
@@ -224,7 +230,9 @@ const ApiDocs = () => {
           <h2 className="api-section-title">All Endpoints</h2>
           <div className="api-search-bar">
             <input
+              id="endpoint-search"
               type="text"
+              aria-label="Search API endpoints"
               placeholder="Search endpoints... (e.g. merge, compress, jpg)"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -240,6 +248,15 @@ const ApiDocs = () => {
               ))}
             </div>
           ))}
+
+          {/* aria-live announces search result count to screen readers */}
+          <p className="sr-only" aria-live="polite" aria-atomic="true">
+            {search.trim()
+              ? filtered.length === 0
+                ? `No endpoints match "${search}"`
+                : `${filtered.reduce((n, c) => n + c.items.length, 0)} endpoint${filtered.reduce((n, c) => n + c.items.length, 0) === 1 ? '' : 's'} found`
+              : ''}
+          </p>
 
           {filtered.length === 0 && (
             <p className="api-no-results">No endpoints match "{search}"</p>

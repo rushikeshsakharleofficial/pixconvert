@@ -1666,6 +1666,10 @@ section { padding: 5rem 2rem 4rem; }
   .tool-feat.inf { color: #1D4ED8; }
   .tool-feat.ok  { color: #15803D; }
   .footer h4 { color: #BE3600; }
+
+  /* Code block background — light theme */
+  --surface2: #f0f0f5;
+  --surface2-text: #1a1a2e;
 }
 
 [data-theme="dark"] {
@@ -1694,6 +1698,10 @@ section { padding: 5rem 2rem 4rem; }
 
   --primary-glow: rgba(255,79,0,0.15);
   --primary-glow-md: rgba(255,79,0,0.30);
+
+  /* Code block background — dark theme */
+  --surface2: #1a1a2e;
+  --surface2-text: #c9d1d9;
 
   --shadow: 0 1px 3px rgba(0,0,0,0.3);
   --shadow-md: 0 4px 16px rgba(0,0,0,0.4);
@@ -2884,6 +2892,7 @@ section { padding: 5rem 2rem 4rem; }
   border-radius: 8px;
   overflow: hidden;
   max-width: 100%;
+  /* --surface2 defined per-theme in [data-theme] blocks above */
 }
 
 .api-code-block pre {
@@ -2897,8 +2906,8 @@ section { padding: 5rem 2rem 4rem; }
 }
 
 .api-code-block code {
-  font-family: 'JetBrains Mono', 'Fira Code', monospace;
-  color: var(--text1);
+  font-family: var(--mono, 'IBM Plex Mono', 'JetBrains Mono', monospace);
+  color: var(--surface2-text, #c9d1d9);
   white-space: pre;
 }
 
