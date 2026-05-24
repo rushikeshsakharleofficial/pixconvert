@@ -1,0 +1,43 @@
+{
+  "title": "Contact Us — PixConvert",
+  "h1": [
+    "Contact Us"
+  ],
+  "canonical": null,
+  "metaDesc": "PixConvert — Free online PDF & image converter. Convert, merge, split, compress PDFs and images privately in your browser. No uploads, no sign-up.",
+  "forms": [
+    {
+      "action": "https://fileconverter-three.vercel.app/contact",
+      "method": "get",
+      "hasSubmit": true,
+      "fields": [
+        {
+          "type": "text",
+          "name": "",
+          "label": "Name",
+          "required": true
+        },
+        {
+          "type": "email",
+          "name": "",
+          "label": "Email",
+          "required": true
+        },
+        {
+          "type": "text",
+          "name": "",
+          "label": "Subject",
+          "required": true
+        },
+        {
+          "type": "textarea",
+          "name": "",
+          "label": "Message",
+          "required": true
+        }
+      ]
+    }
+  ],
+  "hashLinks": 0,
+  "hasHorizScroll": false
+}

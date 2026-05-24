@@ -8,10 +8,12 @@ import {
   CardDescription 
 } from "./card";
 
-const ToolCard = ({ tool }) => (
+const ToolCard = ({ tool, isDuplicate = false }) => (
   <Link
     to={tool.comingSoon ? '#' : tool.path}
     className="mx-4 w-64 shrink-0 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] group"
+    aria-hidden={isDuplicate ? 'true' : undefined}
+    tabIndex={isDuplicate ? -1 : undefined}
   >
     <Card className="h-full border-slate-200 dark:border-border shadow-sm hover:shadow-md dark:shadow-black/40 transition-all duration-300 bg-card">
       <CardHeader className="p-4 flex flex-col gap-3">
@@ -60,7 +62,7 @@ function MarqueeRow({
         }}
       >
         {doubled.map((tool, i) => (
-          <ToolCard key={`${tool.path}-${i}`} tool={tool} />
+          <ToolCard key={`${tool.path}-${i}`} tool={tool} isDuplicate={i >= data.length} />
         ))}
       </div>
     </div>

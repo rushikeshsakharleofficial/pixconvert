@@ -49,7 +49,7 @@ const Contact = () => {
             <h2 style={{ fontFamily: 'var(--heading)', color: 'var(--white)', marginBottom: '1.25rem' }}>
               Send a Message
             </h2>
-            <form className="contact-form" onSubmit={handleSubmit}>
+            <form className="contact-form" method="post" onSubmit={handleSubmit}>
               {[
                 { id: 'name',    label: 'Name',    type: 'text',  placeholder: 'Your name' },
                 { id: 'email',   label: 'Email',   type: 'email', placeholder: 'you@example.com' },

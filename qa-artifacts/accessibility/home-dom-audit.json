@@ -1,0 +1,528 @@
+{
+  "title": "PixConvert — Free Online PDF & Image Converter",
+  "metaDesc": "PixConvert — Free online PDF & image converter. Convert, merge, split, compress PDFs and images privately in your browser. No uploads, no sign-up.",
+  "canonical": null,
+  "ogTitle": "PixConvert — Free Online PDF & Image Converter",
+  "ogDesc": "Convert PDFs and images privately in your browser. 100% free, no sign-up required.",
+  "ogImage": null,
+  "robotsMeta": null,
+  "h1Count": 1,
+  "h1Text": [
+    "Every tool you need forPDFs & Images"
+  ],
+  "favicon": "https://fileconverter-three.vercel.app/favicon.svg",
+  "duplicateIds": [],
+  "hashLinks": 0,
+  "unsafeBlank": [],
+  "unsandboxedIframes": [],
+  "duplicateToolCards": [
+    [
+      "/tools/converter",
+      7
+    ],
+    [
+      "/tools/merge-pdf",
+      7
+    ],
+    [
+      "/tools/split-pdf",
+      6
+    ],
+    [
+      "/tools/pdf",
+      7
+    ],
+    [
+      "/tools/pdf-to-jpg",
+      7
+    ],
+    [
+      "/tools/gif",
+      7
+    ],
+    [
+      "/tools/edit-pdf",
+      6
+    ],
+    [
+      "/tools/jpg-to-png",
+      5
+    ],
+    [
+      "/tools/png-to-jpg",
+      4
+    ],
+    [
+      "/tools/webp-to-jpg",
+      4
+    ],
+    [
+      "/tools/heic-to-jpg",
+      5
+    ],
+    [
+      "/tools/bmp-to-png",
+      4
+    ],
+    [
+      "/tools/photo-to-markdown",
+      5
+    ],
+    [
+      "/tools/remove-pages",
+      4
+    ],
+    [
+      "/tools/extract-pages",
+      4
+    ],
+    [
+      "/tools/organize-pdf",
+      4
+    ],
+    [
+      "/tools/scan-to-pdf",
+      4
+    ],
+    [
+      "/tools/compress-pdf",
+      4
+    ],
+    [
+      "/tools/repair-pdf",
+      4
+    ],
+    [
+      "/tools/ocr-pdf",
+      4
+    ],
+    [
+      "/tools/jpg-to-pdf",
+      4
+    ],
+    [
+      "/tools/word-to-pdf",
+      4
+    ],
+    [
+      "/tools/powerpoint-to-pdf",
+      4
+    ],
+    [
+      "/tools/excel-to-pdf",
+      4
+    ],
+    [
+      "/tools/html-to-pdf",
+      4
+    ],
+    [
+      "/tools/pdf-to-word",
+      5
+    ],
+    [
+      "/tools/pdf-to-powerpoint",
+      4
+    ],
+    [
+      "/tools/pdf-to-excel",
+      4
+    ],
+    [
+      "/tools/pdf-to-pdf-a",
+      4
+    ],
+    [
+      "/tools/rotate-pdf",
+      4
+    ],
+    [
+      "/tools/add-page-numbers",
+      4
+    ],
+    [
+      "/tools/add-watermark",
+      4
+    ],
+    [
+      "/tools/crop-pdf",
+      4
+    ],
+    [
+      "/tools/pdf-lock",
+      5
+    ],
+    [
+      "/tools/sign-pdf",
+      4
+    ],
+    [
+      "/tools/redact-pdf",
+      4
+    ],
+    [
+      "/tools/compare-pdf",
+      4
+    ]
+  ],
+  "totalToolLinks": 172,
+  "uniqueToolLinks": 37,
+  "imagesNoAlt": [],
+  "unnamedButtons": 0,
+  "unlabeledInputs": [],
+  "localStorage": [],
+  "sessionStorage": [],
+  "headings": [
+    {
+      "level": 4,
+      "text": "Media Tools"
+    },
+    {
+      "level": 4,
+      "text": "Image Conversion"
+    },
+    {
+      "level": 4,
+      "text": "Organize PDF"
+    },
+    {
+      "level": 4,
+      "text": "Optimize PDF"
+    },
+    {
+      "level": 4,
+      "text": "Convert to PDF"
+    },
+    {
+      "level": 4,
+      "text": "Convert from PDF"
+    },
+    {
+      "level": 4,
+      "text": "Edit PDF"
+    },
+    {
+      "level": 4,
+      "text": "PDF Security"
+    },
+    {
+      "level": 1,
+      "text": "Every tool you need forPDFs & Images"
+    },
+    {
+      "level": 3,
+      "text": "Universal Converter"
+    },
+    {
+      "level": 3,
+      "text": "GIF Maker"
+    },
+    {
+      "level": 3,
+      "text": "JPG to PNG"
+    },
+    {
+      "level": 3,
+      "text": "PNG to JPG"
+    },
+    {
+      "level": 3,
+      "text": "WebP to JPG"
+    },
+    {
+      "level": 3,
+      "text": "HEIC to JPG"
+    },
+    {
+      "level": 3,
+      "text": "BMP to PNG"
+    },
+    {
+      "level": 3,
+      "text": "Photo to Markdown"
+    },
+    {
+      "level": 3,
+      "text": "Merge PDF"
+    },
+    {
+      "level": 3,
+      "text": "Split PDF"
+    },
+    {
+      "level": 3,
+      "text": "Remove Pages"
+    },
+    {
+      "level": 3,
+      "text": "Extract Pages"
+    },
+    {
+      "level": 3,
+      "text": "Organize PDF"
+    },
+    {
+      "level": 3,
+      "text": "Scan to PDF"
+    },
+    {
+      "level": 3,
+      "text": "Compress PDF"
+    },
+    {
+      "level": 3,
+      "text": "Repair PDF"
+    },
+    {
+      "level": 3,
+      "text": "OCR PDF"
+    },
+    {
+      "level": 3,
+      "text": "JPG to PDF"
+    },
+    {
+      "level": 3,
+      "text": "WORD to PDF"
+    },
+    {
+      "level": 3,
+      "text": "Universal Converter"
+    },
+    {
+      "level": 3,
+      "text": "GIF Maker"
+    },
+    {
+      "level": 3,
+      "text": "JPG to PNG"
+    },
+    {
+      "level": 3,
+      "text": "PNG to JPG"
+    },
+    {
+      "level": 3,
+      "text": "WebP to JPG"
+    },
+    {
+      "level": 3,
+      "text": "HEIC to JPG"
+    },
+    {
+      "level": 3,
+      "text": "BMP to PNG"
+    },
+    {
+      "level": 3,
+      "text": "Photo to Markdown"
+    },
+    {
+      "level": 3,
+      "text": "Merge PDF"
+    },
+    {
+      "level": 3,
+      "text": "Split PDF"
+    },
+    {
+      "level": 3,
+      "text": "Remove Pages"
+    },
+    {
+      "level": 3,
+      "text": "Extract Pages"
+    },
+    {
+      "level": 3,
+      "text": "Organize PDF"
+    },
+    {
+      "level": 3,
+      "text": "Scan to PDF"
+    },
+    {
+      "level": 3,
+      "text": "Compress PDF"
+    },
+    {
+      "level": 3,
+      "text": "Repair PDF"
+    },
+    {
+      "level": 3,
+      "text": "OCR PDF"
+    },
+    {
+      "level": 3,
+      "text": "JPG to PDF"
+    },
+    {
+      "level": 3,
+      "text": "WORD to PDF"
+    },
+    {
+      "level": 3,
+      "text": "POWERPOINT to PDF"
+    },
+    {
+      "level": 3,
+      "text": "EXCEL to PDF"
+    },
+    {
+      "level": 3,
+      "text": "HTML to PDF"
+    },
+    {
+      "level": 3,
+      "text": "PDF to JPG"
+    },
+    {
+      "level": 3,
+      "text": "PDF to WORD"
+    },
+    {
+      "level": 3,
+      "text": "PDF to POWERPOINT"
+    },
+    {
+      "level": 3,
+      "text": "PDF to EXCEL"
+    },
+    {
+      "level": 3,
+      "text": "PDF to PDF/A"
+    },
+    {
+      "level": 3,
+      "text": "Rotate PDF"
+    },
+    {
+      "level": 3,
+      "text": "Add Page Numbers"
+    },
+    {
+      "level": 3,
+      "text": "Add Watermark"
+    },
+    {
+      "level": 3,
+      "text": "Crop PDF"
+    },
+    {
+      "level": 3,
+      "text": "Edit PDF"
+    },
+    {
+      "level": 3,
+      "text": "Unlock PDF"
+    },
+    {
+      "level": 3,
+      "text": "Protect PDF"
+    },
+    {
+      "level": 3,
+      "text": "Sign PDF"
+    },
+    {
+      "level": 3,
+      "text": "Redact PDF"
+    },
+    {
+      "level": 3,
+      "text": "Compare PDF"
+    },
+    {
+      "level": 3,
+      "text": "POWERPOINT to PDF"
+    },
+    {
+      "level": 3,
+      "text": "EXCEL to PDF"
+    },
+    {
+      "level": 3,
+      "text": "HTML to PDF"
+    },
+    {
+      "level": 3,
+      "text": "PDF to JPG"
+    },
+    {
+      "level": 3,
+      "text": "PDF to WORD"
+    },
+    {
+      "level": 3,
+      "text": "PDF to POWERPOINT"
+    },
+    {
+      "level": 3,
+      "text": "PDF to EXCEL"
+    },
+    {
+      "level": 3,
+      "text": "PDF to PDF/A"
+    },
+    {
+      "level": 3,
+      "text": "Rotate PDF"
+    },
+    {
+      "level": 3,
+      "text": "Add Page Numbers"
+    },
+    {
+      "level": 3,
+      "text": "Add Watermark"
+    },
+    {
+      "level": 3,
+      "text": "Crop PDF"
+    },
+    {
+      "level": 3,
+      "text": "Edit PDF"
+    },
+    {
+      "level": 3,
+      "text": "Unlock PDF"
+    },
+    {
+      "level": 3,
+      "text": "Protect PDF"
+    },
+    {
+      "level": 3,
+      "text": "Sign PDF"
+    },
+    {
+      "level": 3,
+      "text": "Redact PDF"
+    },
+    {
+      "level": 3,
+      "text": "Compare PDF"
+    },
+    {
+      "level": 2,
+      "text": "How It Works"
+    },
+    {
+      "level": 2,
+      "text": "PDF Tools"
+    },
+    {
+      "level": 2,
+      "text": "Image Tools"
+    },
+    {
+      "level": 2,
+      "text": "Company"
+    }
+  ],
+  "bodyScrollWidth": 1434,
+  "windowWidth": 1440,
+  "hasHorizontalScroll": false
+}

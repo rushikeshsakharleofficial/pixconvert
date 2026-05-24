@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { GlowingLineChart } from './ui/glowing-line-chart.jsx';
 import { DonutChart } from './ui/donut-chart.jsx';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -147,7 +147,6 @@ const Analytics = () => {
   const [liveTotal, setLiveTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [dataSource, setDataSource] = useState('api');
-  const esRef = useRef(null);
 
   const fetchStats = useCallback(async (p) => {
     try {
@@ -187,33 +186,10 @@ const Analytics = () => {
     fetchStats(period);
   }, [period, fetchStats]);
 
-  // SSE for live updates
+  // Poll for live updates every 30 seconds (SSE not supported on static deployment)
   useEffect(() => {
-    let es;
-    try {
-      es = new EventSource('/api/metrics/stream');
-      esRef.current = es;
-
-      es.onmessage = (e) => {
-        try {
-          const data = JSON.parse(e.data);
-          if (typeof data.totalAllTime === 'number') {
-            setLiveTotal(data.totalAllTime);
-          }
-          if (data.type === 'new_event') {
-            fetchStats(period);
-          }
-        } catch (err) {
-          console.error('SSE Error:', err);
-        }
-      };
-    } catch {
-      // silent
-    }
-
-    return () => {
-      if (es) es.close();
-    };
+    const id = setInterval(() => fetchStats(period), 30_000);
+    return () => clearInterval(id);
   }, [period, fetchStats]);
 
   useEffect(() => {
@@ -253,13 +229,6 @@ const Analytics = () => {
     return config;
   }, [stats]);
 
-  // Debug: log data to console
-  useEffect(() => {
-    if (chartData.length) {
-      console.log('Analytics Chart Data:', chartData);
-      console.log('Analytics Chart Config:', chartConfig);
-    }
-  }, [chartData, chartConfig]);
 
   return (
     <section>
@@ -267,7 +236,7 @@ const Analytics = () => {
         
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '1rem', marginBottom: '2.5rem' }}>
           <div>
-            <h2 className="section-title fade-in visible">Analytics</h2>
+            <h1 className="section-title fade-in visible">Analytics</h1>
             <p className="section-subtitle fade-in visible" style={{ textAlign: 'left', margin: 0 }}>Real-time file processing metrics</p>
           </div>
           <div className="analytics-live-badge">

@@ -100,7 +100,7 @@
 html { scroll-behavior: smooth; font-size: 16px; height: 100%; overflow-x: clip; overscroll-behavior-x: none; }
 body { font-family: var(--body); background: var(--bg); color: var(--text); line-height: 1.6; overflow-x: hidden; overscroll-behavior-x: none; height: 100%; }
 #root { display: flex; flex-direction: column; min-height: 100vh; }
-.app-content { flex: 1; display: flex; flex-direction: column; }
+.app-content { flex: 1; display: flex; flex-direction: column; overflow-x: clip; }
 ::selection { background: var(--primary); color: #fff; }
 
 /* Ambient background orbs */
@@ -387,7 +387,7 @@ body::before {
   max-height: 80vh;
   opacity: 1;
 }
-.mobile-tools-cat h4 {
+.mobile-tools-cat-heading {
   font-size: 0.68rem; font-weight: 700; color: var(--text3);
   text-transform: uppercase; letter-spacing: 0.06em;
   margin-bottom: 0.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.3rem;

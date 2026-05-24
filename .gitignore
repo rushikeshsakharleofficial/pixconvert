@@ -39,3 +39,15 @@ downloads/
 # Documentation / Internal Plans
 docs/superpowers/
 .vercel
+
+# QA debug screenshots dumped at root
+audit-*.png
+audit-*.jpeg
+before*.png
+after*.png
+ocr-pdf-*.png
+photo-to-markdown-*.png
+about-before-*.png
+.playwright-mcp/
+.code-outline-graph/
+audit-screenshots/

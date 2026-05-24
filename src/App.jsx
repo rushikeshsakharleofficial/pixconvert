@@ -47,6 +47,28 @@ const ComparePdf = lazy(() => import('./components/ComparePdf'));
 const Analytics = lazy(() => import('./components/Analytics'));
 const ApiDocs = lazy(() => import('./components/ApiDocs'));
 
+const BASE_URL = 'https://fileconverter-three.vercel.app';
+
+const PAGE_META = {
+  '/': 'PixConvert — Free online PDF & image converter. Convert, merge, split, compress PDFs and images privately in your browser. No uploads, no sign-up.',
+  '/tools': 'Browse all 37 free PDF and image tools. Merge, split, compress, convert — everything runs in your browser, no files uploaded.',
+  '/about': 'Learn about PixConvert — why we built a 100% client-side, privacy-first file converter with no accounts and no uploads.',
+  '/privacy': 'PixConvert Privacy Policy — your files never leave your browser. No data collection, no tracking, no uploads to any server.',
+  '/contact': 'Have a question? Contact the PixConvert team — we respond within 24 hours. Feedback and bug reports welcome.',
+  '/api': 'PixConvert API Documentation — integrate PDF and image conversion into your apps. Full REST API reference with examples.',
+  '/analytics': 'PixConvert usage analytics — real-time metrics on which tools are used most.',
+  '/tools/converter': 'Convert images between PNG, JPEG, WebP, AVIF, BMP, TIFF, HEIC and more — free, instant, 100% in your browser.',
+  '/tools/gif': 'Create animated GIFs from images or video frames — free GIF maker running entirely in your browser.',
+  '/tools/merge-pdf': 'Merge multiple PDF files into one — free, instant, no upload required. Drag, reorder, combine.',
+  '/tools/split-pdf': 'Split a PDF into separate pages or page ranges — free, private, runs in your browser.',
+  '/tools/pdf': 'Remove PDF password protection instantly — free online PDF unlocker, no upload to any server.',
+  '/tools/pdf-lock': 'Add password protection to any PDF — free online PDF locker, 100% private.',
+  '/tools/compress-pdf': 'Compress PDF file size without losing quality — free online PDF compressor.',
+  '/tools/pdf-to-jpg': 'Convert PDF pages to high-quality JPG images — free, fast, no signup.',
+  '/tools/pdf-to-word': 'Convert PDF to editable Word document — free online PDF to DOCX converter.',
+  '/tools/jpg-to-pdf': 'Combine JPG images into a single PDF — free online JPG to PDF converter.',
+};
+
 const PAGE_TITLES = {
   '/': 'PixConvert — Free Online PDF & Image Converter',
   '/tools': 'All Tools — PixConvert',
@@ -98,10 +120,51 @@ const ScrollToTop = () => {
   const timerRef = useRef(null);
   const observedElementsRef = useRef([]);
 
-  // Effect for scroll-to-top and title changes on route change
+  // Effect for scroll-to-top, title, canonical, and meta updates on route change
   useEffect(() => {
     window.scrollTo(0, 0);
-    document.title = PAGE_TITLES[pathname] || 'PixConvert — Free Online PDF & Image Converter';
+
+    const title = PAGE_TITLES[pathname] || 'PixConvert — Free Online PDF & Image Converter';
+    document.title = title;
+
+    const desc = PAGE_META[pathname] || PAGE_META['/'];
+    const canonicalHref = `${BASE_URL}${pathname}`;
+
+    // meta description
+    const metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) metaDesc.setAttribute('content', desc);
+
+    // og:title
+    const ogTitle = document.querySelector('meta[property="og:title"]');
+    if (ogTitle) ogTitle.setAttribute('content', title);
+
+    // og:description
+    const ogDesc = document.querySelector('meta[property="og:description"]');
+    if (ogDesc) ogDesc.setAttribute('content', desc);
+
+    // og:url — create if missing
+    let ogUrl = document.querySelector('meta[property="og:url"]');
+    if (!ogUrl) {
+      ogUrl = document.createElement('meta');
+      ogUrl.setAttribute('property', 'og:url');
+      document.head.appendChild(ogUrl);
+    }
+    ogUrl.setAttribute('content', canonicalHref);
+
+    // twitter:title / twitter:description
+    const twTitle = document.querySelector('meta[name="twitter:title"]');
+    if (twTitle) twTitle.setAttribute('content', title);
+    const twDesc = document.querySelector('meta[name="twitter:description"]');
+    if (twDesc) twDesc.setAttribute('content', desc);
+
+    // canonical link — create if missing
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement('link');
+      canonical.setAttribute('rel', 'canonical');
+      document.head.appendChild(canonical);
+    }
+    canonical.setAttribute('href', canonicalHref);
   }, [pathname]);
 
   // Effect for reveal animations - runs once on mount

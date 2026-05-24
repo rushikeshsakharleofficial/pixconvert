@@ -1,0 +1,84 @@
+{
+  "title": "Universal Image Converter — PixConvert",
+  "h1": [
+    "🔄 Universal Converter"
+  ],
+  "canonical": null,
+  "metaDesc": "PixConvert — Free online PDF & image converter. Convert, merge, split, compress PDFs and images privately in your browser. No uploads, no sign-up.",
+  "hasHorizScroll": false,
+  "dropzone": true,
+  "fileInput": [
+    {
+      "accept": "image/*,.heic,.heif",
+      "multiple": true
+    },
+    {
+      "accept": "",
+      "multiple": true
+    }
+  ],
+  "buttons": [
+    {
+      "text": "Media Tools2›",
+      "disabled": false,
+      "ariaLabel": null
+    },
+    {
+      "text": "Image Conversion6›",
+      "disabled": false,
+      "ariaLabel": null
+    },
+    {
+      "text": "Organize PDF6›",
+      "disabled": false,
+      "ariaLabel": null
+    },
+    {
+      "text": "Optimize PDF3›",
+      "disabled": false,
+      "ariaLabel": null
+    },
+    {
+      "text": "Convert to PDF5›",
+      "disabled": false,
+      "ariaLabel": null
+    },
+    {
+      "text": "Convert from PDF5›",
+      "disabled": false,
+      "ariaLabel": null
+    },
+    {
+      "text": "Edit PDF5›",
+      "disabled": false,
+      "ariaLabel": null
+    },
+    {
+      "text": "PDF Security5›",
+      "disabled": false,
+      "ariaLabel": null
+    },
+    {
+      "text": "Tools ▾",
+      "disabled": false,
+      "ariaLabel": "Expand tools menu"
+    },
+    {
+      "text": "",
+      "disabled": false,
+      "ariaLabel": "Switch to light mode"
+    },
+    {
+      "text": "",
+      "disabled": false,
+      "ariaLabel": "Open menu"
+    },
+    {
+      "text": "📂 Select Folder",
+      "disabled": false,
+      "ariaLabel": "Select folder to upload images"
+    }
+  ],
+  "hashLinks": 0,
+  "imagesNoAlt": 0
+}

@@ -41,6 +41,7 @@ const FolderUpload = ({ onFiles }) => {
         type="file"
         style={{ display: 'none' }}
         webkitdirectory="true"
+        accept="image/*,.heic,.heif"
         multiple
         onChange={handleChange}
       />

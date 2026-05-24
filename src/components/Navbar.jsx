@@ -135,14 +135,16 @@ const Navbar = () => {
                       <div key={index} className={`tools-dd-cat${isOpen ? ' open' : ''}`}>
                         <button
                           className="tools-dd-cat-header"
+                          aria-label={`${category.category} (${active.length} tools)`}
+                          aria-expanded={isOpen}
                           onClick={(e) => {
                             e.stopPropagation();
                             setExpandedCat(isOpen ? null : index);
                           }}
                         >
-                          <span className="tools-dd-cat-label">{category.category}</span>
-                          <span className="tools-dd-cat-count">{active.length}</span>
-                          <span className={`tools-dd-chevron${isOpen ? ' rotated' : ''}`}>›</span>
+                          <span className="tools-dd-cat-label" aria-hidden="true">{category.category}</span>
+                          <span className="tools-dd-cat-count" aria-hidden="true">{active.length}</span>
+                          <span className={`tools-dd-chevron${isOpen ? ' rotated' : ''}`} aria-hidden="true">›</span>
                         </button>
                         <div className="tools-dd-cat-items" style={{ maxHeight: isOpen ? `${active.length * 34}px` : '0' }}>
                           {active.map((item) => (
@@ -217,7 +219,7 @@ const Navbar = () => {
                     if (!active.length) return null;
                     return (
                       <div key={category.category} className="mobile-tools-cat">
-                        <h4>{category.category}</h4>
+                        <p className="mobile-tools-cat-heading" aria-hidden="true">{category.category}</p>
                         {active.map((item) => (
                           <NavLink key={item.path} to={item.path} onClick={closeMenu}>
                             {item.icon} {item.name}
